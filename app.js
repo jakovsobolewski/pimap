@@ -12,14 +12,15 @@
   'use strict';
   const { SHELTERS, OPERATORS, MDS, VEHICLE_LABELS, DISTRICTS, WORK_TYPES, PROTOCOLS } = LKP;
   const POIS = LKP.POIS || [];
-  const LS_KEY = 'lkp-shared-v4', UI_KEY = 'lkp-ui-v4', ROUTE_KEY = 'lkp-routes-v2';
+  const LS_KEY = 'lkp-shared-v5', UI_KEY = 'lkp-ui-v5', ROUTE_KEY = 'lkp-routes-v2';
 
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const timeStr = ts => new Date(ts).toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' });
+  const LOC = () => (window.LKP_LOCALE ? window.LKP_LOCALE() : 'en-GB');
+  const timeStr = ts => new Date(ts).toLocaleTimeString(LOC(), { hour: '2-digit', minute: '2-digit', hour12: false });
   const uid = p => p + '-' + Math.random().toString(36).slice(2, 8);
   const todayISO = plusDays => new Date(Date.now() + (plusDays || 0) * 86400e3).toISOString().slice(0, 10);
-  const fmtDate = iso => { const d = new Date(iso + 'T00:00:00'); return isNaN(d) ? iso : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
+  const fmtDate = iso => { const d = new Date(iso + 'T00:00:00'); return isNaN(d) ? iso : d.toLocaleDateString(LOC(), { day: 'numeric', month: 'short' }); };
   function workStatus(w) { const t = todayISO(0); if (w.end < t) return 'finished'; if (w.start > t) return 'upcoming'; return 'active'; }
 
   const POP = { 'All of Tallinn': 461000, 'Kesklinn': 65000, 'Põhja-Tallinn': 61000, 'Kristiine': 33000, 'Lasnamäe': 118000, 'Mustamäe': 66000, 'Nõmme': 40000, 'Haabersti': 47000, 'Pirita': 20000 };
@@ -42,7 +43,13 @@
     fallen_tree: { label: 'Fallen tree', hint: 'Blocking a street or path', radius: 25, color: '#6D4C41', svg: '<path d="M3 20h18"/><path d="M4 17l10-6"/><path d="M14 11l2-5 4 4-6 1z"/><path d="M8 15l-1-3M11 13l1-3"/>' },
     branches: { label: 'Fallen branches', hint: 'Branches or debris on the ground', radius: 15, color: '#A1887F', svg: '<path d="M3 20l10-7"/><path d="M8 16.5l-1-4M12 14l3-5M13 13l5 1M17 9l2-2"/>' },
     tree: { label: 'Tree at risk', hint: 'Leaning, cracked or large tree that could fall', radius: 20, color: '#2E7D32', svg: '<path d="M12 22v-5"/><path d="M12 3l6 8h-3l4 6H5l4-6H6z"/>' },
+    flooded: { label: 'Flooded street', hint: 'Water on the street or in an underpass', radius: 40, color: '#1565C0', svg: '<path d="M2 15c2 0 2-1.5 4-1.5S8 15 10 15s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5M2 19c2 0 2-1.5 4-1.5S8 19 10 19s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><path d="M12 3v7M9 7l3 3 3-3"/>' },
+    blocked: { label: 'Blocked way', hint: 'Debris, a fallen pole or a closed passage', radius: 20, color: '#455A64', svg: '<rect x="3" y="9" width="18" height="5" rx="1"/><path d="M7 9l-3 5M13 9l-3 5M19 9l-3 5M6 14v5M18 14v5"/>' },
+    danger: { label: 'Other danger', hint: 'Loose roofing, broken glass, a downed power line', radius: 30, color: '#B71C1C', svg: '<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/>' },
   };
+  /* Which emergency report types residents can send, per protocol */
+  const EMERGENCY_TYPES = { storm: ['fallen_tree', 'branches', 'tree', 'blocked', 'danger'], flood: ['flooded', 'blocked', 'danger', 'fallen_tree'], airstrike: ['blocked', 'danger', 'flooded'], heat: ['blocked', 'danger'] };
+  const emergencyTypes = () => EMERGENCY_TYPES[(S.emergency && S.emergency.type) || 'storm'];
   /* Citizen contributions: issues and ideas for the city and for each other */
   const CONTRIB = {
     issue: { label: 'Issue', color: '#E8590C', svg: '<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
@@ -122,7 +129,7 @@
       rideDraft: { need: 'none', people: 1, note: '' },
       seatDraft: { vehicle: 'car', seats: 3, accessible: false },
       callDraft: { name: '', need: 'slow', people: 1, lat: null, lng: null },
-      workDraft: { editingId: null, name: '', type: 'roadworks', note: '', start: todayISO(0), end: todayISO(14), radius: 100, walk: true, bike: true, drive: true, lat: null, lng: null },
+      workDraft: { editingId: null, name: '', type: 'roadworks', note: '', start: todayISO(0), end: todayISO(14), walk: true, bike: true, drive: true, lat: null, lng: null, pts: [], coords: [] },
       stormDraft: { name: '', wind: 20, gust: 30, from: 225, radiusKm: 8, start: localDT(Date.now()), hours: 12, lat: null, lng: null },
       reportDraft: { type: 'fallen_tree', note: '', lat: null, lng: null },
       contribDraft: { kind: 'issue', cat: 'road', title: '', note: '', lat: null, lng: null },
@@ -167,7 +174,37 @@
     if (coords.length) out.push(coords[coords.length - 1]);
     return out;
   }
-  const crosses = (coords, zone, pad = 10) => densify(coords, 15).some(c => dist(ll(c), zone) <= zone.radius + pad);
+  /* Distance from a point to a polyline (metres, local flat projection) */
+  function segDist(p, a, b) {
+    const kx = 111320 * Math.cos(toRad(p.lat)), ky = 110540;
+    const ax = (a[1] - p.lng) * kx, ay = (a[0] - p.lat) * ky, bx = (b[1] - p.lng) * kx, by = (b[0] - p.lat) * ky;
+    const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+    const t = L2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / L2)) : 0, x = ax + t * dx, y = ay + t * dy;
+    return Math.sqrt(x * x + y * y);
+  }
+  function lineDist(p, coords) { if (coords.length < 2) return dist(p, ll(coords[0])); let m = Infinity; for (let i = 1; i < coords.length; i++) m = Math.min(m, segDist(p, coords[i - 1], coords[i])); return m; }
+  function lineLen(coords) { let s = 0; for (let i = 1; i < coords.length; i++) s += dist(ll(coords[i - 1]), ll(coords[i])); return s; }
+  function lineMid(coords) {
+    const half = lineLen(coords) / 2; let s = 0;
+    for (let i = 1; i < coords.length; i++) { const d = dist(ll(coords[i - 1]), ll(coords[i])); if (s + d >= half) { const f = d ? (half - s) / d : 0; return { lat: coords[i - 1][0] + (coords[i][0] - coords[i - 1][0]) * f, lng: coords[i - 1][1] + (coords[i][1] - coords[i - 1][1]) * f }; } s += d; }
+    return ll(coords[0]);
+  }
+  /* Construction works are street sections (polylines); older circle-shaped ones still work. */
+  function workZone(w) {
+    if (w.coords && w.coords.length > 1) { const mid = lineMid(w.coords); return { coords: w.coords, buffer: w.buffer || 12, mid, half: lineLen(w.coords) / 2, lat: mid.lat, lng: mid.lng }; }
+    return { lat: w.lat, lng: w.lng, radius: w.radius || 60 };
+  }
+  const zoneDist = (p, z) => z.coords ? lineDist(p, z.coords) : dist(p, z);
+  const zoneR = z => z.coords ? z.buffer : z.radius;
+  /* A route "uses" a street section only if it runs along it for ~30 m; crossing the street is fine. */
+  function crosses(coords, zone, pad = 10) {
+    const pts = densify(coords, 10);
+    if (!zone.coords) return pts.some(c => dist(ll(c), zone) <= zone.radius + pad);
+    const lim = (zone.buffer || 12) + pad, mid = zone.mid || lineMid(zone.coords), reach = (zone.half || lineLen(zone.coords) / 2) + lim + 30;
+    let run = 0;
+    for (const c of pts) { const p = ll(c); if (dist(p, mid) > reach) { run = 0; continue; } if (lineDist(p, zone.coords) <= lim) { if (++run >= 3) return true; } else run = 0; }
+    return false;
+  }
   const fmtDist = m => m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1) + ' km';
   const walkMin = m => Math.max(1, Math.round(m * 1.25 / SPEED[S.user.mobility]));
   const rideMin = (m, type) => Math.max(1, Math.round(m * 1.25 / (RIDE_SPEED[type] || 250)));
@@ -229,8 +266,8 @@
     const t = proto(), z = [];
     if (t === 'flood') S.hazards.filter(h => h.kind === 'flood').forEach(h => z.push(h));
     if (t === 'storm') S.hazards.filter(h => h.kind === 'unsafe').forEach(h => z.push(h));
-    if (t === 'storm' || !t) S.reports.filter(r => r.status !== 'cleared' && (t === 'storm' || (!r.example && r.type !== 'tree'))).forEach(r => { const T = REPORT_TYPES[r.type]; z.push({ id: r.id, name: T.label + (r.note ? ` (${r.note})` : ''), lat: r.lat, lng: r.lng, radius: T.radius }); });
-    if (!t) S.works.filter(w => workStatus(w) === 'active' && w.affects[modeKey]).forEach(w => z.push({ id: w.id, name: w.name, lat: w.lat, lng: w.lng, radius: w.radius, work: true }));
+    S.reports.filter(r => r.status !== 'cleared' && (t === 'storm' || !r.example) && (r.type !== 'tree' || t === 'storm')).forEach(r => { const T = REPORT_TYPES[r.type]; z.push({ id: r.id, name: T.label + (r.note ? ` (${r.note})` : ''), lat: r.lat, lng: r.lng, radius: T.radius }); });
+    if (!t) S.works.filter(w => workStatus(w) === 'active' && w.affects[modeKey]).forEach(w => z.push(Object.assign({ id: w.id, name: w.name, work: true }, workZone(w))));
     return z;
   }
   function nearestDest() { return destCandidates().map(p => ({ p, d: dist(S.user, p) })).sort((a, b) => a.d - b.d)[0].p; }
@@ -344,7 +381,7 @@
     if (gridNear(F.trees, p, tr + 2).some(t => dist(p, t) <= tr)) return 1;
     if (polyHit(F.woods, p)) return 1;
     if (gridNear(F.coast, p, cr + 10).some(c => dist(p, c) <= cr)) return 1;
-    if (S.works.some(w => workStatus(w) === 'active' && dist(p, w) <= w.radius)) return 1;
+    if (S.works.some(w => { if (workStatus(w) !== 'active') return false; const z = workZone(w); return zoneDist(p, z) <= zoneR(z); })) return 1;
     if (polyHit(F.parks, p)) return 0.7;
     return 0;
   }
@@ -377,7 +414,17 @@
     if (baseHits.length) {
       /* Detour waypoints around each crossed zone (12 bearings, two distances). If every
          one-waypoint detour still clips a zone, add a second waypoint around what remains. */
-      const mkVias = hits => { const vs = []; hits.forEach(h => [1.45, 2.2, 3.2].forEach(k => { for (let b = 0; b < 360; b += 30) { const v = offset(h, h.radius * k + 60, b); if (!hz.some(z => dist(v, z) <= z.radius + 25) && dist(v, from) > 80 && dist(v, to) > 80) vs.push(v); } })); return vs; };
+      const mkVias = hits => {
+        const vs = [];
+        hits.forEach(h => {
+          if (h.coords) {
+            const a0 = ll(h.coords[0]), b0 = ll(h.coords[h.coords.length - 1]), m = h.mid || lineMid(h.coords), brg = bearing(a0, b0);
+            [a0, m, b0].forEach(p => [h.buffer + 50, h.buffer + 140, h.buffer + 260].forEach(k => [90, 270].forEach(s => vs.push(offset(p, k, (brg + s) % 360)))));
+            [[a0, (brg + 180) % 360], [b0, brg]].forEach(([p, br]) => [50, 140].forEach(k => vs.push(offset(p, k, br))));
+          } else [1.45, 2.2, 3.2].forEach(k => { for (let b = 0; b < 360; b += 30) vs.push(offset(h, h.radius * k + 60, b)); });
+        });
+        return vs.filter(v => !hz.some(z => zoneDist(v, z) <= zoneR(z) + 25) && dist(v, from) > 80 && dist(v, to) > 80);
+      };
       const byDetour = (x, y) => (dist(from, x) + dist(x, to)) - (dist(from, y) + dist(y, to));
       const side = v => Math.sign((to.lng - from.lng) * (v.lat - from.lat) - (to.lat - from.lat) * (v.lng - from.lng));
       const balanced = (vs, n) => { const L = vs.filter(v => side(v) > 0).sort(byDetour), R = vs.filter(v => side(v) <= 0).sort(byDetour), out = []; for (let i = 0; out.length < n && (i < L.length || i < R.length); i++) { if (L[i]) out.push(L[i]); if (R[i] && out.length < n) out.push(R[i]); } return out; };
@@ -438,7 +485,7 @@
     if (clickMode === 'user') { S.user.lat = lat; S.user.lng = lng; S.unlock = null; setClickMode(null); save(); renderAll(); refreshRoute(); }
     else if (clickMode === 'listing') { U.lendDraft.lat = lat; U.lendDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'call') { U.callDraft.lat = lat; U.callDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
-    else if (clickMode === 'work') { U.workDraft.lat = lat; U.workDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
+    else if (clickMode === 'work') { U.workDraft.pts = (U.workDraft.pts || []).concat([[+lat.toFixed(6), +lng.toFixed(6)]]); snapWorkDraft(); }
     else if (clickMode === 'storm') { U.stormDraft.lat = lat; U.stormDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'contrib') { U.contribDraft.lat = lat; U.contribDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'report') { U.reportDraft.lat = lat; U.reportDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
@@ -451,7 +498,9 @@
   }
   function openPlace(kind, id) {
     U.dest = { kind, id }; U.cview = 'place';
-    const p = placeOf(kind, id); if (p) map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 16), { duration: 0.6 });
+    const p = placeOf(kind, id);
+    if (p && p.work && p.work.coords) map.fitBounds(L.latLngBounds(p.work.coords), Object.assign({ maxZoom: 17 }, fitPad()));
+    else if (p) map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 16), { duration: 0.6 });
     saveUI(); renderCitizen(); drawMap();
   }
   function hazardKindShown() {
@@ -498,14 +547,22 @@
 
     S.works.forEach(w => {
       const st = workStatus(w); if (st === 'finished') return;
-      const color = st === 'active' ? '#F28C00' : '#9AA5B1';
-      L.circle([w.lat, w.lng], { radius: w.radius, color, weight: 2, dashArray: st === 'active' ? null : '6 6', fillColor: color, fillOpacity: st === 'active' ? 0.16 : 0.07, interactive: false }).addTo(layers.works);
-      const m = L.marker([w.lat, w.lng], { icon: icon('mk-poi' + (st === 'active' ? '' : ' soon'), `<span style="--c:${color}">${svgOf(catById('works'))}</span>`, 24) });
-      if (gov) m.bindPopup(`<b>${esc(w.name)}</b><span class="muted">${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)} · ${st}</span>${esc(w.note)}<div class="pop-actions"><button class="btn btn-outline btn-sm" data-action="edit-work" data-id="${w.id}" type="button">Edit</button><button class="btn btn-grey btn-sm" data-action="extend-work" data-id="${w.id}" type="button">+7 days</button></div>`);
-      else m.on('click', () => openPlace('work', w.id));
-      m.addTo(layers.works);
+      const color = st === 'active' ? '#F28C00' : '#9AA5B1', z = workZone(w);
+      const html = `<b>${esc(w.name)}</b><span class="muted">${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)} · ${st}${z.coords ? ` · ${Math.round(lineLen(z.coords))} m of street` : ''}</span>${esc(w.note)}<div class="pop-actions"><button class="btn btn-outline btn-sm" data-action="edit-work" data-id="${w.id}" type="button">Edit</button><button class="btn btn-grey btn-sm" data-action="extend-work" data-id="${w.id}" type="button">+7 days</button></div>`;
+      const bind = l => { if (gov) l.bindPopup(html); else l.on('click', () => openPlace('work', w.id)); return l; };
+      if (z.coords) {
+        L.polyline(z.coords, { color: '#fff', weight: 14, opacity: 0.95, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(layers.works);
+        L.polyline(z.coords, { color, weight: 9, opacity: 1, lineCap: 'butt', lineJoin: 'round', interactive: false }).addTo(layers.works);
+        L.polyline(z.coords, { color: st === 'active' ? '#1F1F1F' : '#fff', weight: 9, opacity: 0.75, dashArray: '6 9', lineCap: 'butt', lineJoin: 'round', interactive: false }).addTo(layers.works);
+        bind(L.polyline(z.coords, { color: '#000', weight: 24, opacity: 0.001 })).addTo(layers.works);
+      } else L.circle([w.lat, w.lng], { radius: z.radius, color, weight: 2, dashArray: st === 'active' ? null : '6 6', fillColor: color, fillOpacity: st === 'active' ? 0.16 : 0.07, interactive: false }).addTo(layers.works);
+      bind(L.marker([z.lat, z.lng], { icon: icon('mk-poi' + (st === 'active' ? '' : ' soon'), `<span style="--c:${color}">${svgOf(catById('works'))}</span>`, 22), zIndexOffset: 250 })).addTo(layers.works);
     });
-    if (gov && U.workDraft.lat && U.govTab === 'works') L.circle([U.workDraft.lat, U.workDraft.lng], { radius: Number(U.workDraft.radius) || 100, color: '#F28C00', weight: 2, dashArray: '4 6', fillOpacity: 0.1 }).addTo(layers.works);
+    const wdr = U.workDraft;
+    if (gov && U.govTab === 'works' && wdr.pts && wdr.pts.length) {
+      if (wdr.coords && wdr.coords.length > 1) { L.polyline(wdr.coords, { color: '#fff', weight: 13, opacity: 0.9, interactive: false }).addTo(layers.works); L.polyline(wdr.coords, { color: '#F28C00', weight: 8, opacity: 0.9, dashArray: '2 10', lineCap: 'round', interactive: false }).addTo(layers.works); }
+      wdr.pts.forEach((p, i) => L.marker(p, { icon: icon('mk-wpt', String(i + 1), 20), zIndexOffset: 950, interactive: false }).addTo(layers.works));
+    }
 
     const showGeo = em && S.mandate === 'active' && (gov || (inDir && U.mode === 'bike'));
     if (showGeo) SHELTERS.forEach(s => L.circle([s.lat, s.lng], { radius: S.radius, color: '#0072CE', weight: 1, fillColor: '#0072CE', fillOpacity: 0.05, interactive: false }).addTo(layers.geofences));
@@ -603,7 +660,7 @@
     drawSmart(res);
     fit(res.route.coords.concat(...legs.map(l => l.coords)));
     const all = drawn.flat ? drawn.flat() : [].concat(...drawn);
-    const hits = S.works.filter(w => workStatus(w) === 'active' && w.affects[modeKey]).filter(w => densify(all, 15).some(c => dist(ll(c), w) <= w.radius + 25));
+    const hits = S.works.filter(w => workStatus(w) === 'active' && w.affects[modeKey]).filter(w => crosses(all, workZone(w)));
     U.conflicts = hits.map(w => w.id);
     U.routeInfo = Object.assign({ distance: res.route.distance, estimated: !!res.route.estimated }, res.info);
     saveUI(); renderCitizen(); drawMap();
@@ -729,10 +786,22 @@
     toast(S.emergency ? 'Listing is live — an alert is active' : 'Listed as dormant — invisible until an alert is declared');
   }
   function removeListing(id) { const l = S.listings.find(x => x.id === id); if (l) l.status = 'removed'; save(); renderAll(); }
+  /* Snap the drawn waypoints to the street network (walking graph covers streets and pedestrian ways) */
+  async function snapWorkDraft() {
+    const d = U.workDraft, pts = d.pts || [];
+    if (pts.length < 2) { d.coords = pts.slice(); saveUI(); renderGov(); drawMap(); return; }
+    d.snapping = true; renderGov();
+    const r = await osrm(pts.map(ll), 'foot');
+    if (U.workDraft !== d) return;
+    d.coords = r && r.coords.length > 1 ? r.coords : pts.slice(); d.snapping = false;
+    const m = lineMid(d.coords); d.lat = m.lat; d.lng = m.lng;
+    saveUI(); renderGov(); drawMap();
+  }
   function editWork(id) {
     const w = S.works.find(x => x.id === id); if (!w) return;
     U.govTab = 'works';
-    U.workDraft = { editingId: w.id, name: w.name, type: w.type, note: w.note || '', start: w.start, end: w.end, radius: w.radius, walk: !!w.affects.walk, bike: !!w.affects.bike, drive: !!w.affects.drive, lat: w.lat, lng: w.lng };
+    U.workDraft = { editingId: w.id, name: w.name, type: w.type, note: w.note || '', start: w.start, end: w.end, walk: !!w.affects.walk, bike: !!w.affects.bike, drive: !!w.affects.drive, lat: w.lat, lng: w.lng, pts: w.pts || (w.coords ? [w.coords[0], w.coords[w.coords.length - 1]] : [[w.lat, w.lng]]), coords: w.coords || [] };
+    if (w.coords) map.fitBounds(L.latLngBounds(w.coords), Object.assign({ maxZoom: 17 }, fitPad()));
     map.closePopup(); saveUI(); renderGov(); drawMap(); $('#govPanel').scrollTop = 0;
   }
   function extendWork(id, days) {
@@ -785,12 +854,13 @@
   function addWork() {
     const d = U.workDraft;
     if (!d.name.trim()) { toast('Give the construction site a name'); return; }
-    if (!d.lat) { toast('Place the site on the map first'); return; }
+    if (!d.coords || d.coords.length < 2) { toast('Draw the street section: click where the works start and where they end'); return; }
     if (!d.start || !d.end || d.end < d.start) { toast('Check the dates: the end must not be before the start'); return; }
-    const rec = { name: d.name.trim(), type: d.type, note: d.note.trim(), lat: d.lat, lng: d.lng, radius: Math.max(30, Number(d.radius) || 100), start: d.start, end: d.end, affects: { walk: !!d.walk, bike: !!d.bike, drive: !!d.drive }, updatedAt: Date.now() };
+    const mid = lineMid(d.coords);
+    const rec = { name: d.name.trim(), type: d.type, note: d.note.trim(), coords: d.coords, pts: d.pts, buffer: 12, lat: mid.lat, lng: mid.lng, start: d.start, end: d.end, affects: { walk: !!d.walk, bike: !!d.bike, drive: !!d.drive }, updatedAt: Date.now() };
     const existing = d.editingId && S.works.find(w => w.id === d.editingId);
     if (existing) Object.assign(existing, rec); else S.works.push(Object.assign({ id: uid('w'), mine: true, createdAt: Date.now() }, rec));
-    U.workDraft = freshUI().workDraft; saveUI(); save(); renderAll(); refreshRoute();
+    U.workDraft = freshUI().workDraft; setClickMode(null); saveUI(); save(); renderAll(); refreshRoute();
     toast(existing ? 'Changes published — citizens see the new location and dates' : 'Construction site published to the citizen map');
   }
   function removeWork(id) { S.works = S.works.filter(w => w.id !== id); save(); renderAll(); refreshRoute(); }
@@ -841,7 +911,7 @@
     const em = S.emergency, pill = $('#statusPill');
     if (em) { pill.className = 'pill pill-alert'; pill.textContent = `${PROTOCOLS[em.type || 'airstrike'].label} · ${em.district} · until ${timeStr(em.endsAt)}`; } else { pill.className = 'pill'; pill.textContent = 'No alert'; }
     const net = $('#netPill'); net.textContent = 'Offline · cached'; net.hidden = navigator.onLine;
-    const cb = $('#contributeBtn'); if (cb) { const n = S.contribs.filter(c => c.status === 'new').length; cb.classList.toggle('active', (U.portal === 'citizen' && U.cview === 'contribute') || (U.portal === 'gov' && U.govTab === 'contrib')); cb.querySelector('.cb-n').textContent = U.portal === 'gov' && n ? n : ''; }
+    const cb = $('#contributeBtn'); if (cb) { const n = S.contribs.filter(c => c.status === 'new').length + S.reports.filter(r => r.status === 'reported' && !r.example).length; cb.classList.toggle('active', (U.portal === 'citizen' && U.cview === 'contribute') || (U.portal === 'gov' && U.govTab === 'contrib')); cb.querySelector('.cb-n').textContent = U.portal === 'gov' && n ? n : ''; }
     document.querySelectorAll('.portal-tab').forEach(t => { const on = t.dataset.portal === U.portal; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
     $('#app').className = 'portal-' + U.portal;
     document.body.dataset.portal = U.portal;
@@ -853,7 +923,7 @@
     if (U.portal !== 'gov') { el.hidden = true; return; }
     el.hidden = false;
     const em = S.emergency, queued = S.requests.filter(r => r.status === 'queued').length, active = S.works.filter(w => workStatus(w) === 'active').length;
-    const newC = S.contribs.filter(c => c.status === 'new').length;
+    const newC = S.contribs.filter(c => c.status === 'new').length + S.reports.filter(r => r.status === 'reported' && !r.example).length;
     const extra = { contrib: newC ? `<span class="count red">${newC}</span>` : '', works: `<span class="count">${active}</span>`, crisis: em ? '<span class="dot-red" aria-label="alert active"></span>' : '', dispatch: queued ? `<span class="count red">${queued}</span>` : '', fleet: S.mandate === 'active' ? '<span class="count">on</span>' : '' };
     el.innerHTML = GOV_TABS.map(([k, l]) => `<button class="subtab ${U.govTab === k ? 'active' : ''}" data-gtab="${k}" type="button" role="tab" aria-selected="${U.govTab === k}">${l}${extra[k] || ''}</button>`).join('');
   }
@@ -874,13 +944,13 @@
     return `<button class="prow" data-action="place" data-kind="${p.kind}" data-id="${esc(p.id)}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>${esc(p.name)}</b><span>${esc(p.address || c.label)}</span></span><span class="pdist">${fmtDist(d)}<small>${walkMin(d)} min walk</small></span></button>`;
   }
   function worksRow(w) {
-    const st = workStatus(w), d = dist(S.user, w), c = catById('works');
+    const st = workStatus(w), d = zoneDist(S.user, workZone(w)), c = catById('works');
     const when = st === 'active' ? `until ${fmtDate(w.end)}` : `from ${fmtDate(w.start)}`;
     const aff = ['walk', 'bike', 'drive'].filter(k => w.affects[k]).map(k => ({ walk: 'pedestrians', bike: 'cyclists', drive: 'cars' })[k]).join(', ');
     return `<button class="prow" data-action="place" data-kind="work" data-id="${w.id}" type="button"><span class="picon" style="--c:${st === 'active' ? c.color : '#9AA5B1'}">${svgOf(c)}</span><span class="ptext"><b>${esc(w.name)}</b><span>${WORK_TYPES[w.type] || w.type} · ${when}${aff ? ' · ' + aff : ''}</span></span><span class="pdist">${fmtDist(d)}<small>${st === 'active' ? daysBetween(todayISO(0), w.end) + ' d left' : 'in ' + daysBetween(todayISO(0), w.start) + ' d'}</small></span></button>`;
   }
   function worksListPanel() {
-    const all = S.works.filter(w => workStatus(w) !== 'finished').filter(w => U.worksAll || dist(S.user, w) <= 2000).sort((a, b) => dist(S.user, a) - dist(S.user, b));
+    const wd2 = w => zoneDist(S.user, workZone(w)), all = S.works.filter(w => workStatus(w) !== 'finished').filter(w => U.worksAll || wd2(w) <= 2000).sort((a, b) => wd2(a) - wd2(b));
     const act = all.filter(w => workStatus(w) === 'active'), up = all.filter(w => workStatus(w) === 'upcoming').sort((a, b) => a.start.localeCompare(b.start));
     const lastUpd = S.works.reduce((m, w) => Math.max(m, w.updatedAt || 0), 0);
     return phead('Construction', null, lastUpd ? `Updated by the city ${ago(lastUpd)}` : 'Updated by the city')
@@ -915,7 +985,7 @@
     if (p.kind === 'shelter') extra = `<p class="muted">Public shelter, marked with the civil defence sign (blue triangle on orange). Päästeamet register, ${LKP.SHELTER_SOURCE.date}.</p>`;
     if (p.kind === 'poi') extra = `${p.hours ? `<div class="kv"><span>Opening hours</span><b>${esc(p.hours)}</b></div>` : ''}${p.wheelchair ? `<div class="kv"><span>Wheelchair access</span><b>${esc(p.wheelchair)}</b></div>` : ''}${p.cat === 'cool' ? `<p class="muted">${p.sub === 'library' ? 'Public library' : 'Shopping centre'}: an indoor place to cool down during a heatwave or wait out a storm.</p>` : ''}<p class="src">© OpenStreetMap contributors</p>`;
     if (p.kind === 'report') { const r = p.report; extra = `<div class="kv"><span>Status</span><b>${r.status === 'reported' ? 'Reported, not yet confirmed' : r.status === 'confirmed' ? 'Confirmed by the city' : 'Cleared'}</b></div><div class="kv"><span>Reported by</span><b>${r.by === 'city' ? 'City crew' : r.mine ? 'You' : 'A neighbour'} · ${ago(r.createdAt)}</b></div><p class="muted">Routes keep ${REPORT_TYPES[r.type].radius} m away until the city clears it.</p>`; }
-    if (p.kind === 'work') { const w = p.work, st = workStatus(w); extra = `<div class="kv"><span>Status</span><b>${st === 'active' ? `Active · ${daysBetween(todayISO(0), w.end)} days left` : st === 'upcoming' ? `Starts in ${daysBetween(todayISO(0), w.start)} days` : 'Finished'}</b></div><div class="kv"><span>Dates</span><b>${fmtDate(w.start)} – ${fmtDate(w.end)}</b></div><div class="kv"><span>Last updated</span><b>${w.updatedAt ? new Date(w.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—'} · Tallinna Linnavalitsus</b></div><div class="kv"><span>Affects</span><b>${['walk', 'bike', 'drive'].filter(k => w.affects[k]).map(k => ({ walk: 'Pedestrians', bike: 'Cyclists', drive: 'Cars' })[k]).join(', ') || '—'}</b></div>${w.note ? `<p>${esc(w.note)}</p>` : ''}<p class="src">Registered by the municipality</p>`; }
+    if (p.kind === 'work') { const w = p.work, st = workStatus(w); extra = `<div class="kv"><span>Status</span><b>${st === 'active' ? `Active · ${daysBetween(todayISO(0), w.end)} days left` : st === 'upcoming' ? `Starts in ${daysBetween(todayISO(0), w.start)} days` : 'Finished'}</b></div><div class="kv"><span>Dates</span><b>${fmtDate(w.start)} – ${fmtDate(w.end)}</b></div>${w.coords ? `<div class="kv"><span>Street section</span><b>${Math.round(lineLen(w.coords))} m</b></div>` : ''}<div class="kv"><span>Last updated</span><b>${w.updatedAt ? new Date(w.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—'} · Tallinna Linnavalitsus</b></div><div class="kv"><span>Affects</span><b>${['walk', 'bike', 'drive'].filter(k => w.affects[k]).map(k => ({ walk: 'Pedestrians', bike: 'Cyclists', drive: 'Cars' })[k]).join(', ') || '—'}</b></div>${w.note ? `<p>${esc(w.note)}</p>` : ''}<p class="src">Registered by the municipality</p>`; }
     if (p.kind === 'search') extra = `<p class="src">Address search © OpenStreetMap contributors (Nominatim)</p>`;
     const back = U.cat ? 'list' : (U.query ? 'search' : null);
     if (p.kind === 'contrib') return phead(p.contrib.kind === 'idea' ? 'Idea' : 'Issue', U.cat === 'community' ? 'list' : 'contribute') + contribDetail(p);
@@ -951,6 +1021,7 @@
       body += `<div class="meter risk"><span style="width:${pct}%"></span></div><p><b>${pct}% of the route is exposed</b>${basePct > pct + 2 ? `, down from ${basePct}% on the fastest route` : ''}. Red marks stretches under trees, by the shoreline or next to construction.</p>`;
     }
     if (ri.note) body += `<p class="muted">${esc(ri.note)}</p>`;
+    if (t !== 'storm') body += `<p class="muted">See flooding, a blocked way or another danger? <button class="linkbtn inline" data-action="open-contribute" data-k="tree" type="button">Report it</button></p>`;
     return `<div class="proto-box ${t}"><div class="pb-head">${PROTO_IC[t]}<b>${pr.label}</b></div>${body}<ul class="tips">${pr.tips.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
   }
   function directionsPanel() {
@@ -1067,18 +1138,19 @@
     return `<button class="prow" data-action="place" data-kind="contrib" data-id="${c.id}" type="button"><span class="picon" style="--c:${K.color}">${svgOf(K)}</span><span class="ptext"><b>${esc(c.title)}</b><span>${K.cats[c.cat]} · ${CSTATUS[c.status]}${c.comments.length ? ` · ${c.comments.length} comment${c.comments.length > 1 ? 's' : ''}` : ''}</span></span><span class="pdist">▲ ${c.votes}<small>${fmtDist(d)}</small></span></button>`;
   }
   function contributePanel() {
-    const d = U.contribDraft, storm = proto() === 'storm';
-    const kinds = [['issue', 'Report an issue'], ['idea', 'Share an idea']].concat(storm ? [['tree', 'Fallen tree']] : []);
-    const tabs = `<div class="ktabs" role="tablist">${kinds.map(([k, l]) => `<button class="ktab ${d.kind === k ? 'on' : ''} ${k}" data-action="contrib-kind" data-k="${k}" type="button" role="tab" aria-selected="${d.kind === k}">${svgOf(k === 'tree' ? REPORT_TYPES.fallen_tree : CONTRIB[k])}<span>${l}</span></button>`).join('')}</div>`;
+    const d = U.contribDraft, em = S.emergency, storm = proto() === 'storm';
+    if (em && !emergencyTypes().includes(U.reportDraft.type)) U.reportDraft.type = emergencyTypes()[0];
+    const kinds = (em ? [['tree', storm ? 'Fallen tree' : 'Emergency report']] : []).concat([['issue', 'Report an issue'], ['idea', 'Share an idea']]);
+    const tabs = `<div class="ktabs" role="tablist">${kinds.map(([k, l]) => `<button class="ktab ${d.kind === k ? 'on' : ''} ${k}" data-action="contrib-kind" data-k="${k}" type="button" role="tab" aria-selected="${d.kind === k}">${svgOf(k === 'tree' ? (storm ? REPORT_TYPES.fallen_tree : REPORT_TYPES.danger) : CONTRIB[k])}<span>${l}</span></button>`).join('')}</div>`;
     const near = S.contribs.filter(c => c.status !== 'declined' && dist(S.user, c) <= 1500).sort((a, b) => b.votes - a.votes).slice(0, 5);
     let form;
     if (d.kind === 'tree') {
       const r = U.reportDraft;
-      form = `<div class="rtypes" role="radiogroup" aria-label="What did you see?">${Object.entries(REPORT_TYPES).map(([k, t]) => `<button class="rtype ${r.type === k ? 'on' : ''}" data-action="report-type" data-t="${k}" type="button" role="radio" aria-checked="${r.type === k}"><span class="picon" style="--c:${t.color}">${svgOf(t)}</span><b>${t.label}</b><small>${t.hint}</small></button>`).join('')}</div>
+      form = `<div class="rtypes" role="radiogroup" aria-label="What did you see?">${emergencyTypes().map(k => [k, REPORT_TYPES[k]]).map(([k, t]) => `<button class="rtype ${r.type === k ? 'on' : ''}" data-action="report-type" data-t="${k}" type="button" role="radio" aria-checked="${r.type === k}"><span class="picon" style="--c:${t.color}">${svgOf(t)}</span><b>${t.label}</b><small>${t.hint}</small></button>`).join('')}</div>
         <div class="field"><label>Details (optional)</label><input type="text" placeholder="e.g. Birch across the pavement by the tram stop" value="${esc(r.note)}" data-draft="reportDraft.note"></div>
         <div class="row between" style="margin-bottom:10px"><span class="small">${r.lat ? 'Pinned on the map' : 'At your current location'}</span><button class="btn-dark" data-action="pick-report" type="button">${r.lat ? 'Move pin' : 'Pick on map'}</button></div>
-        <button class="btn-y btn-full" data-action="submit-report" type="button">Send storm report</button>
-        <p class="muted" style="margin-top:8px">Routes for everyone avoid it straight away.</p>`;
+        <button class="btn-y btn-full" data-action="submit-report" type="button">Send emergency report</button>
+        <p class="muted" style="margin-top:8px">Routes for everyone avoid it straight away, and the city sees it under Citizen contributions.</p>`;
     } else {
       const K = CONTRIB[d.kind];
       form = `<div class="ccats">${Object.entries(K.cats).map(([k, l]) => `<button class="ccat ${d.cat === k ? 'on' : ''}" data-action="contrib-cat" data-c="${k}" type="button" style="--c:${K.color}">${l}</button>`).join('')}</div>
@@ -1088,7 +1160,7 @@
         <button class="btn-y btn-full" data-action="add-contrib" type="button">${d.kind === 'idea' ? 'Share idea' : 'Send to the city'}</button>
         <p class="muted" style="margin-top:8px">Visible to the city and your neighbours. Neighbours can support it and comment; the city updates its status.</p>`;
     }
-    return phead('Contribute', null, storm ? 'Storm alert: fallen trees help everyone route safely' : 'Improve the city with the municipality and your neighbours')
+    return phead('Contribute', null, em ? `${PROTOCOLS[em.type].label} alert: your reports help everyone route safely` : 'Improve the city with the municipality and your neighbours')
       + `<div class="sheet flat">${tabs}${form}</div>`
       + (near.length ? `<div class="plabel">Near you · most supported</div><div class="plist">${near.map(contribRow).join('')}</div>` : '');
   }
@@ -1127,12 +1199,12 @@
   }
   function homeCard() {
     if (S.emergency || U.cview !== 'map' || U.portal !== 'citizen') return '';
-    const act = S.works.filter(w => workStatus(w) === 'active' && dist(S.user, w) <= 2000).sort((a, b) => dist(S.user, a) - dist(S.user, b));
+    const wd2 = w => zoneDist(S.user, workZone(w)), act = S.works.filter(w => workStatus(w) === 'active' && wd2(w) <= 2000).sort((a, b) => wd2(a) - wd2(b));
     const sh = nearby('shelter', 1)[0], reps = reportsShown();
     return `<div class="home-card" role="region" aria-label="Around you">
       <div class="hc-title">Around you</div>
       <button class="hc-row" data-action="cat" data-cat="works" type="button"><span class="picon" style="--c:#F28C00">${svgOf(catById('works'))}</span><span class="ptext"><b>${act.length ? `${act.length} construction site${act.length > 1 ? 's' : ''} within 2 km` : 'No construction within 2 km'}</b><span>${act.length ? `${esc(act[0].name)} · until ${fmtDate(act[0].end)}` : 'Tap to see works across Tallinn'}</span></span></button>
-      ${reps.length ? `<button class="hc-row" data-action="cat" data-cat="reports" type="button"><span class="picon" style="--c:#6D4C41">${svgOf(REPORT_TYPES.fallen_tree)}</span><span class="ptext"><b>${reps.length} fallen tree report${reps.length > 1 ? 's' : ''}</b><span>Routes go around them until cleared</span></span></button>` : ''}
+      ${reps.length ? `<button class="hc-row" data-action="cat" data-cat="reports" type="button"><span class="picon" style="--c:#6D4C41">${svgOf(REPORT_TYPES.fallen_tree)}</span><span class="ptext"><b>${reps.length} hazard report${reps.length > 1 ? 's' : ''}</b><span>Routes go around them until cleared</span></span></button>` : ''}
       ${(() => { const n = S.contribs.filter(c => c.status !== 'declined' && c.status !== 'done' && dist(S.user, c) <= 1500); return `<button class="hc-row" data-action="cat" data-cat="community" type="button"><span class="picon" style="--c:#7B3FA0">${svgOf(catById('community'))}</span><span class="ptext"><b>${n.length} issues and ideas near you</b><span>Support them or add your own</span></span></button>`; })()}
       <button class="hc-row" data-action="place" data-kind="shelter" data-id="${sh.p.id}" type="button"><span class="picon" style="--c:#0072CE">${svgOf(catById('shelter'))}</span><span class="ptext"><b>Your nearest shelter</b><span>${esc(sh.p.name)} · ${walkMin(sh.d)} min walk</span></span></button>
       <button class="hc-row" data-action="cview" data-view="ready" type="button"><span class="picon" style="--c:#1E8E3E"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg></span><span class="ptext"><b>Be ready</b><span>Home supplies and what to do in each emergency</span></span></button>
@@ -1141,7 +1213,8 @@
   function renderCitizen() {
     const em = S.emergency;
     $('#homeCard').innerHTML = homeCard();
-    $('#fab').innerHTML = (proto() === 'storm' && !['report', 'directions', 'contribute'].includes(U.cview)) ? `<button class="fab" data-action="open-contribute" data-k="tree" type="button">${svgOf(REPORT_TYPES.fallen_tree)}<span>Report fallen tree</span></button>` : '';
+    const fabLbl = proto() === 'storm' ? 'Report fallen tree' : proto() === 'flood' ? 'Report flooding' : 'Report a hazard', fabT = proto() === 'storm' ? REPORT_TYPES.fallen_tree : proto() === 'flood' ? REPORT_TYPES.flooded : REPORT_TYPES.danger;
+    $('#fab').innerHTML = (S.emergency && !['report', 'contribute'].includes(U.cview)) ? `<button class="fab ${proto()}" data-action="open-contribute" data-k="tree" type="button">${svgOf(fabT)}<span>${fabLbl}</span></button>` : '';
     $('#chips').innerHTML = CATS.filter(c => c.id !== 'reports' || reportsShown().length).map(c => `<button class="chip ${U.cat === c.id ? 'active' : ''}" data-action="cat" data-cat="${c.id}" type="button" role="tab" aria-selected="${U.cat === c.id}" style="--c:${c.color}">${svgOf(c)}<span>${c.label}</span></button>`).join('');
     const pr = em && PROTOCOLS[em.type || 'airstrike'];
     $('#alertBanner').innerHTML = em ? `<div class="alert-banner ${em.type}" role="alert">${PROTO_IC[em.type || 'airstrike']}<div class="ab-text"><b>EE-ALARM · ${pr.label}</b><span>${esc(em.message)}</span></div><button class="btn-alert" data-action="directions" data-nearest="1" type="button">Go to nearest ${pr.destLabel}</button></div>` : '';
@@ -1149,7 +1222,7 @@
     const html = U.cview === 'list' && U.cat ? listPanel() : U.cview === 'search' ? searchPanel() : U.cview === 'place' ? placePanel() : U.cview === 'directions' ? directionsPanel()
       : U.cview === 'menu' ? menuPanel() : U.cview === 'settings' ? settingsPanel() : U.cview === 'lend' ? lendPanel()
       : U.cview === 'contribute' ? contributePanel() : U.cview === 'report' ? reportPanel() : U.cview === 'whereto' ? wheretoPanel() : U.cview === 'ready' ? readyPanel() : '';
-    panel.hidden = !html; panel.innerHTML = html;
+    panel.hidden = !html; panel.innerHTML = html; document.body.classList.toggle('panel-open', !!html);
     $('#searchClear').hidden = !U.query;
     document.body.classList.toggle('has-alert', !!em);
     const cbtn = $('#contributeBtn'); if (cbtn && U.portal === 'citizen') cbtn.classList.toggle('active', U.cview === 'contribute');
@@ -1161,19 +1234,19 @@
   function tabWorks() {
     const wd = U.workDraft, works = S.works.slice().sort((x, y) => x.start.localeCompare(y.start)), byStatus = st => works.filter(w => workStatus(w) === st);
     const wbadge = w => { const st = workStatus(w); return st === 'active' ? '<span class="badge badge-orange">active</span>' : st === 'upcoming' ? '<span class="badge badge-grey">upcoming</span>' : '<span class="badge badge-outline">finished</span>'; };
-    const editing = wd.editingId && S.works.find(w => w.id === wd.editingId);
+    const editing = wd.editingId && S.works.find(w => w.id === wd.editingId), drawing = clickMode === 'work';
     return card('Tallinna Linnavalitsus', editing ? 'Edit construction works' : 'Add construction works', `<p>${editing ? 'Change the location, dates or affected modes. Citizens see the update straight away.' : 'Register a site with its dates. Citizens see it on the map, and everyday routes steer around it for the modes it affects.'}</p>
         <div class="field"><label>Name</label><input type="text" placeholder="e.g. Telliskivi street reconstruction" value="${esc(wd.name)}" data-draft="workDraft.name"></div>
-        <div class="grid2"><div class="field"><label>Type</label><select data-draft="workDraft.type">${Object.entries(WORK_TYPES).map(([k, v]) => `<option value="${k}" ${wd.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
-          <div class="field"><label>Zone radius (m)</label><input type="number" min="30" max="600" step="10" value="${wd.radius}" data-draft="workDraft.radius"></div></div>
+        <div class="field"><label>Type</label><select data-draft="workDraft.type">${Object.entries(WORK_TYPES).map(([k, v]) => `<option value="${k}" ${wd.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+        <div class="draw-box ${drawing ? 'on' : ''}"><div><b>Street section</b><span>${wd.snapping ? 'Snapping to the streets…' : (wd.coords || []).length > 1 ? `${Math.round(lineLen(wd.coords))} m of street · ${wd.pts.length} points` : (wd.pts || []).length === 1 ? 'Now click where the works end' : 'Click where the works start and where they end; the line follows the streets'}</span></div>
+          <div class="row">${drawing ? '<button class="btn btn-green btn-sm" data-action="work-done" type="button">Done</button>' : `<button class="btn btn-outline btn-sm" data-action="pick-work" type="button">${(wd.pts || []).length ? 'Add points' : 'Draw on map'}</button>`}${(wd.pts || []).length ? '<button class="btn btn-grey btn-sm" data-action="work-undo" type="button">Undo point</button><button class="btn btn-grey btn-sm" data-action="work-clear" type="button">Clear</button>' : ''}</div></div>
         <div class="grid2"><div class="field"><label>Start date</label><input type="date" value="${wd.start}" data-draft="workDraft.start"></div>
           <div class="field"><label>End date</label><input type="date" value="${wd.end}" data-draft="workDraft.end"></div></div>
         <div class="field"><label>Note for residents</label><input type="text" placeholder="e.g. Pavement closed, use the other side" value="${esc(wd.note)}" data-draft="workDraft.note"></div>
         <div class="row" style="margin-bottom:10px"><label class="check" style="margin:0"><input type="checkbox" ${wd.walk ? 'checked' : ''} data-draft="workDraft.walk"> Pedestrians</label><label class="check" style="margin:0"><input type="checkbox" ${wd.bike ? 'checked' : ''} data-draft="workDraft.bike"> Cyclists</label><label class="check" style="margin:0"><input type="checkbox" ${wd.drive ? 'checked' : ''} data-draft="workDraft.drive"> Cars</label></div>
-        <div class="row between" style="margin-bottom:10px"><span class="small">${wd.lat ? `Pinned at ${wd.lat.toFixed(4)}, ${wd.lng.toFixed(4)}` : 'Not placed yet'}</span><button class="btn btn-outline btn-sm" data-action="pick-work" type="button">${wd.lat ? 'Move on map' : 'Place on map'}</button></div>
         <div class="row"><button class="btn btn-green" style="flex:1" data-action="add-work" type="button">${editing ? 'Save changes' : 'Publish construction works'}</button>${editing ? '<button class="btn btn-grey" data-action="cancel-edit" type="button">Cancel</button>' : ''}</div>`)
       + card(null, null, `<div class="row between"><h2 style="margin:0">Registered works</h2><span class="muted">${byStatus('active').length} active · ${byStatus('upcoming').length} upcoming</span></div>
-        ${works.length ? works.map(w => `<div class="wrow ${wd.editingId === w.id ? 'editing' : ''}"><div class="wtop"><div><b>${esc(w.name)}</b><span class="meta">${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)} · ${w.radius} m · ${['walk', 'bike', 'drive'].filter(k => w.affects[k]).join(', ') || 'no modes'}${w.updatedAt ? ` · updated ${ago(w.updatedAt)}` : ''}</span></div>${wbadge(w)}</div>
+        ${works.length ? works.map(w => `<div class="wrow ${wd.editingId === w.id ? 'editing' : ''}"><div class="wtop"><div><b>${esc(w.name)}</b><span class="meta">${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)} · ${w.coords ? Math.round(lineLen(w.coords)) + ' m of street' : (w.radius || 0) + ' m radius'} · ${['walk', 'bike', 'drive'].filter(k => w.affects[k]).join(', ') || 'no modes'}${w.updatedAt ? ` · updated ${ago(w.updatedAt)}` : ''}</span></div>${wbadge(w)}</div>
           <div class="wact"><button class="btn btn-outline btn-sm" data-action="edit-work" data-id="${w.id}" type="button">Edit</button>${workStatus(w) !== 'finished' ? `<button class="btn btn-grey btn-sm" data-action="extend-work" data-id="${w.id}" type="button">+7 days</button><button class="btn btn-grey btn-sm" data-action="end-work" data-id="${w.id}" type="button">Finished</button>` : ''}<button class="btn btn-grey btn-sm" data-action="remove-work" data-id="${w.id}" type="button">Remove</button></div></div>`).join('') : '<div class="empty">No construction works registered.</div>'}
         <p class="muted" style="margin-top:8px">Tip: click a site on the map to edit it. Finished works stay listed but leave the map automatically.</p>`);
   }
@@ -1181,7 +1254,7 @@
     const em = S.emergency, works = S.works, act = works.filter(w => workStatus(w) === 'active'), up = works.filter(w => workStatus(w) === 'upcoming');
     const unlocked = S.fleet.filter(v => v.unlocked).length, active = S.listings.filter(l => l.status === 'active' || l.status === 'claimed').length;
     const acked = OPERATORS.filter(o => S.acks[o.id] && S.acks[o.id].status === 'applied').length, matched = S.requests.filter(r => r.status === 'matched').length;
-    return card('City works · live', null, `<div class="stats"><div class="stat"><b>${act.length}</b><span>construction sites active</span></div><div class="stat"><b>${up.length}</b><span>starting soon</span></div><div class="stat"><b>${SHELTERS.filter(sh => act.some(w => dist(sh, w) <= w.radius + 300)).length}</b><span>shelters near works</span></div></div>`)
+    return card('City works · live', null, `<div class="stats"><div class="stat"><b>${act.length}</b><span>construction sites active</span></div><div class="stat"><b>${up.length}</b><span>starting soon</span></div><div class="stat"><b>${SHELTERS.filter(sh => act.some(w => zoneDist(sh, workZone(w)) <= 300)).length}</b><span>shelters near works</span></div></div>`)
       + card('Crisis status · Päästeamet', em ? `${PROTOCOLS[em.type].label} alert active` : 'Standby', `<div class="stats">
           <div class="stat"><b>${SHELTERS.length}</b><span>public shelters (register)</span></div>
           <div class="stat"><b>${em ? (POP[em.district] / 1000).toFixed(0) + 'k' : '—'}</b><span>devices pushed (sim.)</span></div>
@@ -1293,17 +1366,23 @@
     return card(null, null, `<div class="row between"><h2 style="margin:0">MDS exchange log</h2><span class="muted">${S.mdsLog.length} calls</span></div>
       ${S.mdsLog.length ? `<div class="log">${S.mdsLog.map(e => `<div class="log-e"><span class="a ${e.actor === 'agency' ? '' : 'prov'}">${e.actor === 'agency' ? 'Rescue Board' : (OPERATORS.find(o => o.id === e.actor) || { name: e.actor }).name}</span><span class="m">${e.method}</span> ${esc(e.url)}<span class="st">${e.status} · ${timeStr(e.t)}</span><details><summary>body</summary><pre>${esc(JSON.stringify(e.body, null, 1))}</pre></details></div>`).join('')}</div>` : '<div class="empty">No calls yet. Unlock the fleets to publish the mandate.</div>'}`);
   }
+  function emergencyReportsCard() {
+    const stormOn = (proto() || U.form.protocol) === 'storm', list = S.reports.slice().filter(r => !r.example || (stormOn && r.status !== 'cleared')).sort((x, y) => (x.status === 'reported' ? 0 : 1) - (y.status === 'reported' ? 0 : 1) || y.createdAt - x.createdAt);
+    const rb = r => r.status === 'reported' ? '<span class="badge badge-orange">new</span>' : r.status === 'confirmed' ? '<span class="badge badge-green">confirmed</span>' : '<span class="badge badge-outline">cleared</span>';
+    return list.map(r => { const T = REPORT_TYPES[r.type]; return `<div class="wrow"><div class="wtop"><div class="rhead"><span class="picon sm" style="--c:${T.color}">${svgOf(T)}</span><div><b>${T.label}</b><span class="meta">${esc(r.note || T.hint)} · ${r.by === 'city' ? 'city crew' : 'resident'} · ${ago(r.createdAt)}${r.example ? ' · example' : ''}</span></div></div>${rb(r)}</div>
+      <div class="wact">${r.status === 'reported' ? `<button class="btn btn-outline btn-sm" data-action="report-status" data-id="${r.id}" data-s="confirmed" type="button">Confirm</button>` : ''}${r.status !== 'cleared' ? `<button class="btn btn-grey btn-sm" data-action="report-status" data-id="${r.id}" data-s="cleared" type="button">Mark cleared</button>` : `<button class="btn btn-grey btn-sm" data-action="report-status" data-id="${r.id}" data-s="confirmed" type="button">Reopen</button>`}<button class="btn btn-grey btn-sm" data-action="show-on-map" data-lat="${r.lat}" data-lng="${r.lng}" type="button">Show</button><button class="btn btn-grey btn-sm" data-action="remove-report" data-id="${r.id}" type="button">Remove</button></div></div>`; }).join('') || '<div class="empty">No emergency reports.</div>';
+  }
   function tabContrib() {
     const f = U.contribFilter, list = S.contribs.filter(c => f === 'all' || c.kind === f).sort((a, b) => (a.status === 'new' ? 0 : 1) - (b.status === 'new' ? 0 : 1) || b.votes - a.votes);
     const cnt = k => S.contribs.filter(c => c.kind === k).length, newN = S.contribs.filter(c => c.status === 'new').length;
     return card('Tallinna Linnavalitsus', 'Citizen contributions', `<p>Issues and ideas residents pinned on the map. Set a status and reply; residents see both.</p>
-      <div class="seg blue" role="group" aria-label="Filter">${[['all', `All · ${S.contribs.length}`], ['issue', `Issues · ${cnt('issue')}`], ['idea', `Ideas · ${cnt('idea')}`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-action="contrib-filter" data-f="${k}" type="button">${l}</button>`).join('')}</div>
-      <p class="muted">${newN} new · sorted by new first, then most supported</p>
+      <div class="seg blue" role="group" aria-label="Filter">${[['all', `All · ${S.contribs.length}`], ['issue', `Issues · ${cnt('issue')}`], ['idea', `Ideas · ${cnt('idea')}`], ['emergency', `Emergency · ${S.reports.filter(r => r.status !== 'cleared' && !r.example).length}`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-action="contrib-filter" data-f="${k}" type="button">${l}</button>`).join('')}</div>
+      ${f === 'emergency' ? `<p class="muted">Fallen trees, flooded streets, blocked ways and other dangers residents reported during alerts. Routes avoid everything not cleared.</p>${emergencyReportsCard()}` : `<p class="muted">${newN} new · sorted by new first, then most supported</p>`}
       ${list.map(c => { const K = CONTRIB[c.kind]; return `<div class="wrow"><div class="wtop"><div class="rhead"><span class="picon sm" style="--c:${K.color}">${svgOf(K)}</span><div><b>${esc(c.title)}</b><span class="meta">${K.cats[c.cat]} · ▲ ${c.votes} · ${c.comments.length} comment${c.comments.length === 1 ? '' : 's'} · ${c.by === 'city' ? 'city' : 'resident'} · ${ago(c.createdAt)}${c.example ? ' · example' : ''}</span></div></div>
           <select class="status-sel" data-action="contrib-status" data-id="${c.id}" aria-label="Status">${Object.entries(CSTATUS).map(([k, l]) => `<option value="${k}" ${c.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         ${c.note ? `<p class="small" style="margin:6px 0 0">${esc(c.note)}</p>` : ''}
         ${c.comments.filter(m => m.by === 'city').slice(-1).map(m => `<div class="cmt city small-cmt"><b>City reply</b><span>${ago(m.at)}</span><p>${esc(m.text)}</p></div>`).join('')}
-        <div class="cform"><input type="text" placeholder="Reply publicly as the city" value="${esc((U.replyDrafts || {})[c.id] || '')}" data-reply="${c.id}" aria-label="Reply"><button class="btn btn-green btn-sm" data-action="city-reply" data-id="${c.id}" type="button">Reply</button><button class="btn btn-grey btn-sm" data-action="remove-contrib" data-id="${c.id}" type="button">Remove</button></div></div>`; }).join('') || '<div class="empty">No contributions yet.</div>'}`);
+        ${c.kind === 'issue' && c.status !== 'done' ? `<div class="wact"><button class="btn btn-outline btn-sm" data-action="plan-work" data-id="${c.id}" type="button">Plan as construction works</button><button class="btn btn-grey btn-sm" data-action="show-on-map" data-lat="${c.lat}" data-lng="${c.lng}" type="button">Show</button></div>` : `<div class="wact"><button class="btn btn-grey btn-sm" data-action="show-on-map" data-lat="${c.lat}" data-lng="${c.lng}" type="button">Show</button></div>`}<div class="cform"><input type="text" placeholder="Reply publicly as the city" value="${esc((U.replyDrafts || {})[c.id] || '')}" data-reply="${c.id}" aria-label="Reply"><button class="btn btn-green btn-sm" data-action="city-reply" data-id="${c.id}" type="button">Reply</button><button class="btn btn-grey btn-sm" data-action="remove-contrib" data-id="${c.id}" type="button">Remove</button></div></div>`; }).join('') || (f === 'emergency' ? '' : '<div class="empty">No contributions yet.</div>')}`);
   }
   const GOV_RENDER = { contrib: tabContrib, works: tabWorks, overview: tabOverview, crisis: tabCrisis, fleet: tabFleet, dispatch: tabDispatch, listings: tabListings, log: tabLog };
   function renderGov() {
@@ -1333,8 +1412,8 @@
   $('#contributeBtn').addEventListener('click', () => {
     if (U.portal === 'gov') { U.govTab = 'contrib'; saveUI(); renderGov(); drawMap(); renderTop(); $('#govPanel').scrollTop = 0; return; }
     U.cview = 'contribute'; U.cat = null; U.dest = null; layers.route.clearLayers();
-    if (U.contribDraft.kind === 'tree' && proto() !== 'storm') U.contribDraft.kind = 'issue';
-    if (proto() === 'storm') U.contribDraft.kind = 'tree';
+    if (U.contribDraft.kind === 'tree' && !S.emergency) U.contribDraft.kind = 'issue';
+    if (S.emergency) U.contribDraft.kind = 'tree';
     saveUI(); renderCitizen(); renderTop(); drawMap();
   });
   $('#subtabs').addEventListener('click', e => {
@@ -1398,7 +1477,7 @@
       case 'open-contribute':
         U.cview = 'contribute'; U.cat = null; U.dest = null; layers.route.clearLayers();
         if (b.dataset.k) U.contribDraft.kind = b.dataset.k;
-        if (U.contribDraft.kind === 'tree' && proto() !== 'storm') U.contribDraft.kind = 'issue';
+        if (U.contribDraft.kind === 'tree' && !S.emergency) U.contribDraft.kind = 'issue';
         saveUI(); renderCitizen(); renderTop(); drawMap(); break;
       case 'contrib-kind': { const k = b.dataset.k; U.contribDraft.kind = k; if (k !== 'tree') U.contribDraft.cat = Object.keys(CONTRIB[k].cats)[0]; saveUI(); renderCitizen(); drawMap(); break; }
       case 'contrib-cat': U.contribDraft.cat = b.dataset.c; saveUI(); renderCitizen(); break;
@@ -1460,7 +1539,18 @@
       case 'remove-listing': removeListing(b.dataset.id); break;
       case 'pick-call': setClickMode('call', 'Click the map where the caller is'); break;
       case 'add-call': addCallRequest(); break;
-      case 'pick-work': setClickMode('work', 'Click the map at the centre of the construction site'); break;
+      case 'pick-work': setClickMode('work', 'Click where the works start, then where they end. Add clicks to follow a longer stretch.'); renderGov(); break;
+      case 'work-done': setClickMode(null); renderGov(); break;
+      case 'work-undo': U.workDraft.pts = (U.workDraft.pts || []).slice(0, -1); snapWorkDraft(); break;
+      case 'work-clear': U.workDraft.pts = []; U.workDraft.coords = []; U.workDraft.lat = null; U.workDraft.lng = null; saveUI(); renderGov(); drawMap(); break;
+      case 'plan-work': {
+        const c = S.contribs.find(x => x.id === b.dataset.id); if (!c) break;
+        U.workDraft = Object.assign(freshUI().workDraft, { name: c.title, note: 'Planned after residents reported it in PiMap' });
+        if (c.status === 'new' || c.status === 'seen') { c.status = 'planned'; c.updatedAt = Date.now(); save(); }
+        U.govTab = 'works'; map.flyTo([c.lat, c.lng], 17, { duration: 0.6 });
+        setClickMode('work', 'Click where the works start, then where they end.'); saveUI(); renderGov(); renderTop(); drawMap(); $('#govPanel').scrollTop = 0; break;
+      }
+      case 'show-on-map': map.flyTo([Number(b.dataset.lat), Number(b.dataset.lng)], 17, { duration: 0.6 }); break;
       case 'add-work': addWork(); break;
       case 'remove-work': removeWork(b.dataset.id); break;
       case 'pick-hazard': setClickMode('hazard', 'Click the map at the centre of the area'); break;
@@ -1470,7 +1560,7 @@
     }
   });
   $('#resetBtn').addEventListener('click', () => {
-    if (!confirm('Reset the demo? This clears the alert, listings, works, hazard zones and requests on this device.')) return;
+    if (!confirm((window.LKP_T || (s => s))('Reset the demo? This clears the alert, listings, works, hazard zones and requests on this device.'))) return;
     localStorage.removeItem(LS_KEY); sessionStorage.removeItem(UI_KEY);
     const portal = U.portal; S = freshShared(); U = freshUI(); U.portal = portal; lastEm = false; search.value = ''; save();
     layers.route.clearLayers(); renderAll(); map.setView(LKP.CITY_CENTER, 14); toast('Demo reset');
@@ -1481,6 +1571,7 @@
       if (U.cview === 'directions' || (S.emergency && S.emergency.policyId) !== prev) refreshRoute();
     }
   });
+  window.addEventListener('lkp:lang', () => { renderAll(); if (U.cview === 'directions') renderCitizen(); });
   window.addEventListener('online', renderTop); window.addEventListener('offline', renderTop);
   window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if ((h === 'gov' || h === 'citizen') && h !== U.portal) { U.portal = h; setClickMode(null); saveUI(); renderAll(); refreshRoute(); } });
   setInterval(() => { if (S.emergency && Date.now() > S.emergency.endsAt) endEmergency('Time-box elapsed — alert ended automatically'); else if (S.emergency && U.portal === 'gov') { renderGov(); renderTop(); } }, 30000);

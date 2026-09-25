@@ -55,6 +55,28 @@ see "Active now" and "Starting soon" with the last update time.
 Routing uses the FOSSGIS OSRM servers (`routing.openstreetmap.de`), which have real foot, bike and car
 profiles. Shade and exposure data come from the Overpass API per route.
 
+## Languages
+
+PiMap is available in English, Estonian, Finnish, Spanish and Ukrainian. The switch sits next to the
+Tallinn logo and remembers the choice. `i18n.js` translates interface text as it is rendered (text,
+placeholders, labels, popups, messages) from a phrase dictionary plus patterns for sentences with
+numbers, times and distances, and formats dates and times for the chosen language. Place names,
+addresses and what residents type are never translated.
+
+## Contribute and construction
+
+* **Contribute** (header button): residents pin an issue or an idea on the map; neighbours support and
+  comment; the municipality sets a status and replies. During any alert residents can also send
+  emergency reports (fallen trees, flooded streets, blocked ways, other dangers) that routes avoid at once.
+  The Municipality portal lists everything under **Citizen contributions**, with an Emergency filter.
+* **Construction works are street sections.** The city clicks where works start and end; the line is
+  snapped to the street network. Routes only count as passing through works when they run along the
+  section, not when they cross the street, and everyday routes detour around active sections.
+
+> Prototype limitation: there is no server. Contributions, reports and works are stored in the
+> browser (`localStorage`) and only travel between tabs of the same browser. A real deployment needs a
+> small backend so residents and the city see each other's posts across devices.
+
 ## Run it
 
 From this folder:

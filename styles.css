@@ -503,7 +503,29 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
   .leaflet-control-zoom { display: none; }
   .home-card { left: 0; right: 0; bottom: 0; width: auto; border-radius: 18px 18px 0 0; }
   .fab { bottom: 18px; }
+  body.panel-open .fab { display: none; }
   .grid3 { grid-template-columns: 1fr 1fr; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .protos { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Street-section drawing ---------- */
+.draw-box { border: 1.5px dashed #F3C9A6; background: #FFF8F1; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+.draw-box.on { border-style: solid; border-color: #F28C00; }
+.draw-box b { display: block; font-size: .86rem; }
+.draw-box span { font-size: .78rem; color: var(--grey); }
+.mk-wpt { background: #F28C00; color: #fff; font-size: .66rem; }
+.lg.ln { border-radius: 2px; height: 6px; width: 18px; background: repeating-linear-gradient(90deg, #F28C00 0 5px, #1F1F1F 5px 9px); border: 0; box-shadow: none; }
+.fab.flood { background: #1565C0; } .fab.flood:hover { background: #0D47A1; }
+.fab.airstrike, .fab.heat { background: #B71C1C; } .fab.airstrike:hover, .fab.heat:hover { background: #8E1414; }
+
+/* ---------- Language switch (next to the Tallinn logo) ---------- */
+.brand { gap: 14px; }
+.lang-switch { display: inline-flex; gap: 2px; background: var(--blue-pale); padding: 3px; border-radius: var(--r-pill); }
+.lang-switch button { border: 0; background: transparent; color: var(--blue); font-weight: 700; font-size: .74rem; letter-spacing: .03em; padding: 5px 9px; border-radius: var(--r-pill); line-height: 1; }
+.lang-switch button:hover:not(.on) { background: var(--blue-light); }
+.lang-switch button.on { background: var(--blue); color: #fff; }
+@media (max-width: 860px) {
+  .brand { gap: 8px; }
+  .lang-switch button { padding: 5px 7px; font-size: .7rem; }
 }
