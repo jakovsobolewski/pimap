@@ -12,13 +12,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="styles.css?v=20260925-9">
+  <link rel="stylesheet" href="styles.css?v=20260925-10">
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand">
-        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20260925-9" alt="Tallinn"></a>
+        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20260925-10" alt="Tallinn"></a>
       </div>
       <nav class="portals" role="tablist" aria-label="Portals">
         <button class="portal-tab" role="tab" data-portal="citizen" type="button">Citizen portal</button>
@@ -26,7 +26,8 @@
       </nav>
       <div class="topbar-right">
         <span id="statusPill" class="pill">No alert</span>
-        <span id="netPill" class="pill pill-net">Online</span>
+        <button id="contributeBtn" class="btn-contribute" type="button" title="Report an issue or share an idea"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Contribute</span><span class="cb-n"></span></button>
+        <span id="netPill" class="pill pill-net" hidden>Offline · cached</span>
         <button id="resetBtn" class="btn-ghost" type="button" title="Clear local state and reseed demo data">Reset</button>
       </div>
     </div>
@@ -76,14 +77,16 @@
         <div><span class="lg sq" style="--c:#E53935"></span>Unsafe place</div>
         <div><span class="lg" style="--c:#6D4C41"></span>Fallen tree report</div>
         <div><span class="lg" style="--c:#6A1B9A"></span>Storm area</div>
+        <div><span class="lg" style="--c:#E8590C"></span>Citizen issue</div>
+        <div><span class="lg" style="--c:#D4A000"></span>Citizen idea</div>
       </div>
     </div>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="data.js?v=20260925-9"></script>
-  <script src="mds.js?v=20260925-9"></script>
-  <script src="pois.js?v=20260925-9"></script>
-  <script src="app.js?v=20260925-9"></script>
+  <script src="data.js?v=20260925-10"></script>
+  <script src="mds.js?v=20260925-10"></script>
+  <script src="pois.js?v=20260925-10"></script>
+  <script src="app.js?v=20260925-10"></script>
 </body>
 </html>

@@ -25,6 +25,24 @@ Crisis operations, Fleet unlock, Pick-up dispatch, Neighbour listings and MDS lo
 
 State is shared through `localStorage` and synced live between browser tabs.
 
+## Contribute
+
+The **Contribute** button (top right) lets residents pin an **issue** (road damage, broken street
+light, accessibility barrier, litter, broken bench or playground) or an **idea** (trees and green
+space, benches and shade, cycling, safer crossings, play and sport) on the map. Neighbours can
+support and comment; the municipality sees everything under **Citizen contributions**, sets a
+status (Seen, Planned, In progress, Done, Not planned) and replies publicly. During a storm alert
+the same panel lets residents report fallen trees, fallen branches and trees at risk; routes avoid
+them until the city marks them cleared.
+
+## Everyday use
+
+Without an alert, the directions button asks "Where to?" with the nearest pharmacy, grocery store,
+hospital, shelter, water point and cool place; an "Around you" card shows nearby construction,
+community issues and ideas, and your nearest shelter; routes steer around active construction and
+blocked paths. The city edits construction sites (location, dates, +7 days, finished) and residents
+see "Active now" and "Starting soon" with the last update time.
+
 ## Emergency protocols (Crisis operations)
 
 | Protocol | Citizens are sent to | How the route is chosen |

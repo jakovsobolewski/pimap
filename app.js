@@ -43,6 +43,14 @@
     branches: { label: 'Fallen branches', hint: 'Branches or debris on the ground', radius: 15, color: '#A1887F', svg: '<path d="M3 20l10-7"/><path d="M8 16.5l-1-4M12 14l3-5M13 13l5 1M17 9l2-2"/>' },
     tree: { label: 'Tree at risk', hint: 'Leaning, cracked or large tree that could fall', radius: 20, color: '#2E7D32', svg: '<path d="M12 22v-5"/><path d="M12 3l6 8h-3l4 6H5l4-6H6z"/>' },
   };
+  /* Citizen contributions: issues and ideas for the city and for each other */
+  const CONTRIB = {
+    issue: { label: 'Issue', color: '#E8590C', svg: '<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
+      cats: { road: 'Road or pavement damage', light: 'Broken street light', access: 'Accessibility barrier', litter: 'Litter or dumping', furniture: 'Broken bench or playground', other: 'Other issue' } },
+    idea: { label: 'Idea', color: '#D4A000', svg: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0012 3z"/>',
+      cats: { green: 'More trees or green space', bench: 'Benches or shade', bike: 'Cycling improvement', crossing: 'Safer crossing', play: 'Play or sport', other: 'Other idea' } },
+  };
+  const CSTATUS = { new: 'New', seen: 'Seen by the city', planned: 'Planned', progress: 'In progress', done: 'Done', declined: 'Not planned' };
   const DIRS = [[0, 'N'], [45, 'NE'], [90, 'E'], [135, 'SE'], [180, 'S'], [225, 'SW'], [270, 'W'], [315, 'NW']];
   const dirName = deg => (DIRS.find(d => d[0] === Number(deg)) || [0, 'N'])[1];
   const localDT = ms => new Date(ms - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -60,10 +68,11 @@
     { id: 'grocery',  label: 'Groceries',       color: '#7A4FD6', svg: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.5 11h11l2-8H6.5"/>' },
     { id: 'police',   label: 'Police',          color: '#23408E', svg: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>' },
     { id: 'rescue',   label: 'Rescue stations', color: '#E4572E', svg: '<path d="M12 3c2 3 5 5 5 9a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-8z"/>' },
+    { id: 'community', label: 'Community',     color: '#7B3FA0', svg: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.8-3.5 3.2-5 6-5s5.2 1.5 6 5M15 15.5c2.5 0 4.5 1.3 5.5 4.5"/>' },
     { id: 'works',    label: 'Construction',    color: '#F28C00', svg: '<path d="M3 20h18M6 20l4-14h4l4 14M8 13h8"/>' },
   ];
   const ADDRESS_CAT = { id: 'address', label: 'Address', color: '#5F6368', svg: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>' };
-  const catById = id => CATS.find(c => c.id === id) || ADDRESS_CAT;
+  const catById = id => CATS.find(c => c.id === id) || (id === 'contrib-issue' ? { id, label: 'Issue', color: CONTRIB.issue.color, svg: CONTRIB.issue.svg } : id === 'contrib-idea' ? { id, label: 'Idea', color: CONTRIB.idea.color, svg: CONTRIB.idea.svg } : ADDRESS_CAT);
   const svgOf = c => `<svg viewBox="0 0 24 24" aria-hidden="true">${c.svg}</svg>`;
 
   const IC = {
@@ -89,7 +98,7 @@
   };
 
   const GOV_TABS = [
-    ['works', 'Construction works'], ['overview', 'Overview'], ['crisis', 'Crisis operations'],
+    ['works', 'Construction works'], ['contrib', 'Citizen contributions'], ['overview', 'Overview'], ['crisis', 'Crisis operations'],
     ['fleet', 'Fleet unlock'], ['dispatch', 'Pick-up dispatch'], ['listings', 'Neighbour listings'], ['log', 'MDS log'],
   ];
 
@@ -98,7 +107,7 @@
     return {
       emergency: null,
       user: { lat: 59.4450, lng: 24.7350, mobility: 'walks' },
-      fleet: LKP.seedFleet(), listings: LKP.seedListings(), volunteers: LKP.seedVolunteers(), works: LKP.seedWorks(), hazards: LKP.seedHazards(), reports: LKP.seedReports(), storms: [],
+      fleet: LKP.seedFleet(), listings: LKP.seedListings(), volunteers: LKP.seedVolunteers(), works: LKP.seedWorks(), hazards: LKP.seedHazards(), reports: LKP.seedReports(), storms: [], contribs: LKP.seedContribs(),
       requests: [], mdsLog: [], acks: {},
       radius: 1000, autoUnlock: true, mandate: 'none',
       unlock: null, myRequestId: null, myVolunteerId: null,
@@ -116,6 +125,8 @@
       workDraft: { editingId: null, name: '', type: 'roadworks', note: '', start: todayISO(0), end: todayISO(14), radius: 100, walk: true, bike: true, drive: true, lat: null, lng: null },
       stormDraft: { name: '', wind: 20, gust: 30, from: 225, radiusKm: 8, start: localDT(Date.now()), hours: 12, lat: null, lng: null },
       reportDraft: { type: 'fallen_tree', note: '', lat: null, lng: null },
+      contribDraft: { kind: 'issue', cat: 'road', title: '', note: '', lat: null, lng: null },
+      commentDraft: '', replyDrafts: {}, contribFilter: 'all',
       worksAll: false,
       hazardDraft: { name: '', radius: 150, lat: null, lng: null },
       conflicts: [], routeInfo: null, sunHour: null,
@@ -185,6 +196,7 @@
     if (kind === 'shelter') { const s = SHELTERS.find(x => x.id === id); return s && { kind, id, cat: 'shelter', name: s.name, address: `${s.address}, ${s.district}`, lat: s.lat, lng: s.lng }; }
     if (kind === 'poi') { const p = POIS.find(x => x.id === id); return p && { kind, id, cat: p.cat, sub: p.sub, name: p.name, address: p.address, lat: p.lat, lng: p.lng, hours: p.hours, wheelchair: p.wheelchair }; }
     if (kind === 'work') { const w = S.works.find(x => x.id === id); return w && { kind, id, cat: 'works', name: w.name, address: `${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)}`, lat: w.lat, lng: w.lng, work: w }; }
+    if (kind === 'contrib') { const c = S.contribs.find(x => x.id === id); return c && { kind, id, cat: 'contrib-' + c.kind, name: c.title, address: CONTRIB[c.kind].cats[c.cat] || CONTRIB[c.kind].label, lat: c.lat, lng: c.lng, contrib: c }; }
     if (kind === 'report') { const r = S.reports.find(x => x.id === id), T = r && REPORT_TYPES[r.type]; return r && { kind, id, cat: 'reports', name: T.label, address: r.note || T.hint, lat: r.lat, lng: r.lng, report: r }; }
     if (kind === 'search') { const r = (U.searchResults || []).concat(U.searchPlace ? [U.searchPlace] : []).find(x => x.id === id); return r || null; }
     return null;
@@ -231,6 +243,7 @@
     if (cat === 'shelter') items = SHELTERS.map(s => placeOf('shelter', s.id));
     else if (cat === 'works') items = S.works.filter(w => workStatus(w) !== 'finished').map(w => placeOf('work', w.id));
     else if (cat === 'reports') items = reportsShown().map(r => placeOf('report', r.id));
+    else if (cat === 'community') items = S.contribs.filter(c => c.status !== 'declined').map(c => placeOf('contrib', c.id));
     else items = POIS.filter(p => p.cat === cat).map(p => placeOf('poi', p.id));
     return items.map(p => ({ p, d: dist(S.user, p) })).sort((a, b) => a.d - b.d).slice(0, n || 15);
   }
@@ -427,6 +440,7 @@
     else if (clickMode === 'call') { U.callDraft.lat = lat; U.callDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'work') { U.workDraft.lat = lat; U.workDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'storm') { U.stormDraft.lat = lat; U.stormDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
+    else if (clickMode === 'contrib') { U.contribDraft.lat = lat; U.contribDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'report') { U.reportDraft.lat = lat; U.reportDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
     else if (clickMode === 'hazard') { U.hazardDraft.lat = lat; U.hazardDraft.lng = lng; setClickMode(null); saveUI(); renderAll(); }
   });
@@ -469,7 +483,16 @@
       else m.on('click', () => openPlace('report', r.id));
       m.addTo(layers.hazards);
     });
-    if (U.reportDraft.lat && ((gov && U.govTab === 'crisis') || (!gov && U.cview === 'report'))) L.marker([U.reportDraft.lat, U.reportDraft.lng], { icon: icon('mk-poi', `<span style="--c:${REPORT_TYPES[U.reportDraft.type].color}">${svgOf(REPORT_TYPES[U.reportDraft.type])}</span>`, 30), zIndexOffset: 950 }).addTo(layers.hazards);
+    const showContrib = gov ? U.govTab === 'contrib' : (U.cat === 'community' || U.cview === 'contribute' || (U.cview === 'place' && U.dest && U.dest.kind === 'contrib'));
+    if (showContrib) S.contribs.filter(c => gov || c.status !== 'declined').forEach(c => {
+      const K = CONTRIB[c.kind], done = c.status === 'done';
+      const m = L.marker([c.lat, c.lng], { icon: icon('mk-poi mk-contrib' + (done ? ' done' : ''), `<span style="--c:${K.color}">${svgOf(K)}</span>${c.votes ? `<i class="vbadge">${c.votes}</i>` : ''}`, 26), zIndexOffset: 350 });
+      if (gov) m.bindPopup(`<b>${esc(c.title)}</b><span class="muted">${K.label} · ${K.cats[c.cat]} · ${c.votes} support · ${CSTATUS[c.status]}</span>${esc(c.note || '')}`);
+      else m.on('click', () => openPlace('contrib', c.id));
+      m.addTo(layers.pois);
+    });
+    if (!gov && U.cview === 'contribute' && U.contribDraft.lat && U.contribDraft.kind !== 'tree') { const K = CONTRIB[U.contribDraft.kind]; L.marker([U.contribDraft.lat, U.contribDraft.lng], { icon: icon('mk-poi', `<span style="--c:${K.color}">${svgOf(K)}</span>`, 32), zIndexOffset: 950 }).addTo(layers.pois); }
+    if (U.reportDraft.lat && ((gov && U.govTab === 'crisis') || (!gov && (U.cview === 'report' || (U.cview === 'contribute' && U.contribDraft.kind === 'tree'))))) L.marker([U.reportDraft.lat, U.reportDraft.lng], { icon: icon('mk-poi', `<span style="--c:${REPORT_TYPES[U.reportDraft.type].color}">${svgOf(REPORT_TYPES[U.reportDraft.type])}</span>`, 30), zIndexOffset: 950 }).addTo(layers.hazards);
     if (gov && U.stormDraft.lat && U.govTab === 'crisis') L.circle([U.stormDraft.lat, U.stormDraft.lng], { radius: (Number(U.stormDraft.radiusKm) || 8) * 1000, color: '#6A1B9A', weight: 2, dashArray: '4 8', fillOpacity: 0.03 }).addTo(layers.hazards);
     if (gov && U.hazardDraft.lat && U.govTab === 'crisis') L.circle([U.hazardDraft.lat, U.hazardDraft.lng], { radius: Number(U.hazardDraft.radius) || 150, color: '#555', weight: 2, dashArray: '4 6', fillOpacity: 0.08 }).addTo(layers.hazards);
 
@@ -741,6 +764,24 @@
   }
   function setReportStatus(id, status) { const r = S.reports.find(x => x.id === id); if (!r) return; r.status = status; r.updatedAt = Date.now(); save(); renderAll(); refreshRoute(); }
   function removeReport(id) { S.reports = S.reports.filter(r => r.id !== id); save(); renderAll(); refreshRoute(); }
+  function addContrib() {
+    const d = U.contribDraft, p = d.lat ? { lat: d.lat, lng: d.lng } : { lat: S.user.lat, lng: S.user.lng };
+    if (!d.title.trim()) { toast(d.kind === 'idea' ? 'Give your idea a short title' : 'Describe the issue in a few words'); return; }
+    const c = { id: uid('c'), kind: d.kind, cat: d.cat, title: d.title.trim(), note: d.note.trim(), lat: p.lat, lng: p.lng, by: 'citizen', mine: true, status: 'new', votes: 1, votedByMe: true, comments: [], createdAt: Date.now() };
+    S.contribs.unshift(c);
+    U.contribDraft = Object.assign(freshUI().contribDraft, { kind: d.kind, cat: d.cat });
+    saveUI(); save(); openPlace('contrib', c.id); renderAll();
+    toast(d.kind === 'idea' ? 'Idea shared with the city and your neighbours' : 'Issue sent to the city. Neighbours can support it too.');
+  }
+  function toggleVote(id) { const c = S.contribs.find(x => x.id === id); if (!c) return; c.votedByMe = !c.votedByMe; c.votes = Math.max(0, (c.votes || 0) + (c.votedByMe ? 1 : -1)); save(); renderAll(); }
+  function addComment(id, by, text) {
+    const c = S.contribs.find(x => x.id === id); text = (text || '').trim(); if (!c || !text) return false;
+    c.comments.push({ by, text, at: Date.now(), mine: by === 'citizen' });
+    if (by === 'city' && c.status === 'new') c.status = 'seen';
+    c.updatedAt = Date.now(); save(); return true;
+  }
+  function setContribStatus(id, status) { const c = S.contribs.find(x => x.id === id); if (!c) return; c.status = status; c.updatedAt = Date.now(); save(); renderAll(); }
+  function removeContrib(id) { S.contribs = S.contribs.filter(c => c.id !== id); save(); renderAll(); }
   function addWork() {
     const d = U.workDraft;
     if (!d.name.trim()) { toast('Give the construction site a name'); return; }
@@ -799,7 +840,8 @@
   function renderTop() {
     const em = S.emergency, pill = $('#statusPill');
     if (em) { pill.className = 'pill pill-alert'; pill.textContent = `${PROTOCOLS[em.type || 'airstrike'].label} · ${em.district} · until ${timeStr(em.endsAt)}`; } else { pill.className = 'pill'; pill.textContent = 'No alert'; }
-    const net = $('#netPill'); net.textContent = navigator.onLine ? 'Online' : 'Offline · cached'; net.classList.toggle('off', !navigator.onLine);
+    const net = $('#netPill'); net.textContent = 'Offline · cached'; net.hidden = navigator.onLine;
+    const cb = $('#contributeBtn'); if (cb) { const n = S.contribs.filter(c => c.status === 'new').length; cb.classList.toggle('active', (U.portal === 'citizen' && U.cview === 'contribute') || (U.portal === 'gov' && U.govTab === 'contrib')); cb.querySelector('.cb-n').textContent = U.portal === 'gov' && n ? n : ''; }
     document.querySelectorAll('.portal-tab').forEach(t => { const on = t.dataset.portal === U.portal; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
     $('#app').className = 'portal-' + U.portal;
     document.body.dataset.portal = U.portal;
@@ -811,7 +853,8 @@
     if (U.portal !== 'gov') { el.hidden = true; return; }
     el.hidden = false;
     const em = S.emergency, queued = S.requests.filter(r => r.status === 'queued').length, active = S.works.filter(w => workStatus(w) === 'active').length;
-    const extra = { works: `<span class="count">${active}</span>`, crisis: em ? '<span class="dot-red" aria-label="alert active"></span>' : '', dispatch: queued ? `<span class="count red">${queued}</span>` : '', fleet: S.mandate === 'active' ? '<span class="count">on</span>' : '' };
+    const newC = S.contribs.filter(c => c.status === 'new').length;
+    const extra = { contrib: newC ? `<span class="count red">${newC}</span>` : '', works: `<span class="count">${active}</span>`, crisis: em ? '<span class="dot-red" aria-label="alert active"></span>' : '', dispatch: queued ? `<span class="count red">${queued}</span>` : '', fleet: S.mandate === 'active' ? '<span class="count">on</span>' : '' };
     el.innerHTML = GOV_TABS.map(([k, l]) => `<button class="subtab ${U.govTab === k ? 'active' : ''}" data-gtab="${k}" type="button" role="tab" aria-selected="${U.govTab === k}">${l}${extra[k] || ''}</button>`).join('');
   }
 
@@ -848,6 +891,10 @@
   }
   function listPanel() {
     if (U.cat === 'works') return worksListPanel();
+    if (U.cat === 'community') {
+      const list = S.contribs.filter(c => c.status !== 'declined').sort((a, b) => dist(S.user, a) - dist(S.user, b)).slice(0, 20);
+      return phead('Community', null, 'Issues and ideas from residents') + `<button class="btn-y btn-full" data-action="open-contribute" type="button" style="margin:6px 0 4px">+ Contribute</button><div class="plist">${list.map(contribRow).join('') || '<div class="empty">Nothing yet. Be the first.</div>'}</div>`;
+    }
     const c = catById(U.cat), items = nearby(U.cat, 15);
     const src = U.cat === 'shelter' ? `Official public shelters · Päästeamet register, ${LKP.SHELTER_SOURCE.date}` : U.cat === 'works' ? 'Registered by the municipality' : '© OpenStreetMap contributors';
     return phead(`${c.label} near you`, null, `${items.length} closest`) + `<div class="plist">${items.map(({ p, d }) => placeRow(p, d)).join('') || '<div class="empty">Nothing found nearby.</div>'}</div><p class="src">${src}</p>`;
@@ -871,6 +918,7 @@
     if (p.kind === 'work') { const w = p.work, st = workStatus(w); extra = `<div class="kv"><span>Status</span><b>${st === 'active' ? `Active · ${daysBetween(todayISO(0), w.end)} days left` : st === 'upcoming' ? `Starts in ${daysBetween(todayISO(0), w.start)} days` : 'Finished'}</b></div><div class="kv"><span>Dates</span><b>${fmtDate(w.start)} – ${fmtDate(w.end)}</b></div><div class="kv"><span>Last updated</span><b>${w.updatedAt ? new Date(w.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—'} · Tallinna Linnavalitsus</b></div><div class="kv"><span>Affects</span><b>${['walk', 'bike', 'drive'].filter(k => w.affects[k]).map(k => ({ walk: 'Pedestrians', bike: 'Cyclists', drive: 'Cars' })[k]).join(', ') || '—'}</b></div>${w.note ? `<p>${esc(w.note)}</p>` : ''}<p class="src">Registered by the municipality</p>`; }
     if (p.kind === 'search') extra = `<p class="src">Address search © OpenStreetMap contributors (Nominatim)</p>`;
     const back = U.cat ? 'list' : (U.query ? 'search' : null);
+    if (p.kind === 'contrib') return phead(p.contrib.kind === 'idea' ? 'Idea' : 'Issue', U.cat === 'community' ? 'list' : 'contribute') + contribDetail(p);
     if (p.kind === 'report') return phead('Storm report', back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away</p>${extra}</div>`;
     return phead(c.label, back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away · ${walkMin(d)} min walk</p>
       <div class="row">${p.kind !== 'work' ? `<button class="btn-y" data-action="directions" type="button">${IC.dir} Directions</button>` : ''}${p.kind !== 'shelter' ? `<button class="btn-y-outline" data-action="directions" data-nearest="1" type="button">Nearest ${S.emergency ? P().destLabel : 'shelter'}</button>` : ''}</div>${extra}</div>`;
@@ -896,7 +944,7 @@
       const near = S.storms.filter(s => stormStatus(s) !== 'passed').sort((a, b) => dist(S.user, a) - dist(S.user, b))[0];
       if (near) body = `<p><b>${esc(near.name)}</b>: wind ${near.wind} m/s, gusts up to ${near.gust} m/s from the ${dirName(near.from)}, ${stormStatus(near) === 'active' ? 'until ' + timeStr(near.endMs) : 'from ' + timeStr(near.startMs)}.${near.gust >= 25 ? ' Routes keep extra distance from trees and the shoreline.' : ''}</p>` + body;
       const nRep = reportsShown().length;
-      body += `<p class="muted">${nRep} fallen tree${nRep === 1 ? '' : 's'} and branch reports on the map. <button class="linkbtn inline" data-action="cview" data-view="report" type="button">Report one</button></p>`;
+      body += `<p class="muted">${nRep} fallen tree${nRep === 1 ? '' : 's'} and branch reports on the map. <button class="linkbtn inline" data-action="open-contribute" data-k="tree" type="button">Report one</button></p>`;
     }
     if (pr.routing === 'safe' && ri.exposure != null) {
       const pct = Math.round(ri.exposure * 100), basePct = Math.round((ri.baseExposure || 0) * 100);
@@ -987,7 +1035,7 @@
     return phead('Menu') + `<div class="menu">
       <button class="mitem" data-action="cview" data-view="settings" type="button">${IC.user}<span><b>About you</b><small>${MOBILITY[S.user.mobility]}</small></span></button>
       <button class="mitem" data-action="cview" data-view="lend" type="button">${IC.bike}<span><b>Lend a vehicle</b><small>Pre-list a spare bike or mobility aid for emergencies</small></span></button>
-      <button class="mitem" data-action="cview" data-view="report" type="button">${svgOf(REPORT_TYPES.fallen_tree)}<span><b>Report a fallen tree</b><small>Fallen trees, branches or a tree that could fall</small></span></button>
+      <button class="mitem" data-action="open-contribute" type="button">${svgOf(catById('community'))}<span><b>Contribute</b><small>Report an issue or share an idea with the city${proto() === 'storm' ? ', or report a fallen tree' : ''}</small></span></button>
       <button class="mitem" data-action="cview" data-view="ready" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg><span><b>Be ready</b><small>Home supplies and what to do in each emergency</small></span></button>
       <button class="mitem" data-action="geolocate" type="button">${IC.gps}<span><b>Use my location</b><small>From your device's GPS</small></span></button>
       <button class="mitem" data-action="pick-user" type="button">${IC.pin}<span><b>Set my location on the map</b><small>Demo: simulate a resident somewhere else</small></span></button>
@@ -1013,6 +1061,47 @@
       <div class="row between" style="margin-bottom:10px"><span class="small">Pin: ${d.lat ? d.lat.toFixed(4) + ', ' + d.lng.toFixed(4) : 'your location'}</span><span class="row"><button class="btn-dark" data-action="pick-listing" type="button">Pick on map</button>${d.lat ? '<button class="btn-dark" data-action="clear-pin" type="button">Clear</button>' : ''}</span></div>
       <button class="btn-y btn-full" data-action="add-listing" type="button">${em ? 'List now (alert active)' : 'Pre-list as dormant'}</button>
       ${mine.length ? `<h4 style="margin-top:14px">Your listings</h4>${mine.map(l => `<div class="lst"><div><b>${esc(l.label)}</b><span class="meta">${VEHICLE_LABELS[l.type]} · ${esc(l.unlock)}</span></div><span class="row">${badge(l)}<button class="btn-dark" data-action="remove-listing" data-id="${l.id}" type="button">Remove</button></span></div>`).join('')}` : ''}</div>`;
+  }
+  function contribRow(c) {
+    const K = CONTRIB[c.kind], d = dist(S.user, c);
+    return `<button class="prow" data-action="place" data-kind="contrib" data-id="${c.id}" type="button"><span class="picon" style="--c:${K.color}">${svgOf(K)}</span><span class="ptext"><b>${esc(c.title)}</b><span>${K.cats[c.cat]} · ${CSTATUS[c.status]}${c.comments.length ? ` · ${c.comments.length} comment${c.comments.length > 1 ? 's' : ''}` : ''}</span></span><span class="pdist">▲ ${c.votes}<small>${fmtDist(d)}</small></span></button>`;
+  }
+  function contributePanel() {
+    const d = U.contribDraft, storm = proto() === 'storm';
+    const kinds = [['issue', 'Report an issue'], ['idea', 'Share an idea']].concat(storm ? [['tree', 'Fallen tree']] : []);
+    const tabs = `<div class="ktabs" role="tablist">${kinds.map(([k, l]) => `<button class="ktab ${d.kind === k ? 'on' : ''} ${k}" data-action="contrib-kind" data-k="${k}" type="button" role="tab" aria-selected="${d.kind === k}">${svgOf(k === 'tree' ? REPORT_TYPES.fallen_tree : CONTRIB[k])}<span>${l}</span></button>`).join('')}</div>`;
+    const near = S.contribs.filter(c => c.status !== 'declined' && dist(S.user, c) <= 1500).sort((a, b) => b.votes - a.votes).slice(0, 5);
+    let form;
+    if (d.kind === 'tree') {
+      const r = U.reportDraft;
+      form = `<div class="rtypes" role="radiogroup" aria-label="What did you see?">${Object.entries(REPORT_TYPES).map(([k, t]) => `<button class="rtype ${r.type === k ? 'on' : ''}" data-action="report-type" data-t="${k}" type="button" role="radio" aria-checked="${r.type === k}"><span class="picon" style="--c:${t.color}">${svgOf(t)}</span><b>${t.label}</b><small>${t.hint}</small></button>`).join('')}</div>
+        <div class="field"><label>Details (optional)</label><input type="text" placeholder="e.g. Birch across the pavement by the tram stop" value="${esc(r.note)}" data-draft="reportDraft.note"></div>
+        <div class="row between" style="margin-bottom:10px"><span class="small">${r.lat ? 'Pinned on the map' : 'At your current location'}</span><button class="btn-dark" data-action="pick-report" type="button">${r.lat ? 'Move pin' : 'Pick on map'}</button></div>
+        <button class="btn-y btn-full" data-action="submit-report" type="button">Send storm report</button>
+        <p class="muted" style="margin-top:8px">Routes for everyone avoid it straight away.</p>`;
+    } else {
+      const K = CONTRIB[d.kind];
+      form = `<div class="ccats">${Object.entries(K.cats).map(([k, l]) => `<button class="ccat ${d.cat === k ? 'on' : ''}" data-action="contrib-cat" data-c="${k}" type="button" style="--c:${K.color}">${l}</button>`).join('')}</div>
+        <div class="field"><label>${d.kind === 'idea' ? 'Your idea' : 'What is wrong?'}</label><input type="text" maxlength="90" placeholder="${d.kind === 'idea' ? 'e.g. Bike racks by the Balti jaam market' : 'e.g. Deep pothole on the cycle path'}" value="${esc(d.title)}" data-draft="contribDraft.title"></div>
+        <div class="field"><label>Details (optional)</label><textarea rows="2" placeholder="${d.kind === 'idea' ? 'Why would it help, and who?' : 'Where exactly, and since when?'}" data-draft="contribDraft.note">${esc(d.note)}</textarea></div>
+        <div class="row between" style="margin-bottom:10px"><span class="small">${d.lat ? 'Pinned on the map' : 'At your current location'}</span><button class="btn-dark" data-action="pick-contrib" type="button">${d.lat ? 'Move pin' : 'Pick on map'}</button></div>
+        <button class="btn-y btn-full" data-action="add-contrib" type="button">${d.kind === 'idea' ? 'Share idea' : 'Send to the city'}</button>
+        <p class="muted" style="margin-top:8px">Visible to the city and your neighbours. Neighbours can support it and comment; the city updates its status.</p>`;
+    }
+    return phead('Contribute', null, storm ? 'Storm alert: fallen trees help everyone route safely' : 'Improve the city with the municipality and your neighbours')
+      + `<div class="sheet flat">${tabs}${form}</div>`
+      + (near.length ? `<div class="plabel">Near you · most supported</div><div class="plist">${near.map(contribRow).join('')}</div>` : '');
+  }
+  function contribDetail(p) {
+    const c = p.contrib, K = CONTRIB[c.kind], d = dist(S.user, c);
+    const who = c.by === 'city' ? 'Tallinna Linnavalitsus' : c.mine ? 'You' : 'A neighbour';
+    return `<div class="place"><div class="ctag" style="--c:${K.color}">${svgOf(K)}${K.label} · ${K.cats[c.cat]}</div><h3>${esc(c.title)}</h3>${c.note ? `<p class="addr">${esc(c.note)}</p>` : ''}
+      <p class="muted">${who} · ${ago(c.createdAt)} · ${fmtDist(d)} away</p>
+      <div class="cstatus s-${c.status}">${CSTATUS[c.status]}</div>
+      <div class="row" style="margin:12px 0"><button class="btn-vote ${c.votedByMe ? 'on' : ''}" data-action="vote" data-id="${c.id}" type="button" aria-pressed="${!!c.votedByMe}">▲ ${c.votedByMe ? 'Supported' : 'Support'} · ${c.votes}</button><button class="btn-y-outline" data-action="directions" type="button">Directions</button></div>
+      <div class="plabel">Comments · ${c.comments.length}</div>
+      <div class="comments">${c.comments.map(m => `<div class="cmt ${m.by === 'city' ? 'city' : ''}"><b>${m.by === 'city' ? 'Tallinna Linnavalitsus' : m.mine ? 'You' : 'Neighbour'}</b><span>${ago(m.at)}</span><p>${esc(m.text)}</p></div>`).join('') || '<p class="muted">No comments yet.</p>'}</div>
+      <div class="cform"><input type="text" placeholder="Add a comment" value="${esc(U.commentDraft)}" data-draft-plain="commentDraft" aria-label="Add a comment"><button class="btn-y" data-action="comment" data-id="${c.id}" type="button">Post</button></div></div>`;
   }
   function reportPanel() {
     const d = U.reportDraft, mine = S.reports.filter(r => r.mine);
@@ -1044,6 +1133,7 @@
       <div class="hc-title">Around you</div>
       <button class="hc-row" data-action="cat" data-cat="works" type="button"><span class="picon" style="--c:#F28C00">${svgOf(catById('works'))}</span><span class="ptext"><b>${act.length ? `${act.length} construction site${act.length > 1 ? 's' : ''} within 2 km` : 'No construction within 2 km'}</b><span>${act.length ? `${esc(act[0].name)} · until ${fmtDate(act[0].end)}` : 'Tap to see works across Tallinn'}</span></span></button>
       ${reps.length ? `<button class="hc-row" data-action="cat" data-cat="reports" type="button"><span class="picon" style="--c:#6D4C41">${svgOf(REPORT_TYPES.fallen_tree)}</span><span class="ptext"><b>${reps.length} fallen tree report${reps.length > 1 ? 's' : ''}</b><span>Routes go around them until cleared</span></span></button>` : ''}
+      ${(() => { const n = S.contribs.filter(c => c.status !== 'declined' && c.status !== 'done' && dist(S.user, c) <= 1500); return `<button class="hc-row" data-action="cat" data-cat="community" type="button"><span class="picon" style="--c:#7B3FA0">${svgOf(catById('community'))}</span><span class="ptext"><b>${n.length} issues and ideas near you</b><span>Support them or add your own</span></span></button>`; })()}
       <button class="hc-row" data-action="place" data-kind="shelter" data-id="${sh.p.id}" type="button"><span class="picon" style="--c:#0072CE">${svgOf(catById('shelter'))}</span><span class="ptext"><b>Your nearest shelter</b><span>${esc(sh.p.name)} · ${walkMin(sh.d)} min walk</span></span></button>
       <button class="hc-row" data-action="cview" data-view="ready" type="button"><span class="picon" style="--c:#1E8E3E"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg></span><span class="ptext"><b>Be ready</b><span>Home supplies and what to do in each emergency</span></span></button>
     </div>`;
@@ -1051,17 +1141,18 @@
   function renderCitizen() {
     const em = S.emergency;
     $('#homeCard').innerHTML = homeCard();
-    $('#fab').innerHTML = (proto() === 'storm' && !['report', 'directions'].includes(U.cview)) ? `<button class="fab" data-action="cview" data-view="report" type="button">${svgOf(REPORT_TYPES.fallen_tree)}<span>Report fallen tree</span></button>` : '';
+    $('#fab').innerHTML = (proto() === 'storm' && !['report', 'directions', 'contribute'].includes(U.cview)) ? `<button class="fab" data-action="open-contribute" data-k="tree" type="button">${svgOf(REPORT_TYPES.fallen_tree)}<span>Report fallen tree</span></button>` : '';
     $('#chips').innerHTML = CATS.filter(c => c.id !== 'reports' || reportsShown().length).map(c => `<button class="chip ${U.cat === c.id ? 'active' : ''}" data-action="cat" data-cat="${c.id}" type="button" role="tab" aria-selected="${U.cat === c.id}" style="--c:${c.color}">${svgOf(c)}<span>${c.label}</span></button>`).join('');
     const pr = em && PROTOCOLS[em.type || 'airstrike'];
     $('#alertBanner').innerHTML = em ? `<div class="alert-banner ${em.type}" role="alert">${PROTO_IC[em.type || 'airstrike']}<div class="ab-text"><b>EE-ALARM · ${pr.label}</b><span>${esc(em.message)}</span></div><button class="btn-alert" data-action="directions" data-nearest="1" type="button">Go to nearest ${pr.destLabel}</button></div>` : '';
     const panel = $('#cpanel');
     const html = U.cview === 'list' && U.cat ? listPanel() : U.cview === 'search' ? searchPanel() : U.cview === 'place' ? placePanel() : U.cview === 'directions' ? directionsPanel()
       : U.cview === 'menu' ? menuPanel() : U.cview === 'settings' ? settingsPanel() : U.cview === 'lend' ? lendPanel()
-      : U.cview === 'report' ? reportPanel() : U.cview === 'whereto' ? wheretoPanel() : U.cview === 'ready' ? readyPanel() : '';
+      : U.cview === 'contribute' ? contributePanel() : U.cview === 'report' ? reportPanel() : U.cview === 'whereto' ? wheretoPanel() : U.cview === 'ready' ? readyPanel() : '';
     panel.hidden = !html; panel.innerHTML = html;
     $('#searchClear').hidden = !U.query;
     document.body.classList.toggle('has-alert', !!em);
+    const cbtn = $('#contributeBtn'); if (cbtn && U.portal === 'citizen') cbtn.classList.toggle('active', U.cview === 'contribute');
     const bh = $('#alertBanner').offsetHeight; if (bh) document.documentElement.style.setProperty('--banner-h', (bh + 10) + 'px');
   }
 
@@ -1106,6 +1197,7 @@
           <div class="lst"><div><b>Hospitals, pharmacies, cool places, water</b><span class="meta">OpenStreetMap, fetched 25 Sep 2026</span></div><span class="badge badge-grey">${POIS.length}</span></div>
           <div class="lst"><div><b>Hazard zones</b><span class="meta">Drawn by the city during an alert; seeded ones are examples</span></div><span class="badge badge-grey">${S.hazards.length}</span></div>
           <div class="lst"><div><b>Fallen tree reports</b><span class="meta">From citizens and city crews</span></div><span class="badge badge-grey">${S.reports.filter(r => r.status !== 'cleared').length} open</span></div>
+          <div class="lst"><div><b>Citizen contributions</b><span class="meta">Issues and ideas pinned by residents</span></div><span class="badge badge-grey">${S.contribs.length}</span></div>
           <div class="lst"><div><b>Storms</b><span class="meta">Added by the city under the storm protocol</span></div><span class="badge badge-grey">${S.storms.length}</span></div>`);
   }
   function hazardEditor(kind) {
@@ -1201,7 +1293,19 @@
     return card(null, null, `<div class="row between"><h2 style="margin:0">MDS exchange log</h2><span class="muted">${S.mdsLog.length} calls</span></div>
       ${S.mdsLog.length ? `<div class="log">${S.mdsLog.map(e => `<div class="log-e"><span class="a ${e.actor === 'agency' ? '' : 'prov'}">${e.actor === 'agency' ? 'Rescue Board' : (OPERATORS.find(o => o.id === e.actor) || { name: e.actor }).name}</span><span class="m">${e.method}</span> ${esc(e.url)}<span class="st">${e.status} · ${timeStr(e.t)}</span><details><summary>body</summary><pre>${esc(JSON.stringify(e.body, null, 1))}</pre></details></div>`).join('')}</div>` : '<div class="empty">No calls yet. Unlock the fleets to publish the mandate.</div>'}`);
   }
-  const GOV_RENDER = { works: tabWorks, overview: tabOverview, crisis: tabCrisis, fleet: tabFleet, dispatch: tabDispatch, listings: tabListings, log: tabLog };
+  function tabContrib() {
+    const f = U.contribFilter, list = S.contribs.filter(c => f === 'all' || c.kind === f).sort((a, b) => (a.status === 'new' ? 0 : 1) - (b.status === 'new' ? 0 : 1) || b.votes - a.votes);
+    const cnt = k => S.contribs.filter(c => c.kind === k).length, newN = S.contribs.filter(c => c.status === 'new').length;
+    return card('Tallinna Linnavalitsus', 'Citizen contributions', `<p>Issues and ideas residents pinned on the map. Set a status and reply; residents see both.</p>
+      <div class="seg blue" role="group" aria-label="Filter">${[['all', `All · ${S.contribs.length}`], ['issue', `Issues · ${cnt('issue')}`], ['idea', `Ideas · ${cnt('idea')}`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-action="contrib-filter" data-f="${k}" type="button">${l}</button>`).join('')}</div>
+      <p class="muted">${newN} new · sorted by new first, then most supported</p>
+      ${list.map(c => { const K = CONTRIB[c.kind]; return `<div class="wrow"><div class="wtop"><div class="rhead"><span class="picon sm" style="--c:${K.color}">${svgOf(K)}</span><div><b>${esc(c.title)}</b><span class="meta">${K.cats[c.cat]} · ▲ ${c.votes} · ${c.comments.length} comment${c.comments.length === 1 ? '' : 's'} · ${c.by === 'city' ? 'city' : 'resident'} · ${ago(c.createdAt)}${c.example ? ' · example' : ''}</span></div></div>
+          <select class="status-sel" data-action="contrib-status" data-id="${c.id}" aria-label="Status">${Object.entries(CSTATUS).map(([k, l]) => `<option value="${k}" ${c.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        ${c.note ? `<p class="small" style="margin:6px 0 0">${esc(c.note)}</p>` : ''}
+        ${c.comments.filter(m => m.by === 'city').slice(-1).map(m => `<div class="cmt city small-cmt"><b>City reply</b><span>${ago(m.at)}</span><p>${esc(m.text)}</p></div>`).join('')}
+        <div class="cform"><input type="text" placeholder="Reply publicly as the city" value="${esc((U.replyDrafts || {})[c.id] || '')}" data-reply="${c.id}" aria-label="Reply"><button class="btn btn-green btn-sm" data-action="city-reply" data-id="${c.id}" type="button">Reply</button><button class="btn btn-grey btn-sm" data-action="remove-contrib" data-id="${c.id}" type="button">Remove</button></div></div>`; }).join('') || '<div class="empty">No contributions yet.</div>'}`);
+  }
+  const GOV_RENDER = { contrib: tabContrib, works: tabWorks, overview: tabOverview, crisis: tabCrisis, fleet: tabFleet, dispatch: tabDispatch, listings: tabListings, log: tabLog };
   function renderGov() {
     const el = $('#govPanel'); const y = el.scrollTop;
     el.innerHTML = (GOV_RENDER[U.govTab] || tabWorks)() + '<div class="col-foot">Tallinna Linnavalitsus · prototype with Pinge Electronics OÜ · City Resilience Hack 2026</div>';
@@ -1226,9 +1330,16 @@
     const t = e.target.closest('.portal-tab'); if (!t) return;
     U.portal = t.dataset.portal; setClickMode(null); history.replaceState(null, '', '#' + U.portal); saveUI(); renderAll(); refreshRoute();
   });
+  $('#contributeBtn').addEventListener('click', () => {
+    if (U.portal === 'gov') { U.govTab = 'contrib'; saveUI(); renderGov(); drawMap(); renderTop(); $('#govPanel').scrollTop = 0; return; }
+    U.cview = 'contribute'; U.cat = null; U.dest = null; layers.route.clearLayers();
+    if (U.contribDraft.kind === 'tree' && proto() !== 'storm') U.contribDraft.kind = 'issue';
+    if (proto() === 'storm') U.contribDraft.kind = 'tree';
+    saveUI(); renderCitizen(); renderTop(); drawMap();
+  });
   $('#subtabs').addEventListener('click', e => {
     const t = e.target.closest('[data-gtab]'); if (!t) return;
-    U.govTab = t.dataset.gtab; setClickMode(null); saveUI(); renderGov(); drawMap(); $('#govPanel').scrollTop = 0;
+    U.govTab = t.dataset.gtab; setClickMode(null); saveUI(); renderGov(); drawMap(); renderTop(); $('#govPanel').scrollTop = 0;
   });
   const search = $('#searchInput');
   search.value = U.query || '';
@@ -1248,6 +1359,8 @@
 
   const root = $('#app');
   root.addEventListener('input', e => {
+    if (e.target.dataset.draftPlain) { U[e.target.dataset.draftPlain] = e.target.value; saveUI(); return; }
+    if (e.target.dataset.reply) { U.replyDrafts = U.replyDrafts || {}; U.replyDrafts[e.target.dataset.reply] = e.target.value; saveUI(); return; }
     const path = e.target.dataset.draft; if (!path) return;
     const [obj, key] = path.split('.'); U[obj][key] = e.target.type === 'checkbox' ? e.target.checked : e.target.value; saveUI();
     if (obj === 'workDraft' && key === 'radius' && U.workDraft.lat) drawMap();
@@ -1260,6 +1373,7 @@
     if (a === 'mobility') { S.user.mobility = e.target.value; S.unlock = null; save(); renderAll(); }
     if (a === 'radius') { S.radius = Number(e.target.value); save(); renderAll(); }
     if (a === 'auto-unlock') { S.autoUnlock = e.target.checked; save(); }
+    if (a === 'contrib-status') setContribStatus(e.target.dataset.id, e.target.value);
   });
   root.addEventListener('click', async e => {
     const b = e.target.closest('[data-action]'); if (!b || ['SELECT', 'INPUT', 'TEXTAREA'].includes(b.tagName)) return;
@@ -1281,10 +1395,24 @@
         if (U.cview !== 'place') U.dest = null;
         U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
       case 'go': U.dest = { kind: b.dataset.kind, id: b.dataset.id }; U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
+      case 'open-contribute':
+        U.cview = 'contribute'; U.cat = null; U.dest = null; layers.route.clearLayers();
+        if (b.dataset.k) U.contribDraft.kind = b.dataset.k;
+        if (U.contribDraft.kind === 'tree' && proto() !== 'storm') U.contribDraft.kind = 'issue';
+        saveUI(); renderCitizen(); renderTop(); drawMap(); break;
+      case 'contrib-kind': { const k = b.dataset.k; U.contribDraft.kind = k; if (k !== 'tree') U.contribDraft.cat = Object.keys(CONTRIB[k].cats)[0]; saveUI(); renderCitizen(); drawMap(); break; }
+      case 'contrib-cat': U.contribDraft.cat = b.dataset.c; saveUI(); renderCitizen(); break;
+      case 'pick-contrib': setClickMode('contrib', 'Click the map where it is'); break;
+      case 'add-contrib': addContrib(); break;
+      case 'vote': toggleVote(b.dataset.id); break;
+      case 'comment': if (addComment(b.dataset.id, 'citizen', U.commentDraft)) { U.commentDraft = ''; saveUI(); renderCitizen(); } break;
+      case 'city-reply': { const t = (U.replyDrafts || {})[b.dataset.id]; if (addComment(b.dataset.id, 'city', t)) { U.replyDrafts[b.dataset.id] = ''; saveUI(); renderAll(); toast('Reply published'); } break; }
+      case 'remove-contrib': removeContrib(b.dataset.id); break;
+      case 'contrib-filter': U.contribFilter = b.dataset.f; saveUI(); renderGov(); break;
       case 'works-all': U.worksAll = b.dataset.v === '1'; saveUI(); renderCitizen(); break;
       case 'report-type': U.reportDraft.type = b.dataset.t; saveUI(); renderCitizen(); drawMap(); break;
       case 'pick-report': setClickMode('report', 'Click the map where the tree or branches are'); break;
-      case 'submit-report': addReport('citizen'); U.cview = 'map'; saveUI(); renderCitizen(); break;
+      case 'submit-report': addReport('citizen'); U.cview = U.cview === 'contribute' ? 'contribute' : 'map'; saveUI(); renderCitizen(); break;
       case 'city-report': addReport('city'); break;
       case 'report-status': setReportStatus(b.dataset.id, b.dataset.s); break;
       case 'remove-report': removeReport(b.dataset.id); break;

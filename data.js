@@ -222,5 +222,20 @@ LKP.seedReports = function () {
   ];
 };
 
+/* Example citizen contributions (issues and ideas) so the community layer is not empty.
+   Marked example: true; real ones come from residents in the app. */
+LKP.seedContribs = function () {
+  const t = Date.now(), h = 3600e3, day = 86400e3;
+  return [
+    { id: 'c1', kind: 'issue', cat: 'road', title: 'Deep pothole on the cycle path', note: 'Next to the Kalamaja park entrance, easy to fall at night.', lat: 59.4459, lng: 24.7329, by: 'citizen', status: 'planned', votes: 23, comments: [{ by: 'citizen', text: 'Nearly came off my bike here yesterday.', at: t - 20 * h }, { by: 'city', text: 'Thank you. Repair is scheduled with the October pavement works.', at: t - 6 * h }], createdAt: t - 3 * day, example: true },
+    { id: 'c2', kind: 'issue', cat: 'light', title: 'Street light out on Kotzebue', note: 'Two lamps dark between Soo and Vana-Kalamaja.', lat: 59.4436, lng: 24.7378, by: 'citizen', status: 'new', votes: 9, comments: [], createdAt: t - 9 * h, example: true },
+    { id: 'c3', kind: 'issue', cat: 'access', title: 'No ramp at the tram stop kerb', note: 'Wheelchair users cannot get onto the platform from the crossing.', lat: 59.4412, lng: 24.7292, by: 'citizen', status: 'seen', votes: 31, comments: [{ by: 'citizen', text: 'Same problem with a pram.', at: t - 2 * day }], createdAt: t - 5 * day, example: true },
+    { id: 'c4', kind: 'idea', cat: 'bike', title: 'Bike racks by the Balti jaam market', note: 'Bikes are chained to every fence on market days.', lat: 59.4414, lng: 24.7355, by: 'citizen', status: 'new', votes: 47, comments: [{ by: 'citizen', text: 'Yes please, covered ones if possible.', at: t - day }], createdAt: t - 4 * day, example: true },
+    { id: 'c5', kind: 'idea', cat: 'green', title: 'Plant street trees on Tööstuse', note: 'No shade at all in summer; would also help in a heatwave.', lat: 59.4448, lng: 24.7306, by: 'citizen', status: 'new', votes: 18, comments: [], createdAt: t - 2 * day, example: true },
+    { id: 'c6', kind: 'idea', cat: 'bench', title: 'Benches along the Kalaranna promenade', note: 'Older residents have nowhere to rest between the tram and the sea.', lat: 59.4486, lng: 24.7415, by: 'citizen', status: 'progress', votes: 26, comments: [{ by: 'city', text: 'Six benches are being installed this autumn.', at: t - 3 * day }], createdAt: t - 12 * day, example: true },
+    { id: 'c7', kind: 'issue', cat: 'litter', title: 'Illegal dumping behind the garages', note: 'Old furniture and tyres.', lat: 59.4471, lng: 24.7262, by: 'citizen', status: 'done', votes: 12, comments: [{ by: 'city', text: 'Cleared on 22 September.', at: t - 3 * day }], createdAt: t - 9 * day, example: true }
+  ];
+};
+
 /* Default message pushed by EE-ALARM on declaration */
 LKP.DEFAULT_ALERT = 'Seek shelter now. Sirens are active. Your nearest shelter and route are attached. If you cannot walk it, use Borrow or Request a ride.';
