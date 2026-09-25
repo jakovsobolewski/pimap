@@ -79,7 +79,7 @@
     </div>`;
   }
   function showWelcome() { draft = profile ? Object.assign({}, profile) : draft; renderWelcome(); $('#onboard').hidden = false; document.body.classList.add('ob-open'); }
-  function hideWelcome() { $('#onboard').hidden = true; document.body.classList.remove('ob-open'); }
+  function hideWelcome() { $('#onboard').hidden = true; document.body.classList.remove('ob-open'); window.scrollTo(0, 0); }
   function saveProfile() {
     const first = !profile, role = draft.role || (profile && profile.role) || 'citizen', roleChanged = profile && profile.role !== role;
     profile = { city: draft.city, otherCity: draft.city === 'other' ? draft.otherCity.trim() : '', role, email: draft.email.trim(), since: (profile && profile.since) || Date.now() };
@@ -257,6 +257,7 @@
     if (!$('#profileSheet').hidden) renderProfile();
     if (!$('#fbSheet').hidden && $('#muTitle')) renderMuni();
   });
+  window.addEventListener('scroll', () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); }, { passive: true });
   function boot() {
     const btn = $('#profileBtn'); if (btn) btn.addEventListener('click', openProfile);
     renderButton();
