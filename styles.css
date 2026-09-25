@@ -443,6 +443,7 @@ body.ob-open { overflow: hidden; }
 .ob-card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,40,80,.10), 0 1px 3px rgba(0,0,0,.06); }
 .ob-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .ob-brand { display: flex; flex-direction: column; gap: 4px; }
+.ob-logo-img { height: 60px; width: auto; max-width: 100%; align-self: flex-start; object-fit: contain; display: block; margin: -4px 0 6px -4px; }
 .ob-logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: var(--blue); line-height: 1; }
 .ob-logo b { color: var(--ink); }
 .ob-tag { color: var(--grey); font-size: .95rem; max-width: 460px; }
