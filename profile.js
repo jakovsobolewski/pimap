@@ -66,7 +66,7 @@
         <div class="ob-sec">
           <h2>Email <span class="ob-opt">optional</span></h2>
           <input class="ob-input" type="email" autocomplete="email" placeholder="name@example.com" value="${esc(d.email)}" data-ob-field="email" aria-label="Email">
-          <p class="ob-small">Stays on this device only. This prototype has no server and sends nothing.</p>
+          <p class="ob-small">Stays on this device only. It is never sent to us.</p>
         </div>
         <button type="button" class="ob-go" data-ob="go" ${ready ? '' : 'disabled'}>${editing ? 'Save profile' : 'Continue'}</button>
         ${ready ? '' : '<p class="ob-hint">Choose your city to continue.</p>'}

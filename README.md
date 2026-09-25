@@ -106,6 +106,15 @@ Ride requests are matched by priority (wheelchair, mobility aid, slow walkers, c
 else) to the nearest available neighbour or Pinge crew with enough seats and, when needed, an accessible
 vehicle.
 
+## Analytics and privacy
+
+Google Analytics 4 is wired in `analytics.js` but stays off until a Measurement ID is set in
+`index.html` and `about.html` (`window.PIMAP_GA_ID = 'G-XXXXXXXXXX'`). It loads only after the
+visitor taps **Allow** on the consent bar (GDPR), with IP anonymisation and Google signals off.
+Events carry only interface action names (portal, chip, travel mode, protocol, city button); never
+names, emails, typed text or exact locations. Visitors can change their choice under About → Privacy.
+Profiles, emails, contributions and reports live in the browser's `localStorage` only.
+
 ## What is mocked
 
 * Shelters are the real Tallinn public shelters from the Päästeamet register (Maa- ja Ruumiamet geoportal, layer VARJEKOHT), 52 sites, data as of 23.09.2026. The register has no capacity or step-free access fields, so the app does not show them.
