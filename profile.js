@@ -52,7 +52,7 @@
     el.innerHTML = `<div class="ob-wrap">
       <div class="ob-hero">
         <img class="ob-logo-img" src="pinge-logo.png?v=1" alt="Pinge" width="900" height="467">
-        <p class="ob-tag">Your local map with live data from your municipality</p>
+        <p class="ob-tag"><span>Your local map</span><br><span>with live data from your municipality</span></p>
         ${editing ? `<button type="button" class="ob-x hero" data-ob="close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` : ''}
       </div>
       <div class="ob-card" role="dialog" aria-modal="true" aria-labelledby="obTitle">

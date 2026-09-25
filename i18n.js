@@ -648,6 +648,8 @@ Emergency Unlock Mandate|Hädaolukorra avamismandaat|Hätäavausvaltuutus|Mandat
 
   /* Added later: English | Eesti | Suomi | Español | Українська */
   const RAW5 = `
+Your local map|Sinu kohalik kaart|Paikallinen karttasi|Tu mapa local|Карта міста
+with live data from your municipality|linnavalitsuse reaalajas andmetega|kuntasi reaaliaikaisilla tiedoilla|con datos en directo de tu ayuntamiento|з живими даними від мерії
 Choose your city to continue.|Jätkamiseks vali oma linn.|Jatka valitsemalla kaupunkisi.|Elige tu ciudad para continuar.|Щоб продовжити, оберіть своє місто.
 For municipalities|Omavalitsustele|Kunnille|Para ayuntamientos|Для муніципалітетів
 Work for a city or a rescue service? See PiMap from your side, or bring it to your city.|Töötad linnas või päästeteenistuses? Vaata PiMapi oma vaatest või too see oma linna.|Työskenteletkö kaupungilla tai pelastuspalvelussa? Katso PiMapia omasta näkökulmastasi tai tuo se kaupunkiisi.|¿Trabajas para una ciudad o un servicio de emergencias? Mira PiMap desde tu lado o llévalo a tu ciudad.|Працюєте в міській раді чи рятувальній службі? Подивіться на PiMap зі свого боку або запровадьте його у своєму місті.
