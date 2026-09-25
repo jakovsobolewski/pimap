@@ -91,10 +91,18 @@
 
   /* ---------- Header profile button ---------- */
   function renderButton() {
-    const b = $('#profileBtn'); if (!b) return;
-    b.hidden = !profile;
-    if (profile) b.querySelector('.pf-av').textContent = cityName(profile).trim().charAt(0).toUpperCase() || '?';
+    const b = $('#profileBtn');
+    if (b) { b.hidden = !profile; if (profile) b.querySelector('.pf-av').textContent = cityName(profile).trim().charAt(0).toUpperCase() || '?'; }
+    applyRole();
   }
+  /* Citizens get no portal switcher and always stay in the citizen view.
+     Municipality employees (via "For municipalities") keep both portals. */
+  const isCitizen = () => !!profile && profile.role !== 'municipality';
+  function applyRole() {
+    document.body.classList.toggle('role-citizen', isCitizen());
+    if (isCitizen() && (location.hash === '#gov' || document.body.dataset.portal === 'gov')) location.hash = '#citizen';
+  }
+  window.addEventListener('hashchange', () => { if (isCitizen() && location.hash === '#gov') location.hash = '#citizen'; });
 
   /* ---------- Profile sheet ---------- */
   function activity() {
