@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PiMap</title>
+  <meta name="description" content="PiMap: find your nearest shelter and the safest way there in Tallinn. Construction updates every day; air raid, flood, heatwave and storm protocols in an emergency. Prototype, not an official City of Tallinn service.">
+  <meta name="theme-color" content="#0072CE">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="styles.css?v=20260925-9">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20260925-9" alt="Tallinn"></a>
+      </div>
+      <nav class="portals" role="tablist" aria-label="Portals">
+        <button class="portal-tab" role="tab" data-portal="citizen" type="button">Citizen portal</button>
+        <button class="portal-tab" role="tab" data-portal="gov" type="button">Municipality portal</button>
+      </nav>
+      <div class="topbar-right">
+        <span id="statusPill" class="pill">No alert</span>
+        <span id="netPill" class="pill pill-net">Online</span>
+        <button id="resetBtn" class="btn-ghost" type="button" title="Clear local state and reseed demo data">Reset</button>
+      </div>
+    </div>
+    <nav id="subtabs" class="subtabs" role="tablist" aria-label="Municipality sections" hidden></nav>
+  </header>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <main id="app" class="portal-citizen">
+    <div class="map-wrap">
+      <div id="map" aria-label="Map of Tallinn"></div>
+      <div id="mapHint" class="map-hint" hidden></div>
+
+      <div id="citizenUI" class="citizen-ui">
+        <div class="c-top">
+          <div class="searchbar" role="search">
+            <button class="sb-icon" data-action="cview" data-view="menu" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+            <input id="searchInput" type="search" placeholder="Search PiMap" autocomplete="off" aria-label="Search shelters, places and addresses">
+            <button id="searchClear" class="sb-icon" data-action="search-clear" type="button" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            <button class="sb-icon" data-action="search-go" type="button" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
+            <span class="sb-sep" aria-hidden="true"></span>
+            <button class="sb-dir" data-action="dir-button" type="button" aria-label="Directions" title="Directions"><svg viewBox="0 0 24 24" aria-hidden="true" class="dir-ic"><rect x="4.2" y="4.2" width="15.6" height="15.6" rx="2.4" transform="rotate(45 12 12)"/><path d="M9 14v-2.5a1.5 1.5 0 011.5-1.5H15M13 8l2 2-2 2"/></svg></button>
+          </div>
+          <div class="chips-wrap">
+            <div id="chips" class="chips" role="tablist" aria-label="Places to go"></div>
+            <button class="chips-more" data-action="chips-more" type="button" aria-label="More categories"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div id="alertBanner"></div>
+        <div id="homeCard"></div>
+        <div id="fab"></div>
+        <section id="cpanel" class="cpanel" hidden aria-live="polite"></section>
+      </div>
+
+      <section id="govPanel" class="gov-panel" aria-label="Municipality"></section>
+
+      <div class="legend" aria-label="Map legend">
+        <div><span class="lg" style="--c:#0072CE"></span>Public shelter</div>
+        <div><span class="mk mk-user"></span>Resident</div>
+        <div><span class="mk mk-fleet">B</span>Shared vehicle, locked</div>
+        <div><span class="mk mk-fleet on">B</span>Shared vehicle, free</div>
+        <div><span class="mk mk-listing">L</span>Neighbour listing</div>
+        <div><span class="mk mk-vol">R</span>Driver offering pick-up</div>
+        <div><span class="mk mk-req">!</span>Pick-up request</div>
+        <div><span class="lg" style="--c:#F28C00"></span>Construction works</div>
+        <div><span class="lg sq" style="--c:#42A5F5"></span>Flooded area</div>
+        <div><span class="lg sq" style="--c:#E53935"></span>Unsafe place</div>
+        <div><span class="lg" style="--c:#6D4C41"></span>Fallen tree report</div>
+        <div><span class="lg" style="--c:#6A1B9A"></span>Storm area</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="data.js?v=20260925-9"></script>
+  <script src="mds.js?v=20260925-9"></script>
+  <script src="pois.js?v=20260925-9"></script>
+  <script src="app.js?v=20260925-9"></script>
+</body>
+</html>
