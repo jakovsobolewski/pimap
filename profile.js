@@ -52,7 +52,7 @@
     el.innerHTML = `<div class="ob-wrap">
       <div class="ob-card" role="dialog" aria-modal="true" aria-labelledby="obTitle">
         <div class="ob-top">
-          <div class="ob-brand"><img class="ob-logo-img" src="pinge-logo.jpg" alt="Pinge" width="800" height="415"><span class="ob-tag">F*ck Waze, f*ck Goggle Maps. Your local map with live data from your municipality</span></div>
+          <div class="ob-brand"><img class="ob-logo-img" src="pinge-logo.jpg" alt="Pinge" width="800" height="415"><span class="ob-tag">Your local map with live data from your municipality</span></div>
           ${editing ? `<button type="button" class="ob-x" data-ob="close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` : ''}
         </div>
         <div class="ob-sec"><div class="ob-label">Language</div><div class="ob-langs" role="group" aria-label="Language">${langButtons()}</div></div>

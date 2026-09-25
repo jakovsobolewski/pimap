@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- Light grey concrete, drawn procedurally for PiMap's welcome page:
+       cloudy tone variation, fine grain, sparse pores and faint hairline cracks. -->
+  <defs>
+    <filter id="clouds" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0032 0.0045" numOctaves="5" seed="4"/>
+      <feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.24" intercept="0.77"/>
+        <feFuncG type="linear" slope="0.24" intercept="0.77"/>
+        <feFuncB type="linear" slope="0.24" intercept="0.773"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.35  0 0 0 0 0.35  0.9 0 0 0 -0.35"/>
+    </filter>
+    <filter id="pores" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="turbulence" baseFrequency="0.33" numOctaves="1" seed="21"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.10  0 0 0 0 0.10  1 0 0 0 0"/>
+      <feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9"/></feComponentTransfer>
+    </filter>
+    <filter id="bigpores" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="turbulence" baseFrequency="0.11" numOctaves="1" seed="37"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 0 0.22  1 0 0 0 0"/>
+      <feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55"/></feComponentTransfer>
+    </filter>
+    <filter id="mottle" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="27"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.62  0 0 0 0 0.62  0 0 0 0 0.61  1.4 0 0 0 -0.72"/>
+    </filter>
+    <filter id="stains" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="15"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.55  0 0 0 0 0.54  1.6 0 0 0 -0.98"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="#e3e3e2"/>
+  <rect width="1600" height="900" filter="url(#clouds)"/>
+  <rect width="1600" height="900" filter="url(#stains)" opacity="0.18"/>
+  <rect width="1600" height="900" filter="url(#mottle)" opacity="0.22"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.2"/>
+  <rect width="1600" height="900" filter="url(#bigpores)"/>
+  <rect width="1600" height="900" filter="url(#pores)"/>
+  <g fill="none" stroke="#a3a3a1" stroke-width="0.7" stroke-linecap="round" opacity="0.3">
+    <path d="M520 0 l6 60 -9 55 12 70 -4 90 10 80 -7 120 14 110 -6 90 8 130"/>
+    <path d="M1180 40 l-14 40 6 36 -18 44 9 30"/>
+    <path d="M1420 610 l30 18 22 -6 40 26"/>
+  </g>
+</svg>

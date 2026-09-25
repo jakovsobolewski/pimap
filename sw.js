@@ -1,11 +1,11 @@
 /* Service worker — makes the protocol usable offline.
    App shell + Leaflet are cached on install; map tiles and routes are cached as they are fetched,
    so a phone that has opened the app once keeps its shelters, map and last routes without signal. */
-const SHELL_CACHE = 'lkp-shell-v26';
+const SHELL_CACHE = 'lkp-shell-v29';
 const TILE_CACHE = 'lkp-tiles-v1';
 const ROUTE_CACHE = 'lkp-routes-v1';
 const SHELL = [
-  './', './index.html', './styles.css', './app.js', './data.js', './mds.js', './pois.js', './i18n.js', './profile.js', './about.html', './tallinn-logo.svg', './pinge-logo.jpg', './manifest.json', './icon.svg',
+  './', './index.html', './styles.css', './app.js', './data.js', './mds.js', './pois.js', './i18n.js', './profile.js', './about.html', './tallinn-logo.svg', './pinge-logo.jpg', './concrete.svg', './manifest.json', './icon.svg',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'
 ];

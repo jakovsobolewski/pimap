@@ -649,7 +649,7 @@ Emergency Unlock Mandate|Hädaolukorra avamismandaat|Hätäavausvaltuutus|Mandat
   /* Added later: English | Eesti | Suomi | Español | Українська */
   const RAW5 = `
 // ---- welcome page, profile, platform feedback ----
-F*ck Waze, f*ck Goggle Maps. Your local map with live data from your municipality|P*rses Waze, p*rses Goggle Maps. Sinu kohalik kaart linnavalitsuse reaalajas andmetega|V*tut Wazesta, v*tut Goggle Mapsista. Paikallinen karttasi kuntasi reaaliaikaisilla tiedoilla|A la m*erda Waze, a la m*erda Goggle Maps. Tu mapa local con datos en directo de tu ayuntamiento|Н*хай Waze, н*хай Goggle Maps. Твоя локальна карта з актуальними даними від твоєї міської ради
+Your local map with live data from your municipality|Sinu kohalik kaart linnavalitsuse reaalajas andmetega|Paikallinen karttasi kuntasi reaaliaikaisilla tiedoilla|Tu mapa local con datos en directo de tu ayuntamiento|Твоя локальна карта з актуальними даними від твоєї міської ради
 Where are you from?|Kust sa pärit oled?|Mistä olet?|¿De dónde eres?|Звідки ви?
 Other|Muu|Muu|Otra|Інше
 Type your city|Kirjuta oma linn|Kirjoita kaupunkisi|Escribe tu ciudad|Введіть своє місто
