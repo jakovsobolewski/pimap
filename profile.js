@@ -50,12 +50,13 @@
     const ready = d.city && (d.city !== 'other' || d.otherCity.trim());
     const editing = !!profile;
     el.innerHTML = `<div class="ob-wrap">
+      <div class="ob-hero">
+        <img class="ob-logo-img" src="pinge-logo.png?v=1" alt="Pinge" width="900" height="467">
+        <p class="ob-tag">Your local map with live data from your municipality</p>
+        ${editing ? `<button type="button" class="ob-x hero" data-ob="close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` : ''}
+      </div>
       <div class="ob-card" role="dialog" aria-modal="true" aria-labelledby="obTitle">
-        <div class="ob-top">
-          <div class="ob-brand"><img class="ob-logo-img" src="pinge-logo.jpg" alt="Pinge" width="800" height="415"><span class="ob-tag">Your local map with live data from your municipality</span></div>
-          ${editing ? `<button type="button" class="ob-x" data-ob="close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` : ''}
-        </div>
-        <div class="ob-sec"><div class="ob-label">Language</div><div class="ob-langs" role="group" aria-label="Language">${langButtons()}</div></div>
+        <div class="ob-sec first"><div class="ob-label">Language</div><div class="ob-langs" role="group" aria-label="Language">${langButtons()}</div></div>
         <div class="ob-sec">
           <h1 id="obTitle">Where are you from?</h1>
           <div class="ob-cities" role="radiogroup" aria-label="Where are you from?">${CITIES.map(c => `<button type="button" class="ob-city ${d.city === c.id ? 'on' : ''}" data-ob="city" data-v="${c.id}" role="radio" aria-checked="${d.city === c.id}">${PIN}<span class="oc-name">${c.name}</span>${c.country ? `<span class="oc-sub">${c.country}</span>` : '<span class="oc-sub">Type your city</span>'}${c.live ? '<span class="oc-live">Live data</span>' : ''}</button>`).join('')}</div>
@@ -121,7 +122,7 @@
       <div class="pf-kv"><span>City</span><b><span${profile.city === 'other' ? ' data-no-i18n' : ''}>${esc(cityName(profile))}</span>${c.country ? `, <span>${c.country}</span>` : ''}</b></div>
       <div class="pf-kv"><span>Role</span><b>${r.label}</b></div>
       <div class="pf-kv"><span>Email</span>${profile.email ? `<b data-no-i18n>${esc(profile.email)}</b>` : '<b>Not shared</b>'}</div>
-      <div class="pf-kv"><span>Language</span><b data-no-i18n>${(LANGS.find(l => l[0] === lang()) || LANGS[0])[1]}</b></div>
+      <div class="pf-kv col"><span>Language</span><div class="ob-langs" role="group" aria-label="Language">${langButtons()}</div></div>
       <div class="pf-kv"><span>Member since</span><b data-no-i18n>${fmtDate(profile.since)}</b></div>
       <div class="ob-row" style="margin-top:12px"><button type="button" class="ob-ghost" data-pf="edit">Edit profile</button><button type="button" class="ob-ghost" data-pf="portal" data-v="${profile.role === 'municipality' ? 'gov' : 'citizen'}">${profile.role === 'municipality' ? 'Municipality portal' : 'Citizen portal'}</button></div>
 
@@ -200,7 +201,7 @@
   /* ---------- Events ---------- */
   document.addEventListener('click', e => {
     const lb = e.target.closest('[data-set-lang]');
-    if (lb && lb.closest('#onboard')) { if (window.LKP_SET_LANG) window.LKP_SET_LANG(lb.dataset.setLang); return; }
+    if (lb && (lb.closest('#onboard') || lb.closest('#profileSheet'))) { if (window.LKP_SET_LANG) window.LKP_SET_LANG(lb.dataset.setLang); return; }
     const o = e.target.closest('[data-ob]');
     if (o && o.closest('#onboard')) {
       const a = o.dataset.ob;

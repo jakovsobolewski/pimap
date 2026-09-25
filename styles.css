@@ -441,9 +441,11 @@ details summary { cursor: pointer; font-weight: 700; font-size: .86rem; color: v
 body.ob-open { overflow: hidden; }
 .ob-wrap { max-width: 640px; margin: 0 auto; padding: 40px 16px 48px; display: flex; flex-direction: column; gap: 16px; }
 .ob-card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,.14), 0 1px 3px rgba(0,0,0,.08); }
-.ob-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
-.ob-brand { display: flex; flex-direction: column; gap: 4px; }
-.ob-logo-img { height: 60px; width: auto; max-width: 100%; align-self: flex-start; object-fit: contain; display: block; margin: -4px 0 6px -4px; }
+.ob-hero { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 4px 4px 0; }
+.ob-hero .ob-tag { color: #2b2b2b; font-weight: 600; font-size: 1.02rem; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+.ob-x.hero { position: absolute; top: 0; right: 0; background: rgba(255,255,255,.85); }
+.ob-sec.first { margin-top: 0; }
+.ob-logo-img { height: 84px; width: auto; max-width: 100%; align-self: flex-start; object-fit: contain; display: block; margin: 0 0 4px -6px; filter: drop-shadow(0 1px 1px rgba(255,255,255,.7)); }
 .ob-logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: var(--blue); line-height: 1; }
 .ob-logo b { color: var(--ink); }
 .ob-tag { color: var(--grey); font-size: .95rem; max-width: 460px; }
@@ -497,6 +499,9 @@ body.ob-open { overflow: hidden; }
 .pf-kv { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: .9rem; }
 .pf-kv span:first-child { color: var(--grey); }
 .pf-kv b { text-align: right; }
+.pf-kv.col { flex-direction: column; align-items: flex-start; gap: 8px; }
+.pf-kv.col .ob-langs { width: 100%; }
+.pf-kv.col .ob-langbtn { padding: 5px 12px; font-size: .82rem; }
 .pf-card h3 { font-size: 1rem; margin: 18px 0 8px; }
 .pf-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
 .pf-stats div { background: var(--blue-pale); border-radius: 12px; padding: 10px; }
@@ -532,6 +537,7 @@ body.role-citizen .portals { display: none !important; }
   .ob-wrap { padding: 20px 12px 32px; }
   .ob-card { padding: 18px; }
   .ob-tag { font-size: .88rem; }
+  .ob-logo-img { height: 64px; }
   .ob-cities { grid-template-columns: 1fr 1fr; }
   .ob-roles { grid-template-columns: 1fr; }
   .sheet-overlay { padding: 12px; }
