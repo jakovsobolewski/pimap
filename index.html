@@ -12,13 +12,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="styles.css?v=20260925-15">
+  <link rel="stylesheet" href="styles.css?v=20260925-17">
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand">
-        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20260925-15" alt="Tallinn"></a>
+        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20260925-17" alt="Tallinn"></a>
         <div id="langSwitch" class="lang-switch" role="group" aria-label="Language"></div>
       </div>
       <nav class="portals" role="tablist" aria-label="Portals">
@@ -30,12 +30,16 @@
         <span id="statusPill" class="pill">No alert</span>
         <span id="netPill" class="pill pill-net" hidden>Offline · cached</span>
         <button id="contributeBtn" class="btn-contribute" type="button" title="Report an issue or share an idea"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Contribute</span><span class="cb-n"></span></button>
+        <button id="profileBtn" class="btn-profile" type="button" aria-label="Your profile" title="Your profile" hidden><span class="pf-av"></span></button>
       </div>
     </div>
     <nav id="subtabs" class="subtabs" role="tablist" aria-label="Municipality sections" hidden></nav>
   </header>
 
   <div id="toast" class="toast" role="status" hidden></div>
+  <div id="onboard" class="onboard" hidden></div>
+  <div id="profileSheet" class="sheet-overlay" hidden></div>
+  <div id="fbSheet" class="sheet-overlay" hidden></div>
 
   <main id="app" class="portal-citizen">
     <div class="map-wrap">
@@ -85,10 +89,11 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="data.js?v=20260925-15"></script>
-  <script src="mds.js?v=20260925-15"></script>
-  <script src="pois.js?v=20260925-15"></script>
-  <script src="i18n.js?v=20260925-15"></script>
-  <script src="app.js?v=20260925-15"></script>
+  <script src="data.js?v=20260925-17"></script>
+  <script src="mds.js?v=20260925-17"></script>
+  <script src="pois.js?v=20260925-17"></script>
+  <script src="i18n.js?v=20260925-17"></script>
+  <script src="app.js?v=20260925-17"></script>
+  <script src="profile.js?v=20260925-17"></script>
 </body>
 </html>

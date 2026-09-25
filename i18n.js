@@ -648,6 +648,96 @@ Emergency Unlock Mandate|Hädaolukorra avamismandaat|Hätäavausvaltuutus|Mandat
 
   /* Added later: English | Eesti | Suomi | Español | Українська */
   const RAW5 = `
+// ---- welcome page, profile, platform feedback ----
+Your nearest shelter and the safest way there, every day and in an emergency.|Lähim varjumiskoht ja ohutuim tee sinna, iga päev ja hädaolukorras.|Lähin suoja ja turvallisin reitti sinne, joka päivä ja hätätilanteessa.|Tu refugio más cercano y el camino más seguro hasta él, cada día y en una emergencia.|Найближче укриття і найбезпечніший шлях до нього, щодня і в надзвичайній ситуації.
+Where are you from?|Kust sa pärit oled?|Mistä olet?|¿De dónde eres?|Звідки ви?
+Other|Muu|Muu|Otra|Інше
+Type your city|Kirjuta oma linn|Kirjoita kaupunkisi|Escribe tu ciudad|Введіть своє місто
+Live data|Andmed olemas|Tiedot saatavilla|Datos disponibles|Дані доступні
+PiMap has live data for Tallinn only. We will save your city and show you the Tallinn demo.|PiMapis on praegu andmed ainult Tallinna kohta. Salvestame sinu linna ja näitame Tallinna demot.|PiMapissa on toistaiseksi tiedot vain Tallinnasta. Tallennamme kaupunkisi ja näytämme Tallinnan demon.|PiMap solo tiene datos de Tallin por ahora. Guardaremos tu ciudad y te mostraremos la demo de Tallin.|Наразі PiMap має дані лише для Таллінна. Ми збережемо ваше місто й покажемо демо Таллінна.
+Who are you?|Kes sa oled?|Kuka olet?|¿Quién eres?|Хто ви?
+Citizen|Elanik|Asukas|Ciudadano|Мешканець
+Find shelters and safe routes, report issues, share ideas|Leia varjumiskohad ja ohutud teed, teata probleemidest, jaga ideid|Löydä suojat ja turvalliset reitit, ilmoita ongelmista, jaa ideoita|Encuentra refugios y rutas seguras, informa de problemas, comparte ideas|Знаходьте укриття й безпечні маршрути, повідомляйте про проблеми, діліться ідеями
+Municipality employee|Linna töötaja|Kaupungin työntekijä|Empleado municipal|Працівник міської ради
+Manage construction, run crisis protocols, answer residents|Halda ehitustöid, juhi kriisiprotokolle, vasta elanikele|Hallitse rakennustöitä, johda kriisiprotokollia, vastaa asukkaille|Gestiona obras, activa protocolos de crisis, responde a los vecinos|Керуйте будівельними роботами, запускайте кризові протоколи, відповідайте мешканцям
+Email|E-post|Sähköposti|Correo electrónico|Електронна пошта
+optional|valikuline|valinnainen|opcional|необов’язково
+Stays on this device only. This prototype has no server and sends nothing.|Jääb ainult sellesse seadmesse. Sellel prototüübil pole serverit ja see ei saada midagi.|Pysyy vain tällä laitteella. Tällä prototyypillä ei ole palvelinta, eikä se lähetä mitään.|Solo se guarda en este dispositivo. Este prototipo no tiene servidor y no envía nada.|Залишається лише на цьому пристрої. Цей прототип не має сервера й нічого не надсилає.
+Continue|Jätka|Jatka|Continuar|Продовжити
+Save profile|Salvesta profiil|Tallenna profiili|Guardar perfil|Зберегти профіль
+Choose your city and who you are to continue.|Jätkamiseks vali oma linn ja kes sa oled.|Jatka valitsemalla kaupunkisi ja kuka olet.|Elige tu ciudad y quién eres para continuar.|Щоб продовжити, оберіть місто і хто ви.
+Help build PiMap|Aita PiMapi ehitada|Auta rakentamaan PiMapia|Ayuda a construir PiMap|Допоможіть створювати PiMap
+Found a bug or have an idea for the platform? Tell us.|Leidsid vea või on sul idee platvormi jaoks? Anna teada.|Löysitkö virheen tai onko sinulla idea alustaa varten? Kerro meille.|¿Has encontrado un error o tienes una idea para la plataforma? Cuéntanos.|Знайшли помилку чи маєте ідею для платформи? Напишіть нам.
+Report a bug|Teata veast|Ilmoita virheestä|Informar de un error|Повідомити про помилку
+Suggest an idea|Paku ideed|Ehdota ideaa|Sugerir una idea|Запропонувати ідею
+About PiMap: what this project is|PiMapist: mis projekt see on|Tietoa PiMapista: mikä tämä hanke on|Sobre PiMap: qué es este proyecto|Про PiMap: що це за проєкт
+Welcome to PiMap|Tere tulemast PiMapi|Tervetuloa PiMapiin|Bienvenido a PiMap|Ласкаво просимо до PiMap
+Saved. You are exploring the Tallinn demo.|Salvestatud. Vaatad Tallinna demot.|Tallennettu. Tutustut Tallinnan demoon.|Guardado. Estás viendo la demo de Tallin.|Збережено. Ви переглядаєте демо Таллінна.
+Your profile|Sinu profiil|Profiilisi|Tu perfil|Ваш профіль
+City|Linn|Kaupunki|Ciudad|Місто
+Role|Roll|Rooli|Rol|Роль
+Not shared|Pole jagatud|Ei jaettu|No compartido|Не вказано
+Member since|Liige alates|Jäsen alkaen|Miembro desde|Учасник з
+Edit profile|Muuda profiili|Muokkaa profiilia|Editar perfil|Редагувати профіль
+Your activity|Sinu tegevus|Toimintasi|Tu actividad|Ваша активність
+Issues and ideas|Probleemid ja ideed|Ongelmat ja ideat|Problemas e ideas|Проблеми та ідеї
+Emergency reports|Hädaolukorra teated|Hätäilmoitukset|Avisos de emergencia|Повідомлення про небезпеку
+Lent vehicles|Laenatud sõidukid|Lainatut kulkuneuvot|Vehículos prestados|Позичені транспортні засоби
+Nothing yet. Contribute from the map.|Veel pole midagi. Osale kaardilt.|Ei vielä mitään. Osallistu kartalta.|Todavía nada. Contribuye desde el mapa.|Поки нічого. Долучайтеся з карти.
+Sign out|Logi välja|Kirjaudu ulos|Cerrar sesión|Вийти
+Sign out? Your profile is removed from this device.|Kas logida välja? Sinu profiil eemaldatakse sellest seadmest.|Kirjaudutaanko ulos? Profiilisi poistetaan tältä laitteelta.|¿Cerrar sesión? Tu perfil se eliminará de este dispositivo.|Вийти? Ваш профіль буде видалено з цього пристрою.
+Bug|Viga|Virhe|Error|Помилка
+reported|teatatud|ilmoitettu|notificado|повідомлено
+Type|Tüüp|Tyyppi|Tipo|Тип
+What went wrong? What did you expect?|Mis läks valesti? Mida sa ootasid?|Mikä meni vikaan? Mitä odotit?|¿Qué salió mal? ¿Qué esperabas?|Що пішло не так? Чого ви очікували?
+What should PiMap do? Who would it help?|Mida PiMap võiks teha? Keda see aitaks?|Mitä PiMapin pitäisi tehdä? Ketä se auttaisi?|¿Qué debería hacer PiMap? ¿A quién ayudaría?|Що має робити PiMap? Кому це допоможе?
+Send on GitHub|Saada GitHubi kaudu|Lähetä GitHubissa|Enviar en GitHub|Надіслати через GitHub
+Send by email|Saada e-postiga|Lähetä sähköpostilla|Enviar por correo|Надіслати поштою
+GitHub needs a free account. Email opens your mail app. A copy stays in your profile.|GitHub vajab tasuta kontot. E-post avab sinu meilirakenduse. Koopia jääb sinu profiili.|GitHub vaatii ilmaisen tilin. Sähköposti avaa sähköpostisovelluksesi. Kopio jää profiiliisi.|GitHub necesita una cuenta gratuita. El correo abre tu aplicación de correo. Una copia queda en tu perfil.|Для GitHub потрібен безкоштовний обліковий запис. Пошта відкриє ваш поштовий застосунок. Копія залишиться у вашому профілі.
+Write a few words first|Kirjuta enne paar sõna|Kirjoita ensin muutama sana|Escribe unas palabras primero|Спочатку напишіть кілька слів
+Thank you for helping build PiMap|Aitäh, et aitad PiMapi ehitada|Kiitos, että autat rakentamaan PiMapia|Gracias por ayudar a construir PiMap|Дякуємо, що допомагаєте створювати PiMap
+Tallinn|Tallinn|Tallinna|Tallin|Таллінн
+Helsinki|Helsingi|Helsinki|Helsinki|Гельсінкі
+Dnipro|Dnipro|Dnipro|Dnipró|Дніпро
+Lviv|Lviv|Lviv|Leópolis|Львів
+Valencia|Valencia|Valencia|Valencia|Валенсія
+Estonia|Eesti|Viro|Estonia|Естонія
+Finland|Soome|Suomi|Finlandia|Фінляндія
+Ukraine|Ukraina|Ukraina|Ucrania|Україна
+Spain|Hispaania|Espanja|España|Іспанія
+// ---- about page ----
+About PiMap|PiMapist|Tietoa PiMapista|Sobre PiMap|Про PiMap
+Open PiMap|Ava PiMap|Avaa PiMap|Abrir PiMap|Відкрити PiMap
+Every resident reaches safety, whether or not they can walk.|Iga elanik jõuab ohutusse, olenemata sellest, kas ta suudab kõndida.|Jokainen asukas pääsee turvaan, pystyi hän kävelemään tai ei.|Cada vecino llega a un lugar seguro, pueda caminar o no.|Кожен мешканець дістається безпечного місця, навіть якщо не може йти пішки.
+PiMap shows your nearest shelter and the safest way there, every day and in an emergency. It connects residents, neighbours and the city on one map.|PiMap näitab lähimat varjumiskohta ja ohutuimat teed sinna, iga päev ja hädaolukorras. See ühendab elanikud, naabrid ja linna ühel kaardil.|PiMap näyttää lähimmän suojan ja turvallisimman reitin sinne, joka päivä ja hätätilanteessa. Se yhdistää asukkaat, naapurit ja kaupungin yhdellä kartalla.|PiMap muestra tu refugio más cercano y el camino más seguro hasta él, cada día y en una emergencia. Une a residentes, vecinos y el ayuntamiento en un solo mapa.|PiMap показує найближче укриття і найбезпечніший шлях до нього, щодня і в надзвичайній ситуації. Він об’єднує мешканців, сусідів і місто на одній карті.
+A prototype built for City Resilience Hack 2026 in Tallinn. Not an official City of Tallinn service.|Prototüüp, mis on loodud Tallinnas toimunud City Resilience Hack 2026 jaoks. Ei ole Tallinna linna ametlik teenus.|Tallinnan City Resilience Hack 2026 -tapahtumaa varten tehty prototyyppi. Ei Tallinnan kaupungin virallinen palvelu.|Un prototipo creado para City Resilience Hack 2026 en Tallin. No es un servicio oficial de la ciudad de Tallin.|Прототип, створений для City Resilience Hack 2026 у Таллінні. Не є офіційним сервісом міста Таллінн.
+The problem|Probleem|Ongelma|El problema|Проблема
+Cities have shelters, sirens and emergency alerts, but no plan for the last kilometre. If you cannot walk it, you do not reach it.|Linnadel on varjumiskohad, sireenid ja ohuteated, kuid puudub plaan viimaseks kilomeetriks. Kui sa seda jalgsi läbida ei suuda, sa kohale ei jõua.|Kaupungeilla on suojat, sireenit ja hätäviestit, mutta ei suunnitelmaa viimeiselle kilometrille. Jos et pysty kävelemään sitä, et pääse perille.|Las ciudades tienen refugios, sirenas y alertas de emergencia, pero no un plan para el último kilómetro. Si no puedes recorrerlo a pie, no llegas.|Міста мають укриття, сирени та сповіщення про небезпеку, але не мають плану для останнього кілометра. Якщо ви не можете його пройти, ви не дістанетеся.
+Older people, people with limited mobility and families with small children are the first to be left behind.|Esimesena jäävad maha eakad, liikumispuudega inimesed ja väikeste lastega pered.|Ensimmäisinä jälkeen jäävät ikääntyneet, liikuntarajoitteiset ja pikkulapsiperheet.|Las personas mayores, las personas con movilidad reducida y las familias con niños pequeños son las primeras en quedarse atrás.|Першими позаду залишаються літні люди, люди з обмеженою мобільністю та родини з малими дітьми.
+How PiMap works|Kuidas PiMap töötab|Miten PiMap toimii|Cómo funciona PiMap|Як працює PiMap
+One alert brings your nearest shelter, a route that avoids danger, and four ways to get there: walk, bike, drive or request a pick-up. It works without signal.|Üks ohuteade toob sulle lähima varjumiskoha, ohtudest mööduva tee ja neli viisi sinna jõudmiseks: jalgsi, rattaga, autoga või järeletulemist paludes. See töötab ka ilma levita.|Yksi hälytys tuo lähimmän suojan, vaarat kiertävän reitin ja neljä tapaa päästä perille: kävellen, pyörällä, autolla tai kyytiä pyytämällä. Se toimii ilman verkkoyhteyttä.|Una sola alerta te da tu refugio más cercano, una ruta que evita el peligro y cuatro formas de llegar: a pie, en bici, en coche o pidiendo que te recojan. Funciona sin cobertura.|Одне сповіщення показує найближче укриття, маршрут в обхід небезпеки і чотири способи дістатися: пішки, велосипедом, автомобілем або з проханням забрати вас. Працює без зв’язку.
+During an alert, shared scooters and bikes near shelters become free to ride, time-boxed and limited to the shelter area.|Ohuteate ajal muutuvad varjumiskohtade lähedal olevad jagatud tõukerattad ja rattad tasuta, ajaliselt piiratult ja ainult varjumiskoha piirkonnas.|Hälytyksen aikana suojien lähellä olevat yhteiskäyttöpotkulaudat ja -pyörät ovat maksuttomia, määräajan ja vain suoja-alueella.|Durante una alerta, los patinetes y bicis compartidos cerca de los refugios son gratuitos, por tiempo limitado y solo en la zona del refugio.|Під час тривоги спільні самокати й велосипеди біля укриттів стають безкоштовними, на обмежений час і лише в зоні укриття.
+Neighbours pre-list spare bikes and mobility aids and offer seats in their cars. People who cannot walk are picked up first.|Naabrid lisavad eelnevalt oma varurattad ja liikumisabivahendid ning pakuvad kohti oma autodes. Kõndida mittesuutjad viiakse esimesena.|Naapurit ilmoittavat etukäteen ylimääräiset pyöränsä ja liikkumisen apuvälineensä sekä tarjoavat kyytejä autoissaan. Ne, jotka eivät pysty kävelemään, haetaan ensin.|Los vecinos registran de antemano bicis y ayudas a la movilidad que no usan y ofrecen plazas en sus coches. Quienes no pueden caminar son recogidos primero.|Сусіди заздалегідь додають вільні велосипеди та засоби пересування й пропонують місця у своїх авто. Тих, хто не може йти, забирають першими.
+A protocol for each emergency|Iga hädaolukorra jaoks oma protokoll|Oma protokolla jokaiseen hätätilanteeseen|Un protocolo para cada emergencia|Протокол для кожної надзвичайної ситуації
+War or air strike|Sõda või õhurünnak|Sota tai ilmaisku|Guerra o ataque aéreo|Війна або повітряний удар
+Routes to the nearest public shelter.|Teed lähimasse avalikku varjumiskohta.|Reitit lähimpään yleiseen suojaan.|Rutas al refugio público más cercano.|Маршрути до найближчого публічного укриття.
+The city marks flooded streets and routes go around them.|Linn märgib üleujutatud tänavad ja teed lähevad neist mööda.|Kaupunki merkitsee tulvivat kadut, ja reitit kiertävät ne.|El ayuntamiento marca las calles inundadas y las rutas las rodean.|Місто позначає затоплені вулиці, і маршрути їх оминають.
+Routes to cool indoor places along the shadiest streets.|Teed jahedatesse siseruumidesse mööda kõige varjulisemaid tänavaid.|Reitit viileisiin sisätiloihin varjoisimpia katuja pitkin.|Rutas a lugares interiores frescos por las calles con más sombra.|Маршрути до прохолодних приміщень найтінистішими вулицями.
+Routes avoid trees, the shoreline and reported fallen trees.|Teed väldivad puid, rannajoont ja teatatud langenud puid.|Reitit välttävät puita, rantaviivaa ja ilmoitettuja kaatuneita puita.|Las rutas evitan árboles, la costa y los árboles caídos notificados.|Маршрути оминають дерева, берегову лінію та повідомлені повалені дерева.
+Useful every day|Kasulik iga päev|Hyödyllinen joka päivä|Útil cada día|Корисно щодня
+Find the nearest pharmacy, hospital, grocery store or drinking water.|Leia lähim apteek, haigla, toidupood või joogivesi.|Löydä lähin apteekki, sairaala, ruokakauppa tai juomavesi.|Encuentra la farmacia, el hospital, el supermercado o el agua potable más cercanos.|Знайдіть найближчу аптеку, лікарню, продуктовий магазин або питну воду.
+See construction works and routes that steer around them, kept up to date by the city.|Vaata ehitustöid ja neist mööda juhatavaid teid, mida linn ajakohasena hoiab.|Katso rakennustyöt ja niitä kiertävät reitit, jotka kaupunki pitää ajan tasalla.|Consulta las obras y las rutas que las evitan, actualizadas por el ayuntamiento.|Переглядайте будівельні роботи й маршрути в їх обхід, які місто підтримує актуальними.
+Report issues and share ideas for your street. Neighbours support them and the city replies.|Teata probleemidest ja jaga ideid oma tänava kohta. Naabrid toetavad neid ja linn vastab.|Ilmoita ongelmista ja jaa ideoita kadullesi. Naapurit tukevat niitä ja kaupunki vastaa.|Informa de problemas y comparte ideas para tu calle. Los vecinos las apoyan y el ayuntamiento responde.|Повідомляйте про проблеми й діліться ідеями для своєї вулиці. Сусіди їх підтримують, а місто відповідає.
+Two portals, one map|Kaks portaali, üks kaart|Kaksi portaalia, yksi kartta|Dos portales, un mapa|Два портали, одна карта
+Residents use the citizen portal. City staff use the municipality portal to update construction, declare and run emergency protocols, and answer residents.|Elanikud kasutavad kodaniku portaali. Linna töötajad kasutavad linna portaali, et uuendada ehitustöid, kuulutada välja ja juhtida hädaolukorra protokolle ning vastata elanikele.|Asukkaat käyttävät asukasportaalia. Kaupungin henkilöstö päivittää kaupungin portaalissa rakennustyöt, julistaa ja johtaa hätäprotokollia ja vastaa asukkaille.|Los vecinos usan el portal ciudadano. El personal municipal usa el portal municipal para actualizar las obras, declarar y gestionar los protocolos de emergencia y responder a los vecinos.|Мешканці користуються порталом мешканця. Працівники міста в міському порталі оновлюють будівельні роботи, оголошують і ведуть протоколи надзвичайних ситуацій та відповідають мешканцям.
+Open data|Avaandmed|Avoin data|Datos abiertos|Відкриті дані
+Public shelters: the Estonian Rescue Board register, through the Land and Spatial Development Board geoportal.|Avalikud varjumiskohad: Päästeameti register Maa- ja Ruumiameti geoportaali kaudu.|Yleiset suojat: Viron pelastuslaitoksen rekisteri Maa- ja Ruumiametin karttapalvelun kautta.|Refugios públicos: el registro de la Junta de Rescate de Estonia, a través del geoportal de la Junta de Tierras y Desarrollo Espacial.|Публічні укриття: реєстр Рятувальної служби Естонії через геопортал Земельного та просторового управління.
+Places, buildings, trees and walking routes: OpenStreetMap contributors.|Kohad, hooned, puud ja jalgteed: OpenStreetMapi kaastöölised.|Paikat, rakennukset, puut ja kävelyreitit: OpenStreetMapin tekijät.|Lugares, edificios, árboles y rutas a pie: colaboradores de OpenStreetMap.|Місця, будівлі, дерева та пішохідні маршрути: учасники OpenStreetMap.
+Who is building it|Kes seda ehitab|Kuka sitä rakentaa|Quién lo construye|Хто це створює
+PiMap is built by Pinge Electronics OÜ in Tallinn, which runs light electric vehicles and mobility aids for people who find walking hard.|PiMapi ehitab Tallinnas tegutsev Pinge Electronics OÜ, mis pakub kergeid elektrisõidukeid ja liikumisabivahendeid inimestele, kellel on kõndimine raske.|PiMapia rakentaa tallinnalainen Pinge Electronics OÜ, joka tarjoaa kevyitä sähköajoneuvoja ja liikkumisen apuvälineitä ihmisille, joille kävely on vaikeaa.|PiMap lo construye Pinge Electronics OÜ en Tallin, que ofrece vehículos eléctricos ligeros y ayudas a la movilidad para personas a las que les cuesta caminar.|PiMap створює таллінська компанія Pinge Electronics OÜ, яка надає легкий електротранспорт і засоби пересування людям, яким важко ходити.
+The next step is a one-district pilot with the city and the Rescue Board. The code is open.|Järgmine samm on ühe linnaosa pilootprojekt koos linna ja Päästeametiga. Kood on avatud.|Seuraava vaihe on yhden kaupunginosan pilotti yhdessä kaupungin ja pelastuslaitoksen kanssa. Koodi on avointa.|El siguiente paso es un piloto en un distrito con el ayuntamiento y la Junta de Rescate. El código es abierto.|Наступний крок: пілот в одному районі разом із містом і Рятувальною службою. Код відкритий.
+Source code on GitHub|Lähtekood GitHubis|Lähdekoodi GitHubissa|Código fuente en GitHub|Вихідний код на GitHub
+PiMap prototype · not an official City of Tallinn service|PiMapi prototüüp · ei ole Tallinna linna ametlik teenus|PiMap-prototyyppi · ei ole Tallinnan kaupungin virallinen palvelu|Prototipo de PiMap · no es un servicio oficial de la ciudad de Tallin|Прототип PiMap · не є офіційним сервісом міста Таллінн
 No contributions yet.|Panuseid veel pole.|Ei vielä ehdotuksia.|Aún no hay aportaciones.|Ще немає внесків.
 prototype with Pinge Electronics OÜ|prototüüp koostöös Pinge Electronics OÜ-ga|prototyyppi yhdessä Pinge Electronics OÜ:n kanssa|prototipo con Pinge Electronics OÜ|прототип спільно з Pinge Electronics OÜ
 Details|Üksikasjad|Tiedot|Detalles|Деталі
@@ -1533,6 +1623,7 @@ Emergency Unlock Mandate|Мандат екстреного розблокува�
     }
     return [...out];
   };
+  window.LKP_SET_LANG = setLang;   // used by the welcome page's language picker
   window.LKP_LANG = lang;
   window.LKP_LOCALE = () => LOCALE[lang];
   window.LKP_T = s => (lang === 'en' ? s : trOr(s));

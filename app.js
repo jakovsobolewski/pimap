@@ -1571,6 +1571,7 @@
       if (U.cview === 'directions' || (S.emergency && S.emergency.policyId) !== prev) refreshRoute();
     }
   });
+  window.addEventListener('lkp:open', e => { const d = e.detail || {}; if (!d.kind || !d.id) return; U.portal = 'citizen'; U.cat = null; saveUI(); renderAll(); openPlace(d.kind, d.id); });
   window.addEventListener('lkp:lang', () => { renderAll(); if (U.cview === 'directions') renderCitizen(); });
   window.addEventListener('online', renderTop); window.addEventListener('offline', renderTop);
   window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if ((h === 'gov' || h === 'citizen') && h !== U.portal) { U.portal = h; setClickMode(null); saveUI(); renderAll(); refreshRoute(); } });
