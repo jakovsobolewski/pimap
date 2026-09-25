@@ -437,11 +437,10 @@ details summary { cursor: pointer; font-weight: 700; font-size: .86rem; color: v
 .mk-contrib { position: relative; }
 
 /* ---------- Welcome page, profile, feedback ---------- */
-.onboard { position: fixed; inset: 0; z-index: 3000; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; background: #fff; }
+.onboard { position: fixed; inset: 0; z-index: 3000; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; background: #d6d6d4 url(concrete-bg.jpg?v=1) center / cover no-repeat; }
 body.ob-open { overflow: hidden; }
 .ob-wrap { max-width: 640px; margin: 0 auto; padding: 40px 16px 48px; display: flex; flex-direction: column; gap: 16px; }
-.ob-card { background: transparent; padding: 8px 0; }
-.ob-help { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 8px; }
+.ob-card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,.14), 0 1px 3px rgba(0,0,0,.08); }
 .ob-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .ob-brand { display: flex; flex-direction: column; gap: 4px; }
 .ob-logo-img { height: 60px; width: auto; max-width: 100%; align-self: flex-start; object-fit: contain; display: block; margin: -4px 0 6px -4px; }
@@ -486,7 +485,7 @@ body.ob-open { overflow: hidden; }
 .ob-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .ob-ghost { background: #fff; color: var(--blue); border: 1.5px solid #BFD6EE; border-radius: var(--r-pill); padding: 9px 16px; font-weight: 700; font-size: .88rem; }
 .ob-ghost:hover { background: var(--blue-pale); }
-.ob-about { align-self: center; color: var(--blue); font-weight: 700; text-decoration: none; padding: 6px 10px; }
+.ob-about { align-self: center; color: var(--blue); font-weight: 700; text-decoration: none; padding: 9px 16px; background: rgba(255,255,255,.92); border-radius: var(--r-pill); box-shadow: 0 2px 8px rgba(0,0,0,.10); }
 .ob-about:hover { text-decoration: underline; }
 .sheet-overlay { position: fixed; inset: 0; z-index: 3100; overscroll-behavior: contain; background: rgba(0,20,40,.35); display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 72px 16px 24px; }
 .pf-card { width: 100%; max-width: 480px; background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
@@ -526,8 +525,13 @@ body.role-citizen .portals { display: none !important; }
 .btn-profile { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--blue-light); background: var(--blue-pale); padding: 0; display: grid; place-items: center; flex-shrink: 0; }
 .btn-profile .pf-av { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: .86rem; }
 .btn-profile:hover { border-color: var(--blue); }
+@media (max-width: 860px) {
+  .onboard { background-image: url(concrete-bg-phone.jpg?v=1); }
+}
 @media (max-width: 560px) {
-  .ob-wrap { padding: 20px 16px 32px; }
+  .ob-wrap { padding: 20px 12px 32px; }
+  .ob-card { padding: 18px; }
+  .ob-tag { font-size: .88rem; }
   .ob-cities { grid-template-columns: 1fr 1fr; }
   .ob-roles { grid-template-columns: 1fr; }
   .sheet-overlay { padding: 12px; }
@@ -643,6 +647,7 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
 }
 @media (max-width: 360px) {
   .topbar-row { padding: 8px 8px; }
+  .ob-tag { font-size: .8rem; }
   .logo-left img { height: 20px; }
   .lang-switch { padding: 2px; }
   .lang-switch button { padding: 4px 3px; font-size: .64rem; }
