@@ -37,7 +37,7 @@
   const cityName = p => (p.city === 'other' ? (p.otherCity || 'Other') : cityOf(p).name);
 
   let profile = read(KEY, null);
-  let draft = profile ? Object.assign({}, profile) : { city: '', otherCity: '', role: '', email: '' };
+  let draft = profile ? Object.assign({}, profile) : { city: '', otherCity: '', role: 'citizen', email: '' };
   let fb = { type: 'bug', text: '', from: 'welcome' };
 
   function toast(msg) { const t = $('#toast'); if (!t) return; t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 3800); }
@@ -47,7 +47,7 @@
   function renderWelcome() {
     const el = $('#onboard'); if (!el) return;
     const d = draft, sel = CITIES.find(c => c.id === d.city);
-    const ready = d.city && d.role && (d.city !== 'other' || d.otherCity.trim());
+    const ready = d.city && (d.city !== 'other' || d.otherCity.trim());
     const editing = !!profile;
     el.innerHTML = `<div class="ob-wrap">
       <div class="ob-card" role="dialog" aria-modal="true" aria-labelledby="obTitle">
@@ -63,21 +63,17 @@
           ${sel && !sel.live ? '<p class="ob-note">PiMap has live data for Tallinn only. We will save your city and show you the Tallinn demo.</p>' : ''}
         </div>
         <div class="ob-sec">
-          <h2>Who are you?</h2>
-          <div class="ob-roles" role="radiogroup" aria-label="Who are you?">${Object.entries(ROLES).map(([k, r]) => `<button type="button" class="ob-role ${d.role === k ? 'on' : ''}" data-ob="role" data-v="${k}" role="radio" aria-checked="${d.role === k}"><svg viewBox="0 0 24 24" aria-hidden="true">${r.svg}</svg><b>${r.label}</b><span>${r.hint}</span></button>`).join('')}</div>
-        </div>
-        <div class="ob-sec">
           <h2>Email <span class="ob-opt">optional</span></h2>
           <input class="ob-input" type="email" autocomplete="email" placeholder="name@example.com" value="${esc(d.email)}" data-ob-field="email" aria-label="Email">
           <p class="ob-small">Stays on this device only. This prototype has no server and sends nothing.</p>
         </div>
         <button type="button" class="ob-go" data-ob="go" ${ready ? '' : 'disabled'}>${editing ? 'Save profile' : 'Continue'}</button>
-        ${ready ? '' : '<p class="ob-hint">Choose your city and who you are to continue.</p>'}
+        ${ready ? '' : '<p class="ob-hint">Choose your city to continue.</p>'}
       </div>
       <div class="ob-card ob-help">
         <h2>Help build PiMap</h2>
         <p>Found a bug or have an idea for the platform? Tell us.</p>
-        <div class="ob-row"><button type="button" class="ob-ghost" data-fb-open="bug">Report a bug</button><button type="button" class="ob-ghost" data-fb-open="idea">Suggest an idea</button></div>
+        <div class="ob-row"><button type="button" class="ob-ghost" data-fb-open="bug">Report a bug</button><button type="button" class="ob-ghost" data-fb-open="idea">Suggest an idea</button><button type="button" class="ob-ghost muni" data-mu-open="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-6 10 6"/></svg>For municipalities</button></div>
       </div>
       <a class="ob-about" href="about.html">About PiMap: what this project is <span aria-hidden="true">→</span></a>
     </div>`;
@@ -85,8 +81,8 @@
   function showWelcome() { draft = profile ? Object.assign({}, profile) : draft; renderWelcome(); $('#onboard').hidden = false; document.body.classList.add('ob-open'); }
   function hideWelcome() { $('#onboard').hidden = true; document.body.classList.remove('ob-open'); }
   function saveProfile() {
-    const first = !profile, roleChanged = profile && profile.role !== draft.role;
-    profile = { city: draft.city, otherCity: draft.city === 'other' ? draft.otherCity.trim() : '', role: draft.role, email: draft.email.trim(), since: (profile && profile.since) || Date.now() };
+    const first = !profile, role = draft.role || (profile && profile.role) || 'citizen', roleChanged = profile && profile.role !== role;
+    profile = { city: draft.city, otherCity: draft.city === 'other' ? draft.otherCity.trim() : '', role, email: draft.email.trim(), since: (profile && profile.since) || Date.now() };
     write(KEY, profile); hideWelcome(); renderButton();
     if (first || roleChanged) location.hash = profile.role === 'municipality' ? '#gov' : '#citizen';
     const c = cityOf(profile);
@@ -126,7 +122,7 @@
       ${a.contribs.length ? `<div class="pf-list">${a.contribs.slice(0, 6).map(x => `<button type="button" class="pf-item" data-pf="open" data-kind="contrib" data-id="${esc(x.id)}"><span class="pf-dot ${x.kind}"></span><span class="pf-t" data-no-i18n>${esc(x.title)}</span><span class="pf-s">${statusLbl[x.status] || x.status}</span></button>`).join('')}</div>` : '<p class="ob-small">Nothing yet. Contribute from the map.</p>'}
 
       <h3>Help build PiMap</h3>
-      <div class="ob-row"><button type="button" class="ob-ghost" data-fb-open="bug">Report a bug</button><button type="button" class="ob-ghost" data-fb-open="idea">Suggest an idea</button></div>
+      <div class="ob-row"><button type="button" class="ob-ghost" data-fb-open="bug">Report a bug</button><button type="button" class="ob-ghost" data-fb-open="idea">Suggest an idea</button><button type="button" class="ob-ghost muni" data-mu-open="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-6 10 6"/></svg>For municipalities</button></div>
       ${mine.length ? `<div class="pf-list">${mine.slice(0, 5).map(f => `<div class="pf-item static"><span class="pf-dot ${f.type === 'bug' ? 'bug' : 'idea'}"></span><span class="pf-t" data-no-i18n>${esc(f.text.length > 70 ? f.text.slice(0, 70) + '…' : f.text)}</span><span class="pf-s">${f.type === 'bug' ? 'Bug' : 'Idea'}</span></div>`).join('')}</div>` : ''}
 
       <div class="pf-foot"><a href="about.html">About PiMap: what this project is <span aria-hidden="true">→</span></a><button type="button" class="pf-out" data-pf="signout">Sign out</button></div>
@@ -134,6 +130,36 @@
   }
   function openProfile() { renderProfile(); $('#profileSheet').hidden = false; }
   function closeProfile() { $('#profileSheet').hidden = true; }
+
+  /* ---------- For municipalities (replaces the role choice on the welcome page) ---------- */
+  function muniCity() { const src = profile || draft; return src && src.city && (src.city !== 'other' || (src.otherCity || '').trim()) ? src : null; }
+  function renderMuni() {
+    const el = $('#fbSheet'); if (!el) return;
+    const src = muniCity(), isMuni = profile && profile.role === 'municipality';
+    el.innerHTML = `<div class="pf-card fb-card" role="dialog" aria-modal="true" aria-labelledby="muTitle">
+      <div class="pf-head"><span class="pf-big muni"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-6 10 6"/></svg></span><div><h2 id="muTitle">For municipalities</h2><span class="pf-sub">Work for a city or a rescue service? See PiMap from your side, or bring it to your city.</span></div>
+        <button type="button" class="ob-x" data-mu="close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="mu-actions">
+        <button type="button" class="ob-go small" data-mu="portal" ${src ? '' : 'disabled'}>${isMuni ? 'Municipality portal' : 'Open the municipality portal'}</button>
+        <button type="button" class="ob-ghost" data-mu="email">Bring PiMap to your city</button>
+      </div>
+      ${src ? '' : '<p class="ob-hint left">Choose your city above first.</p>'}
+      <p class="ob-small">Demo access. Real municipality accounts will be verified before they can change anything.</p>
+    </div>`;
+  }
+  function openMuni() { renderMuni(); $('#fbSheet').hidden = false; }
+  function becomeMunicipality() {
+    const src = muniCity(); if (!src) return;
+    if (!profile) { draft.role = 'municipality'; saveProfile(); }
+    else { profile.role = 'municipality'; write(KEY, profile); renderButton(); location.hash = '#gov'; hideWelcome(); }
+    $('#fbSheet').hidden = true; if (!$('#profileSheet').hidden) closeProfile();
+  }
+  function muniEmail() {
+    const src = muniCity(), city = src ? cityName(src) : '';
+    const subject = `PiMap for ${city || 'our city'}`;
+    const body = `Hello Pinge,\n\nWe would like to talk about PiMap for ${city || 'our city'}.\n\nOrganisation:\nContact person:\n\n---\nSent from the PiMap ${profile ? 'profile' : 'welcome page'}.`;
+    location.href = `mailto:${MAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
 
   /* ---------- Feedback (bugs and ideas for the platform) ---------- */
   function renderFeedback() {
@@ -176,6 +202,10 @@
       else if (a === 'close') { hideWelcome(); openProfile(); }
       return;
     }
+    const mo = e.target.closest('[data-mu-open]');
+    if (mo) { openMuni(); return; }
+    const mu = e.target.closest('[data-mu]');
+    if (mu && mu.closest('#fbSheet')) { const a = mu.dataset.mu; if (a === 'close') $('#fbSheet').hidden = true; else if (a === 'portal' && !mu.disabled) becomeMunicipality(); else if (a === 'email') muniEmail(); return; }
     const f = e.target.closest('[data-fb-open]');
     if (f) { openFeedback(f.dataset.fbOpen, f.closest('#profileSheet') ? 'profile' : 'welcome'); return; }
     const x = e.target.closest('[data-fb]');
@@ -196,7 +226,7 @@
       else if (a === 'signout') {
         if (!confirm(T('Sign out? Your profile is removed from this device.'))) return;
         try { localStorage.removeItem(KEY); } catch (err) { /* ignore */ }
-        profile = null; draft = { city: '', otherCity: '', role: '', email: '' }; closeProfile(); renderButton(); showWelcome();
+        profile = null; draft = { city: '', otherCity: '', role: 'citizen', email: '' }; closeProfile(); renderButton(); showWelcome();
       }
       return;
     }
@@ -217,6 +247,7 @@
   window.addEventListener('lkp:lang', () => {
     if (!$('#onboard').hidden) renderWelcome();
     if (!$('#profileSheet').hidden) renderProfile();
+    if (!$('#fbSheet').hidden && $('#muTitle')) renderMuni();
   });
   function boot() {
     const btn = $('#profileBtn'); if (btn) btn.addEventListener('click', openProfile);

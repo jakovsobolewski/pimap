@@ -648,6 +648,13 @@ Emergency Unlock Mandate|Hädaolukorra avamismandaat|Hätäavausvaltuutus|Mandat
 
   /* Added later: English | Eesti | Suomi | Español | Українська */
   const RAW5 = `
+Choose your city to continue.|Jätkamiseks vali oma linn.|Jatka valitsemalla kaupunkisi.|Elige tu ciudad para continuar.|Щоб продовжити, оберіть своє місто.
+For municipalities|Omavalitsustele|Kunnille|Para ayuntamientos|Для муніципалітетів
+Work for a city or a rescue service? See PiMap from your side, or bring it to your city.|Töötad linnas või päästeteenistuses? Vaata PiMapi oma vaatest või too see oma linna.|Työskenteletkö kaupungilla tai pelastuspalvelussa? Katso PiMapia omasta näkökulmastasi tai tuo se kaupunkiisi.|¿Trabajas para una ciudad o un servicio de emergencias? Mira PiMap desde tu lado o llévalo a tu ciudad.|Працюєте в міській раді чи рятувальній службі? Подивіться на PiMap зі свого боку або запровадьте його у своєму місті.
+Open the municipality portal|Ava linna portaal|Avaa kaupungin portaali|Abrir el portal municipal|Відкрити міський портал
+Bring PiMap to your city|Too PiMap oma linna|Tuo PiMap kaupunkiisi|Lleva PiMap a tu ciudad|Запровадьте PiMap у своєму місті
+Choose your city above first.|Vali kõigepealt ülal oma linn.|Valitse ensin kaupunkisi yläpuolelta.|Primero elige tu ciudad arriba.|Спершу оберіть своє місто вище.
+Demo access. Real municipality accounts will be verified before they can change anything.|Demojuurdepääs. Päris omavalitsuse kontod kinnitatakse enne, kui need saavad midagi muuta.|Demokäyttö. Oikeat kuntatilit vahvistetaan ennen kuin niillä voi muuttaa mitään.|Acceso de demostración. Las cuentas municipales reales se verificarán antes de poder cambiar nada.|Демо-доступ. Справжні облікові записи муніципалітетів перевірятимуться, перш ніж вони зможуть щось змінювати.
 // ---- welcome page, profile, platform feedback ----
 Your local map with live data from your municipality|Sinu kohalik kaart linnavalitsuse reaalajas andmetega|Paikallinen karttasi kuntasi reaaliaikaisilla tiedoilla|Tu mapa local con datos en directo de tu ayuntamiento|Твоя локальна карта з актуальними даними від твоєї міської ради
 Where are you from?|Kust sa pärit oled?|Mistä olet?|¿De dónde eres?|Звідки ви?
