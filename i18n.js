@@ -1,5 +1,5 @@
 /* ============================================================
-   PiMap translations: English (source), Eesti, Suomi, Español.
+   PiMap translations: English (source), Eesti, Suomi, Español, Українська, Русский.
    The app renders English; this layer translates interface text in the
    DOM as it appears (text nodes and placeholder/aria-label/title), so every
    panel, popup and toast is covered without touching the render code.
@@ -8,10 +8,10 @@
    ============================================================ */
 (function () {
   'use strict';
-  const LANGS = [['en', 'EN', 'English'], ['et', 'ET', 'Eesti'], ['fi', 'FI', 'Suomi'], ['es', 'ES', 'Español'], ['uk', 'UA', 'Українська']];
-  const IDX = { et: 1, fi: 2, es: 3, uk: 4 };
-  const CODES = ['en', 'et', 'fi', 'es', 'uk'];
-  const LOCALE = { en: 'en-GB', et: 'et-EE', fi: 'fi-FI', es: 'es-ES', uk: 'uk-UA' };
+  const LANGS = [['en', 'EN', 'English'], ['et', 'ET', 'Eesti'], ['fi', 'FI', 'Suomi'], ['es', 'ES', 'Español'], ['uk', 'UA', 'Українська'], ['ru', 'RU', 'Русский']];
+  const IDX = { et: 1, fi: 2, es: 3, uk: 4, ru: 5 };
+  const CODES = ['en', 'et', 'fi', 'es', 'uk', 'ru'];
+  const LOCALE = { en: 'en-GB', et: 'et-EE', fi: 'fi-FI', es: 'es-ES', uk: 'uk-UA', ru: 'ru-RU' };
 
   /* English | Eesti | Suomi | Español */
   const RAW = `
@@ -1429,112 +1429,898 @@ Emergency Unlock Mandate|Мандат екстреного розблокува�
 €0|0 €
 `;
 
+  /* Russian for every entry in RAW, RAW5 and RAW_UK: English | Русский */
+  const RAW_RU = `
+// ---- header, navigation, search ----
+Citizen portal|Портал жителя
+Municipality portal|Портал города
+Reset|Сбросить
+No alert|Тревоги нет
+Contribute|Участвовать
++ Contribute|+ Участвовать
+Offline|Офлайн
+cached|из кэша
+Search PiMap|Поиск в PiMap
+Search shelters, places and addresses|Ищите укрытия, места и адреса
+Menu|Меню
+Clear search|Очистить поиск
+Search|Поиск
+Directions|Маршрут
+Directions to the nearest shelter|Маршрут до ближайшего укрытия
+More categories|Больше категорий
+Places to go|Куда пойти
+Map of Tallinn|Карта Таллинна
+Map legend|Легенда карты
+Portals|Порталы
+Municipality sections|Разделы портала города
+Language|Язык
+Clear local state and reseed demo data|Очистить локальные данные и восстановить демо
+Report an issue or share an idea|Сообщите о проблеме или поделитесь идеей
+Back|Назад
+Close|Закрыть
+PiMap prototype|Прототип PiMap
+not an official City of Tallinn service|не является официальным сервисом города Таллинна
+// ---- category chips ----
+Shelters|Укрытия
+Fallen trees|Упавшие деревья
+Hospitals|Больницы
+Pharmacies|Аптеки
+Cool places|Прохладные места
+Drinking water|Питьевая вода
+Groceries|Продукты
+Police|Полиция
+Rescue stations|Спасательные части
+Construction|Стройка
+Community|Сообщество
+Address|Адрес
+Hospital|Больница
+Pharmacy|Аптека
+Grocery store|Продуктовый магазин
+Rescue station|Спасательная часть
+Public shelter|Общественное укрытие
+Resident|Житель
+Shared vehicle, locked|Общий транспорт, заблокирован
+Shared vehicle, free|Общий транспорт, бесплатно
+Neighbour listing|Предложение соседа
+Driver offering pick-up|Водитель предлагает подвезти
+Pick-up request|Запрос на подвоз
+Construction (street section)|Стройка (участок улицы)
+Construction works|Строительные работы
+Flooded area|Затопленный участок
+Unsafe place|Опасное место
+Fallen tree report|Сообщение об упавшем дереве
+Storm area|Зона шторма
+Citizen issue|Проблема от жителя
+Citizen idea|Идея от жителя
+Around you|Рядом с вами
+Your nearest shelter|Ваше ближайшее укрытие
+Be ready|Будьте готовы
+Home supplies and what to do in each emergency|Домашние запасы и действия в каждой чрезвычайной ситуации
+No construction within 2 km|В радиусе 2 км работ нет
+Tap to see works across Tallinn|Посмотреть работы по всему Таллинну
+Routes go around them until cleared|Маршруты обходят их, пока их не уберут
+Support them or add your own|Поддержите их или добавьте свои
+Where to?|Куда?
+Search above, or pick one of these|Ищите вверху или выберите одно из этого
+Nearest pharmacy|Ближайшая аптека
+Nearest grocery store|Ближайший продуктовый магазин
+Nearest hospital|Ближайшая больница
+Nearest public shelter|Ближайшее общественное укрытие
+Nearest drinking water|Ближайшая питьевая вода
+Nearest library or shopping centre|Ближайшая библиотека или торговый центр
+Nearest shelter|Ближайшее укрытие
+Nearest safe indoor place|Ближайшее безопасное помещение
+Nearest cool place|Ближайшее прохладное место
+Nearest dry shelter|Ближайшее сухое укрытие
+Go to nearest public shelter|К ближайшему общественному укрытию
+Go to nearest dry shelter|К ближайшему сухому укрытию
+Go to nearest cool place|К ближайшему прохладному месту
+Go to nearest safe indoor place|К ближайшему безопасному помещению
+Chosen shelter|Выбранное укрытие
+Nearest public shelter (register)|Ближайшее общественное укрытие (реестр)
+Opening hours|Часы работы
+Wheelchair access|Доступ для колясок
+yes|да
+no|нет
+limited|ограниченный
+Public shelter, marked with the civil defence sign (blue triangle on orange)|Общественное укрытие, обозначенное знаком гражданской обороны (синий треугольник на оранжевом фоне)
+Public library|Публичная библиотека
+Shopping centre|Торговый центр
+Dates|Даты
+Affects|Затрагивает
+Pedestrians|Пешеходы
+Cyclists|Велосипедисты
+Cars|Автомобили
+pedestrians|пешеходы
+cyclists|велосипедисты
+cars|автомобили
+walk|пешком
+bike|велосипед
+drive|авто
+no modes|никого
+Status|Статус
+Street section|Участок улицы
+Last updated|Последнее обновление
+Registered by the municipality|Зарегистрировано городом
+Reported by|Сообщил
+City crew|Городская бригада
+You|Вы
+A neighbour|Сосед
+Neighbour|Сосед
+Storm report|Сообщение о шторме
+Reported, not yet confirmed|Сообщено, ещё не подтверждено
+Confirmed by the city|Подтверждено городом
+Cleared|Убрано
+Finished|Завершено
+Your location|Ваше местоположение
+Close directions|Закрыть маршрут
+How to get there|Как добраться
+Walk|Пешком
+Bike|Велосипед
+Drive|Авто
+Pick-up|Подвоз
+at your pace|в вашем темпе
+by car|на автомобиле
+your own bike or scooter|ваш велосипед или самокат
+until pick-up|до подвоза
+pick-up runs during an alert|подвоз работает во время тревоги
+estimated door to destination|ориентировочно от двери до места
+no free driver right now|сейчас нет свободного водителя
+Look for the civil defence sign: a blue triangle on an orange background.|Ищите знак гражданской обороны: синий треугольник на оранжевом фоне.
+Walking route on the map.|Пешеходный маршрут на карте.
+Route and destination are stored on this device and work without signal.|Маршрут и пункт назначения сохранены на устройстве и работают без связи.
+This is a long way at your pace.|В вашем темпе это далеко.
+This is a long way at your pace on a mobility aid.|Со средством передвижения в вашем темпе это далеко.
+Bike or pick-up gets you there faster.|На велосипеде или с подвозом доберётесь быстрее.
+Request pick-up|Заказать подвоз
+Park at least 50 m from the entrance and keep access lanes clear.|Паркуйтесь не ближе 50 м от входа и не перекрывайте подъезды.
+Never drive into water: 30 cm can float a car.|Никогда не заезжайте в воду: 30 см воды могут поднять автомобиль.
+During an alert you can offer spare seats here and be matched with a neighbour who cannot walk.|Во время тревоги здесь можно предложить свободные места, и вас свяжут с соседом, который не может ходить.
+You are listed as a driver|Вы в списке водителей
+Pick up|Подвезите
+No one nearby needs a lift yet.|Рядом пока никому не нужен подвоз.
+We will ping you.|Мы вас уведомим.
+Withdraw|Отменить
+Have spare seats? Neighbours who cannot walk are waiting.|Есть свободные места? Вас ждут соседи, которые не могут ходить.
+Vehicle|Транспорт
+Spare seats|Свободные места
+Can take a wheelchair or mobility aid|Вмещает коляску или средство передвижения
+Offer my seats|Предложить места
+Car|Автомобиль
+Van|Фургон
+Cargo bike|Грузовой велосипед
+E-scooter|Электросамокат
+City bike|Городской велосипед
+E-bike|Электровелосипед
+Wheelchair|Коляска
+Rollator|Ходунки
+Mobility aid (Pinge)|Средство передвижения (Pinge)
+Unlocking…|Разблокируем…
+Sending the unlock event under the Emergency Unlock Mandate.|Отправляем разблокировку по Мандату экстренной разблокировки.
+fare €0 under the mandate|стоимость 0 € по мандату
+Unlock code|Код разблокировки
+How to get it|Как получить
+End your trip at your destination.|Завершите поездку в пункте назначения.
+Release and choose another|Освободить и выбрать другой
+Strong wind: riding is not recommended.|Сильный ветер: ездить не рекомендуется.
+Walk if you can.|Идите пешком, если можете.
+No bike?|Нет велосипеда?
+Shared vehicles near shelters are free under the Emergency Unlock Mandate, and neighbours’ listings are active.|Общий транспорт у укрытий бесплатен по Мандату экстренной разблокировки, а предложения соседей активны.
+Neighbours’ listings are active.|Предложения соседей активны.
+Shared fleets unlock when the city publishes the mandate.|Общий транспорт разблокируется, когда город опубликует мандат.
+During an alert shared vehicles unlock for free and neighbours’ spare bikes appear here.|Во время тревоги общий транспорт разблокируется бесплатно, а здесь появляются свободные велосипеды соседей.
+Free near you|Бесплатно рядом
+Unlock|Разблокировать
+Borrow|Одолжить
+accessible|доступный
+Nothing free within reach right now.|Сейчас рядом нет ничего свободного.
+Try pick-up.|Попробуйте подвоз.
+Queued|В очереди
+Cancel request|Отменить запрос
+Your need|Ваша потребность
+People|Человек
+Note for the driver|Заметка для водителя
+3rd floor, no lift|3-й этаж, без лифта
+Wheelchair user|Человек на коляске
+Uses a mobility aid or cannot stand long|Пользуется средством передвижения или не может долго стоять
+Walks slowly (elderly, injured, pregnant)|Ходит медленно (пожилые, травмированные, беременные)
+Small children or a pram|Маленькие дети или коляска
+No special need|Без особых потребностей
+Pinge crew|Бригада Pinge
+Wait at your door.|Ждите у двери.
+Matched to the nearest neighbour or Pinge crew with room.|Вас свяжут с ближайшим соседом или бригадой Pinge, где есть место.
+People who cannot walk go first.|Первыми помогают тем, кто не может ходить.
+All nearby drivers are busy; the next free neighbour or Pinge crew is dispatched to you.|Все водители рядом заняты; к вам направят следующего свободного соседа или бригаду Pinge.
+When an alert is declared, neighbours with spare seats and Pinge crews pick up residents who cannot get there on their own.|Когда объявляют тревогу, соседи со свободными местами и бригады Pinge подвозят жителей, которые не могут добраться сами.
+// ---- protocols ----
+War / air strike|Война / авиаудар
+war / air strike|война / авиаудар
+Flood|Наводнение
+flood|наводнение
+Heatwave|Жара
+heatwave|жара
+Storm|Шторм
+storm|шторм
+public shelter|общественное укрытие
+dry shelter|сухое укрытие
+cool place|прохладное место
+safe indoor place|безопасное помещение
+Routes to public shelters. Fleets unlock, neighbours lend, pick-ups for people who cannot walk.|Маршруты к общественным укрытиям. Транспорт разблокируется, соседи одалживают, подвоз для тех, кто не может ходить.
+Air raid warning. Go to the nearest public shelter now. If you cannot reach one, stay in a windowless room or basement.|Воздушная тревога. Немедленно идите в ближайшее общественное укрытие. Если не можете добраться, оставайтесь в комнате без окон или в подвале.
+Go below ground if you can: basements, underpasses, parking garages.|Если можете, спуститесь под землю: подвалы, подземные переходы, паркинги.
+Keep away from windows and glass facades.|Держитесь подальше от окон и стеклянных фасадов.
+Take water, medicine and your phone.|Возьмите воду, лекарства и телефон.
+The city marks flooded areas. Routes go around them to shelters on dry ground.|Город отмечает затопленные участки. Маршруты обходят их к укрытиям на сухом месте.
+Flood warning. Leave low-lying and coastal streets. Your route avoids flooded areas.|Предупреждение о наводнении. Покиньте низинные и прибрежные улицы. Ваш маршрут обходит затопленные участки.
+Never walk or drive through moving water: 15 cm can knock you over, 30 cm can float a car.|Никогда не идите и не езжайте через текущую воду: 15 см могут сбить с ног, 30 см — поднять автомобиль.
+Move to higher ground or an upper floor.|Перейдите на возвышенность или верхний этаж.
+Stay away from rivers, the shoreline and open drains.|Держитесь подальше от рек, побережья и открытых стоков.
+Routes to cool indoor places (libraries, shopping centres), choosing streets shaded by buildings and trees.|Маршруты к прохладным помещениям (библиотеки, торговые центры) по улицам в тени зданий и деревьев.
+Heat warning. Avoid direct sun between 11:00 and 17:00. Go to a cool indoor place; your route follows the shade.|Предупреждение о жаре. Избегайте прямого солнца с 11:00 до 17:00. Идите в прохладное помещение; ваш маршрут проходит в тени.
+Walk on the shaded side of the street.|Идите по теневой стороне улицы.
+Drink water every 20 minutes, even if you are not thirsty.|Пейте воду каждые 20 минут, даже если не хотите пить.
+Check on elderly neighbours and never leave anyone in a parked car.|Проведайте пожилых соседей и никогда не оставляйте никого в припаркованной машине.
+Routes to indoor safe places, avoiding marked unsafe places, trees, the shoreline and construction sites.|Маршруты к безопасным помещениям в обход отмеченных опасных мест, деревьев, побережья и стройплощадок.
+Storm warning. Get indoors now. Your route avoids trees, the shoreline, construction sites and unsafe places.|Штормовое предупреждение. Немедленно зайдите в помещение. Ваш маршрут обходит деревья, побережье, стройплощадки и опасные места.
+Keep away from trees, scaffolding, cranes and power lines.|Держитесь подальше от деревьев, лесов, кранов и линий электропередачи.
+Stay off the shoreline and piers.|Не подходите к побережью и пирсам.
+Do not ride shared scooters or bikes in strong wind.|Не пользуйтесь общими самокатами и велосипедами при сильном ветре.
+Seek shelter now. Sirens are active. Your nearest shelter and route are attached. If you cannot walk it, use Borrow or Request a ride.|Немедленно ищите укрытие. Звучат сирены. Ближайшее укрытие и маршрут приложены. Если не можете дойти, одолжите транспорт или закажите подвоз.
+Finding the shadiest route…|Ищем самый тенистый маршрут…
+Checking trees, shoreline and unsafe places…|Проверяем деревья, побережье и опасные места…
+Routing around flooded areas…|Прокладываем маршрут в обход затопленных участков…
+Finding your route…|Ищем маршрут…
+Checking construction and blocked paths…|Проверяем работы и перекрытые пути…
+Your route does not cross any flooded area.|Ваш маршрут не пересекает затопленных участков.
+Your route does not cross any marked unsafe place.|Ваш маршрут не проходит через отмеченные опасные места.
+Shade at|Тень в
+Now|Сейчас
+Plan shade for|Планировать тень на
+Low sun casts long shadows.|Низкое солнце даёт длинные тени.
+The sun is down, so the whole route is shaded.|Солнце зашло, поэтому весь маршрут в тени.
+No public drinking water on this route. Carry water.|На этом маршруте нет общественной питьевой воды. Возьмите воду с собой.
+Routes keep extra distance from trees and the shoreline.|Маршруты держатся подальше от деревьев и побережья.
+Report one|Сообщить
+See flooding, a blocked way or another danger?|Видите подтопление, перекрытый путь или другую опасность?
+Report it|Сообщите
+Construction on this route|На маршруте ведутся работы
+Offline: showing a straight-line estimate. Avoiding hazards and construction needs a connection.|Офлайн: показываем оценку по прямой. Для обхода опасностей и работ нужна связь.
+Street tree and building data could not be loaded, so this is the fastest route.|Не удалось загрузить данные о деревьях и зданиях, поэтому это самый быстрый маршрут.
+Updated by the city|Обновлено городом
+Within 2 km|В радиусе 2 км
+All of Tallinn|Весь Таллинн
+Area|Территория
+Active now|Идут сейчас
+Starting soon|Скоро начнутся
+No active construction here.|Здесь нет активных работ.
+Nothing scheduled.|Ничего не запланировано.
+Everyday routes steer around active sites that affect how you travel.|Повседневные маршруты обходят активные работы, влияющие на ваше передвижение.
+Roadworks|Дорожные работы
+Building site|Стройплощадка
+Utility works|Ремонт коммуникаций
+Street closure|Перекрытие улицы
+Tram line works|Работы на трамвайной линии
+Official public shelters|Официальные общественные укрытия
+Nothing found nearby.|Рядом ничего не найдено.
+Show on map|Показать на карте
+Addresses|Адреса
+Searching addresses…|Ищем адреса…
+Type a place, shelter or address.|Введите место, укрытие или адрес.
+No places found. Press Enter to search addresses.|Мест не найдено. Нажмите Enter, чтобы искать адреса.
+Search addresses in Tallinn|Искать адреса в Таллинне
+About you|О вас
+Lend a vehicle|Одолжить транспорт
+Pre-list a spare bike or mobility aid for emergencies|Заранее предложите свободный велосипед или средство передвижения на случай чрезвычайной ситуации
+Report an issue or share an idea with the city|Сообщите городу о проблеме или поделитесь идеей
+Report an issue or share an idea with the city, or report a fallen tree|Сообщите городу о проблеме, поделитесь идеей или сообщите об упавшем дереве
+Use my location|Использовать моё местоположение
+From your device's GPS|По GPS вашего устройства
+Set my location on the map|Указать местоположение на карте
+Demo: simulate a resident somewhere else|Демо: смоделировать жителя в другом месте
+Mobility|Мобильность
+I can walk|Я могу ходить
+I walk slowly or have limited mobility|Я хожу медленно или у меня ограниченная мобильность
+I use a wheelchair or mobility aid|Я пользуюсь коляской или средством передвижения
+Walking times use your pace, and pick-ups are prioritised for people who cannot walk.|Время пешком рассчитано по вашему темпу, а подвоз в первую очередь для тех, кто не может ходить.
+Accessible vehicles are offered first and your pick-up requests get top priority.|Сначала предлагается доступный транспорт, а ваши запросы на подвоз имеют высший приоритет.
+The public shelter register does not record step-free access yet.|Реестр общественных укрытий пока не содержит данных о безбарьерном доступе.
+Use GPS|Использовать GPS
+Pick on map|Выбрать на карте
+Pirent dormant listing|Спящее предложение в Pirent
+List a spare bike, scooter or mobility aid once.|Один раз добавьте свободный велосипед, самокат или средство передвижения.
+It stays invisible until an alert is declared; then neighbours see it under Bike with your instructions.|Предложение скрыто до объявления тревоги; затем соседи видят его в разделе «Велосипед» с вашими инструкциями.
+What is it?|Что это?
+Short description|Краткое описание
+How does a neighbour get it?|Как соседу его получить?
+Where|Где
+Suitable for someone who cannot walk|Подходит тем, кто не может ходить
+your location|ваше местоположение
+Clear|Очистить
+Pre-list as dormant|Добавить как спящее
+List now (alert active)|Опубликовать сейчас (тревога активна)
+Your listings|Ваши предложения
+Remove|Удалить
+dormant|спящее
+active|активно
+claimed|занято
+Shelters: Päästeamet public shelter register|Укрытия: реестр общественных укрытий Päästeamet
+Places and routing: © OpenStreetMap contributors.|Места и маршруты: © участники OpenStreetMap.
+Construction and hazard zones: the municipality.|Работы и опасные зоны: город.
+© OpenStreetMap contributors|© участники OpenStreetMap
+What to do before and during an emergency|Что делать до и во время чрезвычайной ситуации
+Päästeamet advises every household to keep supplies for at least a week.|Päästeamet советует каждой семье иметь запасы как минимум на неделю.
+Drinking water: about 3 litres per person per day|Питьевая вода: около 3 литров на человека в день
+Food that keeps and needs no cooking|Еда, которая долго хранится и не требует готовки
+Prescription medicines and a first-aid kit|Рецептурные лекарства и аптечка
+Torch, spare batteries, power bank and a battery radio|Фонарик, запасные батарейки, пауэрбанк и радио на батарейках
+Some cash and copies of documents|Немного наличных и копии документов
+Your nearest public shelter is always one tap away: the Shelters chip or the directions button during an alert.|Ближайшее общественное укрытие всегда в одном касании: кнопка «Укрытия» или кнопка маршрута во время тревоги.
+Improve the city with the municipality and your neighbours|Улучшайте город вместе с городскими властями и соседями
+Emergency report|Экстренное сообщение
+Fallen tree|Упавшее дерево
+Report an issue|Сообщить о проблеме
+Share an idea|Поделиться идеей
+Road or pavement damage|Повреждение дороги или тротуара
+Broken street light|Неисправный фонарь
+Accessibility barrier|Барьер для доступности
+Litter or dumping|Мусор или свалка
+Broken bench or playground|Сломанная скамейка или детская площадка
+Other issue|Другая проблема
+More trees or green space|Больше деревьев или зелёных зон
+Benches or shade|Скамейки или тень
+Cycling improvement|Улучшение для велосипедистов
+Safer crossing|Более безопасный переход
+Play or sport|Игры или спорт
+Other idea|Другая идея
+Your idea|Ваша идея
+What is wrong?|Что не так?
+e.g. Bike racks by the Balti jaam market|напр. велопарковки у рынка Балти-яам
+e.g. Deep pothole on the cycle path|напр. глубокая яма на велодорожке
+Details (optional)|Детали (необязательно)
+Why would it help, and who?|Почему это поможет и кому?
+Where exactly, and since when?|Где именно и с каких пор?
+Pinned on the map|Отмечено на карте
+At your current location|В вашем текущем месте
+Move pin|Переместить метку
+Share idea|Поделиться идеей
+Send to the city|Отправить городу
+Visible to the city and your neighbours. Neighbours can support it and comment; the city updates its status.|Видят город и ваши соседи. Соседи могут поддержать и комментировать; город обновляет статус.
+Near you|Рядом с вами
+most supported|самые поддержанные
+What did you see?|Что вы увидели?
+Blocking a street or path|Перекрывает улицу или дорожку
+Fallen branches|Упавшие ветки
+Branches or debris on the ground|Ветки или обломки на земле
+Tree at risk|Опасное дерево
+Leaning, cracked or large tree that could fall|Наклонённое, треснувшее или большое дерево, которое может упасть
+Flooded street|Затопленная улица
+Water on the street or in an underpass|Вода на улице или в подземном переходе
+Blocked way|Перекрытый путь
+Debris, a fallen pole or a closed passage|Обломки, упавший столб или закрытый проход
+Other danger|Другая опасность
+Loose roofing, broken glass, a downed power line|Незакреплённая кровля, разбитое стекло, оборванный провод
+e.g. Birch across the pavement by the tram stop|напр. берёза упала на тротуар у трамвайной остановки
+Send emergency report|Отправить экстренное сообщение
+Send storm report|Отправить сообщение о шторме
+Routes for everyone avoid it straight away, and the city sees it under Citizen contributions.|Маршруты для всех сразу обходят это место, а город видит сообщение в разделе «Вклад жителей».
+Routes for everyone avoid it straight away.|Маршруты для всех сразу обходят это место.
+Report fallen tree|Сообщить об упавшем дереве
+Report flooding|Сообщить о подтоплении
+Report a hazard|Сообщить об опасности
+Report a fallen tree|Сообщить об упавшем дереве
+New|Новое
+Seen by the city|Просмотрено городом
+Planned|Запланировано
+In progress|В работе
+Done|Выполнено
+Not planned|Не запланировано
+Issue|Проблема
+Idea|Идея
+Comments|Комментарии
+No comments yet.|Комментариев пока нет.
+Add a comment|Добавить комментарий
+Post|Отправить
+Issues and ideas from residents|Проблемы и идеи от жителей
+Nothing yet. Be the first.|Пока ничего нет. Будьте первыми.
+city|город
+resident|житель
+example|пример
+// ---- municipality portal ----
+Citizen contributions|Вклад жителей
+Overview|Обзор
+Crisis operations|Кризисное реагирование
+Fleet unlock|Разблокировка транспорта
+Pick-up dispatch|Диспетчеризация подвоза
+Neighbour listings|Предложения соседей
+MDS log|Журнал MDS
+Tallinna Linnavalitsus|Городская управа Таллинна
+Issues and ideas residents pinned on the map. Set a status and reply; residents see both.|Проблемы и идеи, которые жители отметили на карте. Установите статус и ответьте; жители видят и то, и другое.
+All|Все
+Issues|Проблемы
+Ideas|Идеи
+Emergency|Экстренные
+Filter|Фильтр
+Fallen trees, flooded streets, blocked ways and other dangers residents reported during alerts. Routes avoid everything not cleared.|Упавшие деревья, затопленные улицы, перекрытые пути и другие опасности, о которых жители сообщили во время тревог. Маршруты обходят всё неубранное.
+No emergency reports.|Экстренных сообщений нет.
+city crew|городская бригада
+new|новое
+confirmed|подтверждено
+cleared|убрано
+Confirm|Подтвердить
+Mark cleared|Отметить убранным
+Reopen|Открыть заново
+Show|Показать
+Plan as construction works|Запланировать как работы
+Reply publicly as the city|Ответить публично от имени города
+Reply|Ответить
+City reply|Ответ города
+Reply published|Ответ опубликован
+Add construction works|Добавить строительные работы
+Edit construction works|Редактировать строительные работы
+Register a site with its dates. Citizens see it on the map, and everyday routes steer around it for the modes it affects.|Зарегистрируйте работы с датами. Жители видят их на карте, а повседневные маршруты обходят их для затронутых способов передвижения.
+Change the location, dates or affected modes. Citizens see the update straight away.|Измените место, даты или способы передвижения. Жители сразу увидят обновление.
+Name|Название
+e.g. Telliskivi street reconstruction|напр. реконструкция улицы Теллискиви
+Type|Тип
+Now click where the works end|Теперь нажмите, где работы заканчиваются
+Snapping to the streets…|Привязываем к улицам…
+Click where the works start and where they end; the line follows the streets|Нажмите, где работы начинаются и где заканчиваются; линия идёт по улицам
+Draw on map|Нарисовать на карте
+Add points|Добавить точки
+Undo point|Отменить точку
+Start date|Дата начала
+End date|Дата окончания
+Note for residents|Заметка для жителей
+e.g. Pavement closed, use the other side|напр. тротуар закрыт, идите по другой стороне
+Publish construction works|Опубликовать работы
+Save changes|Сохранить изменения
+Cancel|Отмена
+Registered works|Зарегистрированные работы
+upcoming|запланированные
+finished|завершённые
+Edit|Редактировать
++7 days|+7 дней
+Tip: click a site on the map to edit it.|Совет: нажмите на работы на карте, чтобы их редактировать.
+Finished works stay listed but leave the map automatically.|Завершённые работы остаются в списке, но автоматически исчезают с карты.
+City works|Городские работы
+live|онлайн
+construction sites active|активных работ
+starting soon|скоро начнутся
+shelters near works|укрытий рядом с работами
+Crisis status|Состояние кризиса
+Standby|Режим ожидания
+public shelters (register)|общественных укрытий (реестр)
+devices pushed (sim.)|устройств оповещено (сим.)
+operators applied|операторов применили
+vehicles at €0|транспорта за 0 €
+listings active|активных предложений
+pick-ups matched|подвозов назначено
+Map|Карта
+Lend|Одолжить
+Waiting for declaration.|Ожидание объявления.
+Fleets locked.|Транспорт заблокирован.
+Publishing…|Публикуем…
+Data sources|Источники данных
+Public shelters|Общественные укрытия
+Hospitals, pharmacies, cool places, water|Больницы, аптеки, прохладные места, вода
+OpenStreetMap, fetched 25 Sep 2026|OpenStreetMap, получено 25.09.2026
+Hazard zones|Опасные зоны
+Drawn by the city during an alert; seeded ones are examples|Город отмечает во время тревоги; предзаполненные — примеры
+Fallen tree reports|Сообщения об упавших деревьях
+From citizens and city crews|От жителей и городских бригад
+Storms|Штормы
+Added by the city under the storm protocol|Добавляются городом по штормовому протоколу
+Issues and ideas pinned by residents|Проблемы и идеи, отмеченные жителями
+Choose the protocol|Выберите протокол
+Emergency protocol|Протокол чрезвычайной ситуации
+Each protocol changes where citizens are sent and how their route is chosen.|Каждый протокол меняет, куда направляют жителей и как выбирается их маршрут.
+District|Район
+Time-box|Длительность
+Message pushed to phones|Сообщение на телефоны
+Unlock shared fleets on declaration|Разблокировать общий транспорт при объявлении
+Unlock shared fleets on declaration (not advised in strong wind)|Разблокировать общий транспорт при объявлении (не рекомендуется при сильном ветре)
+Active|Активна
+End alert|Завершить тревогу
+End the alert to switch protocol.|Чтобы сменить протокол, завершите тревогу.
+Name the storm|Назовите шторм
+Add the storm the city is tracking. Citizens see its area and wind, and gusts of 25 m/s or more make routes keep further from trees and the shoreline.|Добавьте шторм, который отслеживает город. Жители видят его зону и ветер, а при порывах от 25 м/с маршруты держатся дальше от деревьев и побережья.
+Storm name|Название шторма
+e.g. Storm Ingrid|напр. шторм Ингрид
+Wind (m/s)|Ветер (м/с)
+Gusts (m/s)|Порывы (м/с)
+Wind from|Ветер с
+Arrives|Прибытие
+Lasts (h)|Длится (ч)
+Area (km)|Зона (км)
+Centred on Tallinn|Центр в Таллинне
+Set centre on map|Указать центр на карте
+Add storm|Добавить шторм
+No storm added yet.|Шторм ещё не добавлен.
+Fallen trees and branches|Упавшие деревья и ветки
+Reported by citizens in the app and by city crews. Routes avoid every report that is not cleared.|Сообщают жители в приложении и городские бригады. Маршруты обходят все неубранные сообщения.
+Add city report|Добавить сообщение города
+Place on map|Отметить на карте
+Not placed yet|Ещё не отмечено
+Flooded areas|Затопленные участки
+Unsafe places|Опасные места
+Flood protocol|Протокол наводнения
+Storm protocol|Штормовой протокол
+Mark streets under water. Citizen routes are recalculated around them, and shelters inside them are skipped.|Отметьте затопленные улицы. Маршруты жителей пересчитываются в обход, а укрытия внутри пропускаются.
+Mark fallen trees, flying debris or closed streets. Citizen routes avoid them, as well as trees, the shoreline and construction sites.|Отметьте упавшие деревья, летящие обломки или закрытые улицы. Маршруты жителей обходят их, а также деревья, побережье и стройплощадки.
+Add flooded area|Добавить затопленный участок
+Add unsafe place|Добавить опасное место
+No flooded areas marked.|Затопленных участков не отмечено.
+No unsafe places marked.|Опасных мест не отмечено.
+Radius (m)|Радиус (м)
+example zone|пример зоны
+Fleet unlock (MDS)|Разблокировка транспорта (MDS)
+Unlock the operators|Разблокировать операторов
+Publishes an Emergency Unlock Mandate as an MDS Policy: zero fare near shelters, time-boxed to the alert, revoked automatically.|Публикует Мандат экстренной разблокировки как политику MDS: бесплатно у укрытий, на время тревоги, отзывается автоматически.
+Geofence radius around each shelter:|Радиус геозоны вокруг каждого укрытия:
+Lock fleets|Заблокировать транспорт
+Re-publish|Опубликовать заново
+Unlock fleets|Разблокировать транспорт
+Declare an alert first, under Crisis operations.|Сначала объявите тревогу в разделе «Кризисное реагирование».
+Storm protocol: riding in strong wind is dangerous. Unlock only if the wind has eased.|Штормовой протокол: ездить при сильном ветре опасно. Разблокируйте, только когда ветер стихнет.
+Fleet|Парк
+In geofence|В геозоне
+Types|Типы
+locked|заблокировано
+normal pricing|обычная цена
+awaiting…|ожидание…
+Organise|Организация
+pick-up dispatch|диспетчеризация подвоза
+Priority queue|Приоритетная очередь
+Run matching|Подобрать
+Pri.|Приор.
+Who|Кто
+Need|Потребность
+matched|назначено
+phone|телефон
+Add a request from a phone call|Добавить запрос из телефонного звонка
+Caller|Звонящий
+Name or address|Имя или адрес
+Add to queue|Добавить в очередь
+No pick-up requests. They appear the moment an alert is declared.|Запросов на подвоз нет. Они появляются, как только объявляют тревогу.
+Resolve / remove|Решить / удалить
+Lend from the citizens|Транспорт от жителей
+Shared with the Rescue Board only while an alert is active; owners are notified on every claim.|Передаётся спасательной службе только во время тревоги; владельцы получают уведомление о каждом бронировании.
+MDS exchange log|Журнал обмена MDS
+No calls yet. Unlock the fleets to publish the mandate.|Запросов пока нет. Разблокируйте транспорт, чтобы опубликовать мандат.
+Rescue Board|Спасательная служба
+Demo reset|Демо сброшено
+Reset the demo? This clears the alert, listings, works, hazard zones and requests on this device.|Сбросить демо? Будут очищены тревога, предложения, работы, опасные зоны и запросы на этом устройстве.
+Could not read your location|Не удалось определить местоположение
+Geolocation not available|Геолокация недоступна
+Give the construction site a name|Дайте работам название
+Draw the street section: click where the works start and where they end|Нарисуйте участок улицы: нажмите, где работы начинаются и где заканчиваются
+Check the dates: the end must not be before the start|Проверьте даты: окончание не может быть раньше начала
+Construction site published to the citizen map|Работы опубликованы на карте жителей
+Changes published — citizens see the new location and dates|Изменения опубликованы — жители видят новое место и даты
+Thank you. The city and your neighbours can see it, and routes avoid it now.|Спасибо. Город и соседи видят это, а маршруты уже обходят это место.
+Report added — routes avoid it|Сообщение добавлено — маршруты обходят это место
+Idea shared with the city and your neighbours|Идея отправлена городу и соседям
+Issue sent to the city. Neighbours can support it too.|Проблема отправлена городу. Соседи тоже могут её поддержать.
+Give your idea a short title|Дайте идее короткое название
+Describe the issue in a few words|Опишите проблему в нескольких словах
+Storm published to the citizen map|Шторм опубликован на карте жителей
+Set when the storm arrives|Укажите, когда придёт шторм
+Place it on the map first|Сначала отметьте это на карте
+Place the report on the map first|Сначала отметьте сообщение на карте
+Name the flooded area|Назовите затопленный участок
+Name the unsafe place|Назовите опасное место
+Flooded area published — citizen routes go around it|Затопленный участок опубликован — маршруты жителей обходят его
+Unsafe place published — citizen routes avoid it|Опасное место опубликовано — маршруты жителей его обходят
+Give the listing a short description|Добавьте краткое описание предложения
+Listing is live — an alert is active|Предложение активно — идёт тревога
+Listed as dormant — invisible until an alert is declared|Добавлено как спящее — скрыто до объявления тревоги
+Listed as a driver — you will be matched with a neighbour who needs a pick-up|Вы в списке водителей — вас свяжут с соседом, которому нужен подвоз
+Request added to the dispatch queue|Запрос добавлен в очередь
+Who is calling? Add a name or address|Кто звонит? Добавьте имя или адрес
+Fleets locked again — normal pricing restored|Транспорт снова заблокирован — обычные цены восстановлены
+Alert ended — pricing restored, listings back to dormant|Тревога завершена — цены восстановлены, предложения снова спящие
+Time-box elapsed — alert ended automatically|Время истекло — тревога завершена автоматически
+Click the map where you are|Нажмите на карте, где вы
+Click the map where it is|Нажмите на карте, где это
+Click the map where the vehicle is kept|Нажмите на карте, где хранится транспорт
+Click the map where the caller is|Нажмите на карте, где звонящий
+Click the map where the tree or branches are|Нажмите на карте, где дерево или ветки
+Click the map at the centre of the area|Нажмите на карте в центре участка
+Click the map at the centre of the storm|Нажмите на карте в центре шторма
+Click where the works start, then where they end. Add clicks to follow a longer stretch.|Нажмите, где работы начинаются, затем где заканчиваются. Добавьте нажатия для более длинного участка.
+Click where the works start, then where they end.|Нажмите, где работы начинаются, затем где заканчиваются.
+Planned after residents reported it in PiMap|Запланировано после сообщений жителей в PiMap
+Citizen report|Сообщение жителя
+In use|Используется
+Dormant — activates on declaration|Спящее — активируется при объявлении
+Active — free to borrow|Активно — можно одолжить
+Claimed by a neighbour|Занято соседом
+Available for pick-up|Доступен для подвоза
+On a pick-up|На подвозе
+Matched|Назначено
+Routes go around this area.|Маршруты обходят этот участок.
+Routes avoid this place.|Маршруты обходят это место.
+Accessible vehicle|Доступный транспорт
+Emergency Unlock Mandate|Мандат экстренной разблокировки
+€0|0 €
+// ---- analytics, privacy ----
+PiMap uses Google Analytics to count visits and see which features are used. No names, emails or exact locations are sent.|PiMap использует Google Analytics, чтобы считать посещения и видеть, какие функции используются. Имена, адреса электронной почты и точные местоположения не отправляются.
+Allow|Разрешить
+No thanks|Нет, спасибо
+Privacy|Конфиденциальность
+Analytics|Аналитика
+Your profile, email and everything you type stay on your device. PiMap has no server of its own and never sends them to us.|Ваш профиль, адрес электронной почты и всё, что вы вводите, остаются на вашем устройстве. У PiMap нет собственного сервера, и он никогда не отправляет их нам.
+Routes and addresses are looked up through OpenStreetMap services; only the coordinates needed for that request are sent.|Маршруты и адреса ищутся через сервисы OpenStreetMap; отправляются только координаты, нужные для этого запроса.
+If you allow it, Google Analytics counts visits and which features are used, with IP addresses shortened. No names, emails, free text or exact locations are sent.|Если вы разрешите, Google Analytics считает посещения и используемые функции с сокращёнными IP-адресами. Имена, адреса электронной почты, свободный текст и точные местоположения не отправляются.
+Change your analytics choice|Изменить свой выбор по аналитике
+Turn analytics off|Отключить аналитику
+Analytics is off on this device|Аналитика на этом устройстве отключена
+// ---- welcome, profile, feedback ----
+Your local map|Карта вашего города
+with live data from your municipality|с живыми данными от мэрии
+Choose your city to continue.|Чтобы продолжить, выберите свой город.
+For municipalities|Для муниципалитетов
+Work for a city or a rescue service? See PiMap from your side, or bring it to your city.|Работаете в городской администрации или спасательной службе? Посмотрите на PiMap со своей стороны или внедрите его в своём городе.
+Open the municipality portal|Открыть портал города
+Bring PiMap to your city|Внедрите PiMap в своём городе
+Choose your city above first.|Сначала выберите свой город выше.
+Demo access. Real municipality accounts will be verified before they can change anything.|Демо-доступ. Настоящие учётные записи муниципалитетов будут проверяться, прежде чем они смогут что-либо менять.
+Your local map with live data from your municipality|Карта вашего города с живыми данными от мэрии
+Where are you from?|Откуда вы?
+Other|Другой
+Type your city|Введите свой город
+Live data|Данные доступны
+PiMap has live data for Tallinn only. We will save your city and show you the Tallinn demo.|Пока у PiMap есть данные только для Таллинна. Мы сохраним ваш город и покажем демо Таллинна.
+Who are you?|Кто вы?
+Citizen|Житель
+Find shelters and safe routes, report issues, share ideas|Находите укрытия и безопасные маршруты, сообщайте о проблемах, делитесь идеями
+Municipality employee|Сотрудник муниципалитета
+Manage construction, run crisis protocols, answer residents|Управляйте строительными работами, запускайте кризисные протоколы, отвечайте жителям
+Email|Электронная почта
+optional|необязательно
+Stays on this device only. It is never sent to us.|Остаётся только на этом устройстве. Нам это никогда не отправляется.
+Continue|Продолжить
+Save profile|Сохранить профиль
+Choose your city and who you are to continue.|Чтобы продолжить, выберите город и кто вы.
+Help build PiMap|Помогите создавать PiMap
+Found a bug or have an idea for the platform? Tell us.|Нашли ошибку или есть идея для платформы? Напишите нам.
+Report a bug|Сообщить об ошибке
+Suggest an idea|Предложить идею
+About PiMap: what this project is|О PiMap: что это за проект
+Welcome to PiMap|Добро пожаловать в PiMap
+Saved. You are exploring the Tallinn demo.|Сохранено. Вы просматриваете демо Таллинна.
+Your profile|Ваш профиль
+City|Город
+Role|Роль
+Not shared|Не указано
+Member since|Участник с
+Edit profile|Редактировать профиль
+Your activity|Ваша активность
+Issues and ideas|Проблемы и идеи
+Emergency reports|Экстренные сообщения
+Lent vehicles|Одолженный транспорт
+Nothing yet. Contribute from the map.|Пока ничего. Участвуйте с карты.
+Sign out|Выйти
+Sign out? Your profile is removed from this device.|Выйти? Ваш профиль будет удалён с этого устройства.
+Bug|Ошибка
+reported|сообщено
+What went wrong? What did you expect?|Что пошло не так? Чего вы ожидали?
+What should PiMap do? Who would it help?|Что должен делать PiMap? Кому это поможет?
+Send on GitHub|Отправить через GitHub
+Send by email|Отправить по почте
+GitHub needs a free account. Email opens your mail app. A copy stays in your profile.|Для GitHub нужна бесплатная учётная запись. Почта откроет ваше почтовое приложение. Копия останется в вашем профиле.
+Write a few words first|Сначала напишите несколько слов
+Thank you for helping build PiMap|Спасибо, что помогаете создавать PiMap
+Tallinn|Таллинн
+Helsinki|Хельсинки
+Dnipro|Днепр
+Lviv|Львов
+Valencia|Валенсия
+Estonia|Эстония
+Finland|Финляндия
+Ukraine|Украина
+Spain|Испания
+// ---- about page ----
+About PiMap|О PiMap
+Open PiMap|Открыть PiMap
+Every resident reaches safety, whether or not they can walk.|Каждый житель добирается до безопасного места, даже если не может идти пешком.
+PiMap shows your nearest shelter and the safest way there, every day and in an emergency. It connects residents, neighbours and the city on one map.|PiMap показывает ближайшее укрытие и самый безопасный путь к нему, каждый день и в чрезвычайной ситуации. Он объединяет жителей, соседей и город на одной карте.
+A prototype built for City Resilience Hack 2026 in Tallinn. Not an official City of Tallinn service.|Прототип, созданный для City Resilience Hack 2026 в Таллинне. Не является официальным сервисом города Таллинна.
+The problem|Проблема
+Cities have shelters, sirens and emergency alerts, but no plan for the last kilometre. If you cannot walk it, you do not reach it.|У городов есть укрытия, сирены и экстренные оповещения, но нет плана для последнего километра. Если вы не можете его пройти, вы не доберётесь.
+Older people, people with limited mobility and families with small children are the first to be left behind.|Первыми остаются позади пожилые люди, люди с ограниченной мобильностью и семьи с маленькими детьми.
+How PiMap works|Как работает PiMap
+One alert brings your nearest shelter, a route that avoids danger, and four ways to get there: walk, bike, drive or request a pick-up. It works without signal.|Одно оповещение показывает ближайшее укрытие, маршрут в обход опасности и четыре способа добраться: пешком, на велосипеде, на автомобиле или с просьбой вас забрать. Работает без связи.
+During an alert, shared scooters and bikes near shelters become free to ride, time-boxed and limited to the shelter area.|Во время тревоги общие самокаты и велосипеды у укрытий становятся бесплатными, на ограниченное время и только в зоне укрытия.
+Neighbours pre-list spare bikes and mobility aids and offer seats in their cars. People who cannot walk are picked up first.|Соседи заранее добавляют свободные велосипеды и средства передвижения и предлагают места в своих автомобилях. Тех, кто не может идти, забирают первыми.
+A protocol for each emergency|Протокол для каждой чрезвычайной ситуации
+War or air strike|Война или авиаудар
+Routes to the nearest public shelter.|Маршруты к ближайшему общественному укрытию.
+The city marks flooded streets and routes go around them.|Город отмечает затопленные улицы, и маршруты их обходят.
+Routes to cool indoor places along the shadiest streets.|Маршруты к прохладным помещениям по самым тенистым улицам.
+Routes avoid trees, the shoreline and reported fallen trees.|Маршруты обходят деревья, побережье и упавшие деревья, о которых сообщили.
+Useful every day|Полезно каждый день
+Find the nearest pharmacy, hospital, grocery store or drinking water.|Найдите ближайшую аптеку, больницу, продуктовый магазин или питьевую воду.
+See construction works and routes that steer around them, kept up to date by the city.|Смотрите строительные работы и маршруты в их обход, которые город поддерживает актуальными.
+Report issues and share ideas for your street. Neighbours support them and the city replies.|Сообщайте о проблемах и делитесь идеями для своей улицы. Соседи их поддерживают, а город отвечает.
+Two portals, one map|Два портала, одна карта
+Residents use the citizen portal. City staff use the municipality portal to update construction, declare and run emergency protocols, and answer residents.|Жители пользуются порталом жителя. Сотрудники города в портале города обновляют строительные работы, объявляют и ведут протоколы чрезвычайных ситуаций и отвечают жителям.
+Open data|Открытые данные
+Public shelters: the Estonian Rescue Board register, through the Land and Spatial Development Board geoportal.|Общественные укрытия: реестр Спасательного департамента Эстонии через геопортал Департамента земли и пространственного развития.
+Places, buildings, trees and walking routes: OpenStreetMap contributors.|Места, здания, деревья и пешеходные маршруты: участники OpenStreetMap.
+Who is building it|Кто это создаёт
+PiMap is built by Pinge Electronics OÜ in Tallinn, which runs light electric vehicles and mobility aids for people who find walking hard.|PiMap создаёт таллиннская компания Pinge Electronics OÜ, которая предоставляет лёгкий электротранспорт и средства передвижения людям, которым трудно ходить.
+The next step is a one-district pilot with the city and the Rescue Board. The code is open.|Следующий шаг: пилот в одном районе вместе с городом и Спасательным департаментом. Код открыт.
+Source code on GitHub|Исходный код на GitHub
+PiMap prototype · not an official City of Tallinn service|Прототип PiMap · не является официальным сервисом города Таллинна
+No contributions yet.|Пока нет вкладов.
+prototype with Pinge Electronics OÜ|прототип совместно с Pinge Electronics OÜ
+Details|Детали
+// ---- seed data ----
+Pinge eTricycle|Pinge eTricycle
+Kalamaja low streets (Soo tn)|Низинные улицы Каламая (Soo tn)
+Kalaranna shoreline|Побережье Каларанна
+Pirita river mouth|Устье реки Пирита
+Stroomi beach and Pelgulinn low ground|Пляж Штромка и низины Пельгулинна
+Kadriorg shore, Pirita tee|Побережье Кадриорга, Pirita tee
+Fallen trees, Kadriorg park|Упавшие деревья, парк Кадриорг
+Flying debris, Linnahall seafront|Летящие обломки, набережная Линнахалл
+Loose roofing, Kalamaja (Kotzebue tn)|Незакреплённая кровля, Каламая (Kotzebue tn)
+Vana-Kalamaja street reconstruction|Реконструкция улицы Вана-Каламая
+Kopli tram line works|Работы на трамвайной линии Копли
+Pärnu mnt utility works|Ремонт коммуникаций на Pärnu mnt
+Pavement closed on the north side, pedestrians use the south side|Тротуар с северной стороны закрыт, пешеходы идут по южной стороне
+Tram tracks being replaced, cycle lane diverted|Меняют трамвайные пути, велодорожка перенаправлена
+District heating pipe, one lane closed|Труба теплоснабжения, одна полоса закрыта
+Deep pothole on the cycle path|Глубокая яма на велодорожке
+Street light out on Kotzebue|Не горит фонарь на Kotzebue
+No ramp at the tram stop kerb|Нет пандуса на бордюре трамвайной остановки
+Bike racks by the Balti jaam market|Велопарковки у рынка Балти-яам
+Plant street trees on Tööstuse|Посадить деревья на улице Tööstuse
+Benches along the Kalaranna promenade|Скамейки вдоль набережной Каларанна
+Illegal dumping behind the garages|Незаконная свалка за гаражами
+Next to the Kalamaja park entrance, easy to fall at night.|Рядом со входом в парк Каламая, ночью легко упасть.
+Two lamps dark between Soo and Vana-Kalamaja.|Два фонаря не горят между Soo и Vana-Kalamaja.
+Wheelchair users cannot get onto the platform from the crossing.|Люди на колясках не могут попасть на платформу с перехода.
+Bikes are chained to every fence on market days.|В рыночные дни велосипеды пристёгнуты к каждому забору.
+No shade at all in summer; would also help in a heatwave.|Летом совсем нет тени; это помогло бы и в жару.
+Older residents have nowhere to rest between the tram and the sea.|Пожилым жителям негде отдохнуть между трамваем и морем.
+Old furniture and tyres.|Старая мебель и шины.
+Nearly came off my bike here yesterday.|Вчера чуть не упал здесь с велосипеда.
+Thank you. Repair is scheduled with the October pavement works.|Спасибо. Ремонт запланирован вместе с октябрьскими дорожными работами.
+Same problem with a pram.|Та же проблема с детской коляской.
+Yes please, covered ones if possible.|Да, пожалуйста, по возможности с навесом.
+Six benches are being installed this autumn.|Этой осенью устанавливают шесть скамеек.
+Cleared on 22 September.|Убрано 22 сентября.
+Birch across the pavement|Берёза упала поперёк тротуара
+Large branches on the cycle path|Большие ветки на велодорожке
+Old poplar leaning over the playground|Старый тополь наклонился над детской площадкой
+Lime tree down on Kadrioru tee|Липа упала на Kadrioru tee
+Blue city bike, basket|Синий городской велосипед с корзиной
+Xiaomi e-scooter, charged|Электросамокат Xiaomi, заряжен
+Manual wheelchair, folding|Механическая коляска, складная
+Cargo bike, seats 2 children|Грузовой велосипед на 2 детей
+Rollator with seat|Ходунки с сиденьем
+E-bike, 60 km range|Электровелосипед, запас хода 60 км
+Kids bike + adult bike|Детский велосипед + взрослый
+Elderly couple, Kalamaja|Пожилая пара, Каламая
+Wheelchair user, Vanalinn|Человек на коляске, Ваналинн
+Parent with pram, Kesklinn|Родитель с коляской, Кесклинн
+Resident on crutches, Kristiine|Житель на костылях, Кристийне
+Built when the mandate is published: a|Создаётся при публикации мандата: правило
+rule with rate_amount 0 inside shelter geographies, a|с rate_amount 0 в зонах укрытий, правило
+rule so trips end at shelters, a|чтобы поездки заканчивались в укрытиях, правило
+rule holding accessible vehicles for priority riders, and a ban on rebalancing out of geofences.|резервирующее доступный транспорт для приоритетных пассажиров, и запрет вывозить транспорт за пределы геозон.
+`;
+
   const D = new Map();
   const rows = s => s.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//')).map(l => l.split('|'));
-  rows(RAW).forEach(p => { if (p.length === 4) D.set(p[0], p.concat([null])); });
-  rows(RAW5).forEach(p => { if (p.length === 5) D.set(p[0], p); });
-  rows(RAW_UK).forEach(p => { if (p.length !== 2) return; const r = D.get(p[0]); if (r) r[4] = p[1]; else D.set(p[0], [p[0], null, null, null, p[1]]); });
-  const COMPASS = { N: ['põhjast', 'pohjoisesta', 'del norte', 'з півночі'], NE: ['kirdest', 'koillisesta', 'del noreste', 'з північного сходу'], E: ['idast', 'idästä', 'del este', 'зі сходу'], SE: ['kagust', 'kaakosta', 'del sureste', 'з південного сходу'], S: ['lõunast', 'etelästä', 'del sur', 'з півдня'], SW: ['edelast', 'lounaasta', 'del suroeste', 'з південного заходу'], W: ['läänest', 'lännestä', 'del oeste', 'із заходу'], NW: ['loodest', 'luoteesta', 'del noroeste', 'з північного заходу'] };
-  const DIRSHORT = { N: ['P', 'P', 'N', 'Пн'], NE: ['KI', 'KO', 'NE', 'ПнСх'], E: ['I', 'I', 'E', 'Сх'], SE: ['KA', 'KA', 'SE', 'ПдСх'], S: ['L', 'E', 'S', 'Пд'], SW: ['E', 'LO', 'SO', 'ПдЗх'], W: ['L', 'L', 'O', 'Зх'], NW: ['LO', 'LU', 'NO', 'ПнЗх'] };
+  rows(RAW).forEach(p => { if (p.length === 4) D.set(p[0], p.concat([null, null])); });
+  rows(RAW5).forEach(p => { if (p.length === 5) D.set(p[0], p.concat([null])); });
+  rows(RAW_UK).forEach(p => { if (p.length !== 2) return; const r = D.get(p[0]); if (r) r[4] = p[1]; else D.set(p[0], [p[0], null, null, null, p[1], null]); });
+  rows(RAW_RU).forEach(p => { if (p.length !== 2) return; const r = D.get(p[0]); if (r) r[5] = p[1]; else D.set(p[0], [p[0], null, null, null, null, p[1]]); });
+  const COMPASS = { N: ['põhjast', 'pohjoisesta', 'del norte', 'з півночі', 'с севера'], NE: ['kirdest', 'koillisesta', 'del noreste', 'з північного сходу', 'с северо-востока'], E: ['idast', 'idästä', 'del este', 'зі сходу', 'с востока'], SE: ['kagust', 'kaakosta', 'del sureste', 'з південного сходу', 'с юго-востока'], S: ['lõunast', 'etelästä', 'del sur', 'з півдня', 'с юга'], SW: ['edelast', 'lounaasta', 'del suroeste', 'з південного заходу', 'с юго-запада'], W: ['läänest', 'lännestä', 'del oeste', 'із заходу', 'с запада'], NW: ['loodest', 'luoteesta', 'del noroeste', 'з північного заходу', 'с северо-запада'] };
+  const DIRSHORT = { N: ['P', 'P', 'N', 'Пн', 'С'], NE: ['KI', 'KO', 'NE', 'ПнСх', 'СВ'], E: ['I', 'I', 'E', 'Сх', 'В'], SE: ['KA', 'KA', 'SE', 'ПдСх', 'ЮВ'], S: ['L', 'E', 'S', 'Пд', 'Ю'], SW: ['E', 'LO', 'SO', 'ПдЗх', 'ЮЗ'], W: ['L', 'L', 'O', 'Зх', 'З'], NW: ['LO', 'LU', 'NO', 'ПнЗх', 'СЗ'] };
 
   let lang = 'en';
   try { lang = localStorage.getItem('pimap-lang') || ''; } catch (e) { /* ignore */ }
   if (!CODES.includes(lang)) { const nl = (navigator.language || 'en').slice(0, 2).toLowerCase(); lang = CODES.includes(nl) ? nl : 'en'; }
-  const pick = arr => arr[IDX[lang] - 1];               // for [et, fi, es, uk] arrays
+  const pick = arr => arr[IDX[lang] - 1];               // for [et, fi, es, uk, ru] arrays
   const look = s => { const r = D.get(s); return r ? r[IDX[lang]] : null; };
   const plural = (n, one, many) => (Number(n) === 1 ? one : many);
   const ukPlural = (n, one, few, many) => { n = Math.abs(Number(n)) % 100; const d = n % 10; return n > 10 && n < 20 ? many : d === 1 ? one : d >= 2 && d <= 4 ? few : many; };
-  const u = s => (lang === 'uk' ? s.replace(/ km$/, ' км').replace(/ m$/, ' м') : s);   // unit names in Ukrainian
+  const ruPlural = ukPlural;                            // Russian shares the one / few / many rule
+  const u = s => (lang === 'uk' || lang === 'ru' ? s.replace(/ km$/, ' км').replace(/ m$/, ' м') : s);   // unit names in Ukrainian and Russian
 
-  /* Patterns for text with numbers, times, distances. t() translates a sub-phrase. */
+  /* Patterns for text with numbers, times, distances. t() translates a sub-phrase. Columns: et | fi | es | uk | ru */
   const P = [
-    [/^(~?\d+) min$/, m => pick([null, null, null, `${m[1]} хв`])],
-    [/^([\d.,]+) (k?m)$/, m => pick([null, null, null, `${m[1]} ${m[2] === 'km' ? 'км' : 'м'}`])],
-    [/^([\d.,]+ k?m) away$/, m => pick([`${m[1]} kaugusel`, `${m[1]} päässä`, `a ${m[1]}`, `за ${u(m[1])}`])],
-    [/^(\d+) min walk$/, m => pick([`${m[1]} min jalgsi`, `${m[1]} min kävellen`, `${m[1]} min a pie`, `${m[1]} хв пішки`])],
-    [/^(\d+) d left$/, m => pick([`${m[1]} p jäänud`, `${m[1]} pv jäljellä`, `quedan ${m[1]} d`, `залишилось ${m[1]} дн.`])],
-    [/^in (\d+) d$/, m => pick([`${m[1]} p pärast`, `${m[1]} pv päästä`, `en ${m[1]} d`, `через ${m[1]} дн.`])],
-    [/^until ([^·]+)$/, m => pick([`kuni ${m[1]}`, `${m[1]} asti`, `hasta ${m[1]}`, `до ${m[1]}`])],
-    [/^from ([^·]+)$/, m => pick([`alates ${m[1]}`, `${m[1]} alkaen`, `desde ${m[1]}`, `з ${m[1]}`])],
-    [/^ends ([^·]+)$/, m => pick([`lõpeb ${m[1]}`, `päättyy ${m[1]}`, `termina ${m[1]}`, `завершується о ${m[1]}`])],
-    [/^Declared ([^·]+)$/, m => pick([`Välja kuulutatud ${m[1]}`, `Julistettu ${m[1]}`, `Declarada ${m[1]}`, `Оголошено о ${m[1]}`])],
-    [/^just now$/, () => pick(['just praegu', 'juuri nyt', 'ahora mismo', 'щойно'])],
-    [/^(\d+) min ago$/, m => pick([`${m[1]} min tagasi`, `${m[1]} min sitten`, `hace ${m[1]} min`, `${m[1]} хв тому`])],
-    [/^(\d+) h ago$/, m => pick([`${m[1]} h tagasi`, `${m[1]} h sitten`, `hace ${m[1]} h`, `${m[1]} год тому`])],
-    [/^(\d+) d ago$/, m => pick([`${m[1]} p tagasi`, `${m[1]} pv sitten`, `hace ${m[1]} d`, `${m[1]} дн. тому`])],
-    [/^Updated by the city (.+)$/, (m, t) => pick([`Linn uuendas ${t(m[1])}`, `Kaupunki päivitti ${t(m[1])}`, `Actualizado por el ayuntamiento ${t(m[1])}`, `Оновлено містом ${t(m[1])}`])],
-    [/^(\d+) closest$/, m => pick([`${m[1]} lähimat`, `${m[1]} lähintä`, `los ${m[1]} más cercanos`, `${m[1]} найближчих`])],
-    [/^(.+) near you$/, m => { const x = look(m[1]); return x == null ? null : pick([`${x} sinu lähedal`, `${x} lähelläsi`, `${x} cerca de ti`, `${x} поруч із вами`]); }],
-    [/^(\d+) construction sites? within 2 km$/, m => pick([`${m[1]} ehitustööd 2 km raadiuses`, `${m[1]} työmaata 2 km:n säteellä`, `${m[1]} ${plural(m[1], 'obra', 'obras')} a menos de 2 km`, `Робіт у радіусі 2 км: ${m[1]}`])],
-    [/^(\d+) hazard reports?$/, m => pick([`Ohuteateid: ${m[1]}`, `Vaarailmoituksia: ${m[1]}`, `${m[1]} ${plural(m[1], 'aviso de peligro', 'avisos de peligro')}`, `Повідомлень про небезпеки: ${m[1]}`])],
-    [/^(\d+) fallen tree reports?$/, m => pick([`Teateid langenud puudest: ${m[1]}`, `Ilmoituksia kaatuneista puista: ${m[1]}`, `${m[1]} ${plural(m[1], 'aviso', 'avisos')} de árboles caídos`, `Повідомлень про повалені дерева: ${m[1]}`])],
-    [/^(\d+) issues and ideas near you$/, m => pick([`Probleeme ja ideid sinu lähedal: ${m[1]}`, `Ongelmia ja ideoita lähelläsi: ${m[1]}`, `${m[1]} problemas e ideas cerca de ti`, `Проблем та ідей поруч: ${m[1]}`])],
-    [/^Päästeamet register, (.+)$/, m => pick([`Päästeameti register, ${m[1]}`, `Pelastusviraston rekisteri, ${m[1]}`, `Registro de Päästeamet, ${m[1]}`, `Реєстр Päästeamet, ${m[1]}`])],
-    [/^Päästeamet register via Maa- ja Ruumiamet, (.+)$/, m => pick([`Päästeameti register Maa- ja Ruumiameti kaudu, ${m[1]}`, `Pelastusviraston rekisteri Maa- ja Ruumiametin kautta, ${m[1]}`, `Registro de Päästeamet vía Maa- ja Ruumiamet, ${m[1]}`, `Реєстр Päästeamet через Maa- ja Ruumiamet, ${m[1]}`])],
-    [/^(Public library|Shopping centre): an indoor place to cool down during a heatwave or wait out a storm\.$/, (m, t) => `${t(m[1])}: ` + pick(['siseruum, kus kuumalaine ajal jahtuda või tormi üle oodata.', 'sisätila, jossa viilentyä helteellä tai odottaa myrskyn yli.', 'un interior donde refrescarse en una ola de calor o esperar a que pase una tormenta.', 'приміщення, де можна охолонути в спеку або перечекати шторм.'])],
-    [/^Active · (\d+) days left$/, m => pick([`Käimas · ${m[1]} päeva jäänud`, `Käynnissä · ${m[1]} päivää jäljellä`, `En curso · quedan ${m[1]} días`, `Триває · залишилось ${m[1]} дн.`])],
-    [/^Starts in (\d+) days$/, m => pick([`Algab ${m[1]} päeva pärast`, `Alkaa ${m[1]} päivän päästä`, `Empieza en ${m[1]} días`, `Почнеться через ${m[1]} дн.`])],
-    [/^Routes keep (\d+) m away until the city clears it\.$/, m => pick([`Teekonnad hoiavad ${m[1]} m kaugusele, kuni linn selle koristab.`, `Reitit pysyvät ${m[1]} m:n päässä, kunnes kaupunki raivaa sen.`, `Las rutas se mantienen a ${m[1]} m hasta que el ayuntamiento lo retire.`, `Маршрути оминають це місце на ${m[1]} м, доки місто його не прибере.`])],
-    [/^([\d.,]+ k?m) to the vehicle, then ride$/, m => pick([`${m[1]} sõidukini, siis sõida`, `${m[1]} ajoneuvolle, sitten aja`, `${m[1]} hasta el vehículo y luego a rodar`, `${u(m[1])} до транспорту, далі їхати`])],
-    [/^battery (\d+)%$/, m => pick([`aku ${m[1]}%`, `akku ${m[1]} %`, `batería ${m[1]} %`, `батарея ${m[1]}%`])],
-    [/^(.+), neighbour$/, m => pick([`${m[1]}, naaber`, `${m[1]}, naapuri`, `${m[1]}, vecino`, `${m[1]}, сусід`])],
-    [/^position (\d+)$/, m => pick([`koht ${m[1]}`, `sija ${m[1]}`, `posición ${m[1]}`, `місце ${m[1]}`])],
-    [/^(.+) is coming$/, (m, t) => pick([`${t(m[1])} on teel`, `${t(m[1])} on tulossa`, `${t(m[1])} está en camino`, `${t(m[1])} їде до вас`])],
-    [/^Pinge crew (\d+)$/, m => pick([`Pinge meeskond ${m[1]}`, `Pinge-tiimi ${m[1]}`, `Equipo Pinge ${m[1]}`, `Бригада Pinge ${m[1]}`])],
-    [/^(\d+) seats$/, m => pick([`${m[1]} kohta`, `${m[1]} paikkaa`, `${m[1]} plazas`, `${m[1]} місць`])],
-    [/^(\d+) spare seats?$/, m => pick([`${m[1]} vaba kohta`, `${m[1]} vapaata paikkaa`, `${m[1]} ${plural(m[1], 'plaza libre', 'plazas libres')}`, `вільних місць: ${m[1]}`])],
-    [/^(\d+) pers\.$/, m => pick([`${m[1]} in.`, `${m[1]} hlö`, `${m[1]} pers.`, `${m[1]} ос.`])],
-    [/^queued #(\d+)$/, m => pick([`järjekorras #${m[1]}`, `jonossa #${m[1]}`, `en cola #${m[1]}`, `у черзі #${m[1]}`])],
-    [/^Location (.+)$/, m => pick([`Asukoht ${m[1]}`, `Sijainti ${m[1]}`, `Ubicación ${m[1]}`, `Місцезнаходження ${m[1]}`])],
-    [/^Pin: (.+)$/, (m, t) => pick([`Märk: ${t(m[1])}`, `Merkki: ${t(m[1])}`, `Marcador: ${t(m[1])}`, `Позначка: ${t(m[1])}`])],
-    [/^Pinned at (.+)$/, m => pick([`Märgitud: ${m[1]}`, `Merkitty: ${m[1]}`, `Marcado en ${m[1]}`, `Позначено: ${m[1]}`])],
-    [/^Centred at (.+)$/, m => pick([`Keskpunkt: ${m[1]}`, `Keskipiste: ${m[1]}`, `Centro en ${m[1]}`, `Центр: ${m[1]}`])],
-    [/^(\d+) m of street$/, m => pick([`${m[1]} m tänavat`, `${m[1]} m katua`, `${m[1]} m de calle`, `${m[1]} м вулиці`])],
-    [/^(\d+) m of street · (\d+) points$/, m => pick([`${m[1]} m tänavat · ${m[2]} punkti`, `${m[1]} m katua · ${m[2]} pistettä`, `${m[1]} m de calle · ${m[2]} puntos`, `${m[1]} м вулиці · точок: ${m[2]}`])],
-    [/^(\d+) m radius$/, m => pick([`raadius ${m[1]} m`, `säde ${m[1]} m`, `radio de ${m[1]} m`, `радіус ${m[1]} м`])],
-    [/^(\d+) active$/, m => pick([`${m[1]} käimas`, `${m[1]} käynnissä`, `${m[1]} activas`, `активних: ${m[1]}`])],
-    [/^(\d+) upcoming$/, m => pick([`${m[1]} tulemas`, `${m[1]} tulossa`, `${m[1]} próximas`, `запланованих: ${m[1]}`])],
-    [/^(\d+) open$/, m => pick([`${m[1]} avatud`, `${m[1]} avoinna`, `${m[1]} abiertos`, `відкритих: ${m[1]}`])],
-    [/^(\d+) new$/, m => pick([`${m[1]} uut`, `${m[1]} uutta`, `${m[1]} nuevos`, `нових: ${m[1]}`])],
-    [/^(\d+) confirmed$/, m => pick([`${m[1]} kinnitatud`, `${m[1]} vahvistettu`, `${m[1]} confirmados`, `підтверджених: ${m[1]}`])],
-    [/^(\d+) cleared$/, m => pick([`${m[1]} koristatud`, `${m[1]} raivattu`, `${m[1]} retirados`, `прибраних: ${m[1]}`])],
-    [/^(\d+) calls$/, m => pick([`${m[1]} päringut`, `${m[1]} kutsua`, `${m[1]} llamadas`, `запитів: ${m[1]}`])],
-    [/^sorted by new first, then most supported$/, () => pick(['uued eespool, seejärel enim toetatud', 'uusimmat ensin, sitten eniten tuetut', 'primero los nuevos y luego los más apoyados', 'спершу нові, потім найпідтримуваніші'])],
-    [/^(\d+) hours?$/, m => pick([`${m[1]} ${plural(m[1], 'tund', 'tundi')}`, `${m[1]} ${plural(m[1], 'tunti', 'tuntia')}`, `${m[1]} ${plural(m[1], 'hora', 'horas')}`, `${m[1]} ${ukPlural(m[1], 'година', 'години', 'годин')}`])],
-    [/^(\d+)h (\d+)m left$/, m => pick([`${m[1]} h ${m[2]} min jäänud`, `${m[1]} h ${m[2]} min jäljellä`, `quedan ${m[1]} h ${m[2]} min`, `залишилось ${m[1]} год ${m[2]} хв`])],
-    [/^Declare (.+) alert$/, (m, t) => pick([`Kuuluta välja ${t(m[1])} ohuteade`, `Julista ${t(m[1])} hälytys`, `Declarar alerta de ${t(m[1])}`, `Оголосити тривогу: ${t(m[1])}`])],
-    [/^(War \/ air strike|Flood|Heatwave|Storm) alert$/, (m, t) => pick([`${t(m[1])}: ohuteade`, `${t(m[1])}: hälytys`, `Alerta: ${t(m[1]).toLowerCase()}`, `${t(m[1])}: тривога`])],
-    [/^(War \/ air strike|Flood|Heatwave|Storm) alert active$/, (m, t) => pick([`${t(m[1])}: ohuteade aktiivne`, `${t(m[1])}: hälytys päällä`, `Alerta activa: ${t(m[1]).toLowerCase()}`, `${t(m[1])}: тривога активна`])],
-    [/^(War \/ air strike|Flood|Heatwave|Storm) alert: your reports help everyone route safely$/, (m, t) => pick([`${t(m[1])}: sinu teated aitavad kõigil ohutult liikuda`, `${t(m[1])}: ilmoituksesi auttavat kaikkia kulkemaan turvallisesti`, `${t(m[1])}: tus avisos ayudan a todos a moverse con seguridad`, `${t(m[1])}: ваші повідомлення допомагають усім безпечно пересуватися`])],
-    [/^Citizens are routed to the nearest (.+)\.$/, (m, t) => pick([`Elanikud suunatakse lähimasse kohta: ${t(m[1])}.`, `Asukkaat ohjataan lähimpään kohteeseen: ${t(m[1])}.`, `Se dirige a los vecinos a: ${t(m[1])} más cercano.`, `Мешканців спрямовують до найближчого місця: ${t(m[1])}.`])],
-    [/^EE-ALARM pushed with the (.+) route and four ways to get there\.$/, (m, t) => pick([`EE-ALARM saadeti koos teekonnaga (${t(m[1])}) ja nelja liikumisviisiga.`, `EE-ALARM lähetettiin reitin (${t(m[1])}) ja neljän kulkutavan kanssa.`, `EE-ALARM enviado con la ruta (${t(m[1])}) y cuatro formas de llegar.`, `EE-ALARM надіслано з маршрутом (${t(m[1])}) і чотирма способами дістатися.`])],
-    [/^(\d+) dormant listings waiting\.$/, m => pick([`Ootel pakkumisi: ${m[1]}.`, `Lepotilassa olevia ilmoituksia: ${m[1]}.`, `${m[1]} ofertas latentes a la espera.`, `Неактивних пропозицій в очікуванні: ${m[1]}.`])],
-    [/^(\d+) neighbour listings live\.$/, m => pick([`Aktiivseid naabripakkumisi: ${m[1]}.`, `Naapureiden ilmoituksia voimassa: ${m[1]}.`, `${m[1]} ofertas de vecinos activas.`, `Активних пропозицій сусідів: ${m[1]}.`])],
-    [/^(\d+) vehicles free in (\d+) m zones$/, m => pick([`${m[1]} sõidukit tasuta ${m[2]} m tsoonides`, `${m[1]} ajoneuvoa maksutta ${m[2]} m:n alueilla`, `${m[1]} vehículos gratis en zonas de ${m[2]} m`, `${m[1]} од. транспорту безкоштовно в зонах ${m[2]} м`])],
-    [/^Drivers free: (\d+) of (\d+) \((\d+) Pinge crews, (\d+) neighbours\)\.$/, m => pick([`Vabu juhte: ${m[1]}/${m[2]} (${m[3]} Pinge meeskonda, ${m[4]} naabrit).`, `Vapaita kuljettajia: ${m[1]}/${m[2]} (${m[3]} Pinge-tiimiä, ${m[4]} naapuria).`, `Conductores libres: ${m[1]} de ${m[2]} (${m[3]} equipos Pinge, ${m[4]} vecinos).`, `Вільних водіїв: ${m[1]} з ${m[2]} (бригад Pinge: ${m[3]}, сусідів: ${m[4]}).`])],
-    [/^Policy object \(MDS Policy ([\d.]+)\)$/, m => pick([`Poliitikaobjekt (MDS Policy ${m[1]})`, `Käytäntöobjekti (MDS Policy ${m[1]})`, `Objeto de política (MDS Policy ${m[1]})`, `Об'єкт політики (MDS Policy ${m[1]})`])],
-    [/^(\d+)% of the route is in shade$/, m => pick([`${m[1]}% teekonnast on varjus`, `${m[1]} % reitistä on varjossa`, `el ${m[1]} % de la ruta está a la sombra`, `${m[1]}% маршруту в тіні`])],
-    [/^(\d+)% of the route is exposed$/, m => pick([`${m[1]}% teekonnast on avatud`, `${m[1]} % reitistä on alttiina`, `el ${m[1]} % de la ruta está expuesta`, `${m[1]}% маршруту відкриті`])],
-    [/^, versus (\d+)% on the fastest route\. Green is shade from buildings and trees, orange is direct sun\.$/, m => pick([`, kiireimal teekonnal ${m[1]}%. Roheline on hoonete ja puude vari, oranž otsene päike.`, `, nopeimmalla reitillä ${m[1]} %. Vihreä on rakennusten ja puiden varjoa, oranssi suoraa aurinkoa.`, `, frente al ${m[1]} % de la ruta más rápida. Verde es sombra de edificios y árboles; naranja, sol directo.`, `, проти ${m[1]}% на найшвидшому маршруті. Зелене — тінь від будівель і дерев, помаранчеве — пряме сонце.`])],
-    [/^\. Green is shade from buildings and trees, orange is direct sun\.$/, () => pick(['. Roheline on hoonete ja puude vari, oranž otsene päike.', '. Vihreä on rakennusten ja puiden varjoa, oranssi suoraa aurinkoa.', '. Verde es sombra de edificios y árboles; naranja, sol directo.', '. Зелене — тінь від будівель і дерев, помаранчеве — пряме сонце.'])],
-    [/^, down from (\d+)% on the fastest route\. Red marks stretches under trees, by the shoreline or next to construction\.$/, m => pick([`, kiireimal teekonnal ${m[1]}%. Punane tähistab lõike puude all, ranna ääres või ehitustööde kõrval.`, `, nopeimmalla reitillä ${m[1]} %. Punainen merkitsee osuuksia puiden alla, rannan tuntumassa tai työmaiden vieressä.`, `, frente al ${m[1]} % de la ruta más rápida. En rojo, tramos bajo árboles, junto a la costa o junto a obras.`, `, проти ${m[1]}% на найшвидшому маршруті. Червоним позначено ділянки під деревами, біля узбережжя чи поруч із будівництвом.`])],
-    [/^\. Red marks stretches under trees, by the shoreline or next to construction\.$/, () => pick(['. Punane tähistab lõike puude all, ranna ääres või ehitustööde kõrval.', '. Punainen merkitsee osuuksia puiden alla, rannan tuntumassa tai työmaiden vieressä.', '. En rojo, tramos bajo árboles, junto a la costa o junto a obras.', '. Червоним позначено ділянки під деревами, біля узбережжя чи поруч із будівництвом.'])],
-    [/^Sun from the (N|NE|E|SE|S|SW|W|NW), (-?\d+)° above the horizon at ([\d:.]+)\.$/, m => pick([`Päike paistab ${COMPASS[m[1]][0]}, ${m[2]}° kõrgusel kell ${m[3]}.`, `Aurinko paistaa ${COMPASS[m[1]][1]}, ${m[2]}° korkeudella klo ${m[3]}.`, `Sol ${COMPASS[m[1]][2]}, a ${m[2]}° sobre el horizonte a las ${m[3]}.`, `Сонце світить ${COMPASS[m[1]][3]}, на висоті ${m[2]}° о ${m[3]}.`])],
-    [/^(\d+) drinking water points? on the way, marked on the map\.$/, m => pick([`Teel on ${m[1]} joogiveepunkti, märgitud kaardil.`, `Matkalla on ${m[1]} juomavesipistettä, merkitty kartalle.`, `Hay ${m[1]} ${plural(m[1], 'fuente', 'fuentes')} de agua potable en el camino, marcadas en el mapa.`, `Точок з питною водою на шляху: ${m[1]}, вони позначені на карті.`])],
-    [/^: wind (\d+) m\/s, gusts up to (\d+) m\/s from the (N|NE|E|SE|S|SW|W|NW), (until|from) ([\d:.]+)\.$/, m => pick([`: tuul ${m[1]} m/s, puhangud kuni ${m[2]} m/s ${COMPASS[m[3]][0]}, ${m[4] === 'until' ? 'kuni' : 'alates'} ${m[5]}.`, `: tuuli ${m[1]} m/s, puuskat jopa ${m[2]} m/s ${COMPASS[m[3]][1]}, ${m[4] === 'until' ? m[5] + ' asti' : m[5] + ' alkaen'}.`, `: viento ${m[1]} m/s, rachas de hasta ${m[2]} m/s ${COMPASS[m[3]][2]}, ${m[4] === 'until' ? 'hasta las' : 'desde las'} ${m[5]}.`, `: вітер ${m[1]} м/с, пориви до ${m[2]} м/с ${COMPASS[m[3]][3]}, ${m[4] === 'until' ? 'до' : 'з'} ${m[5]}.`])],
-    [/^(\d+) fallen trees? and branch reports on the map\.$/, m => pick([`Kaardil on ${m[1]} teadet langenud puudest ja okstest.`, `Kartalla on ${m[1]} ilmoitusta kaatuneista puista ja oksista.`, `Hay ${m[1]} avisos de árboles y ramas caídos en el mapa.`, `Повідомлень про повалені дерева й гілки на карті: ${m[1]}.`])],
-    [/^Avoids (\d+) (flooded areas?|unsafe places?): (.+)$/, m => { const fl = m[2].startsWith('flooded'); return pick([`Väldib ${m[1]} ${fl ? 'üleujutatud ala' : 'ohtlikku kohta'}: ${m[3]}`, `Välttää ${m[1]} ${fl ? 'tulva-aluetta' : 'vaarallista paikkaa'}: ${m[3]}`, `Evita ${m[1]} ${fl ? plural(m[1], 'zona inundada', 'zonas inundadas') : plural(m[1], 'lugar peligroso', 'lugares peligrosos')}: ${m[3]}`, `Оминає ${fl ? 'затоплені ділянки' : 'небезпечні місця'} (${m[1]}): ${m[3]}`]); }],
-    [/^Avoids a blocked stretch:$/, () => pick(['Väldib suletud lõiku:', 'Välttää suljetun osuuden:', 'Evita un tramo bloqueado:', 'Оминає перекриту ділянку:'])],
-    [/^Avoids (\d+) blocked stretches:$/, m => pick([`Väldib ${m[1]} suletud lõiku:`, `Välttää ${m[1]} suljettua osuutta:`, `Evita ${m[1]} tramos bloqueados:`, `Оминає перекриті ділянки (${m[1]}):`])],
-    [/^▲ Support$/, () => pick(['▲ Toeta', '▲ Tue', '▲ Apoyar', '▲ Підтримати'])],
-    [/^▲ Supported$/, () => pick(['▲ Toetatud', '▲ Tuettu', '▲ Apoyado', '▲ Підтримано'])],
-    [/^(\d+) comments?$/, m => pick([`${m[1]} kommentaari`, `${m[1]} kommenttia`, `${m[1]} ${plural(m[1], 'comentario', 'comentarios')}`, `коментарів: ${m[1]}`])],
-    [/^(\d+) support$/, m => pick([`${m[1]} toetust`, `${m[1]} tukea`, `${m[1]} apoyos`, `підтримок: ${m[1]}`])],
-    [/^applied ([\d:.]+)$/, m => pick([`rakendatud ${m[1]}`, `sovellettu ${m[1]}`, `aplicado ${m[1]}`, `застосовано ${m[1]}`])],
-    [/^revoked ([\d:.]+)$/, m => pick([`tühistatud ${m[1]}`, `peruttu ${m[1]}`, `revocado ${m[1]}`, `скасовано ${m[1]}`])],
-    [/^(\d+) at €0$/, m => pick([`${m[1]} hinnaga €0`, `${m[1]} 0 €:lla`, `${m[1]} a 0 €`, `${m[1]} за 0 €`])],
-    [/^Wind (\d+) m\/s$/, m => pick([`Tuul ${m[1]} m/s`, `Tuuli ${m[1]} m/s`, `Viento ${m[1]} m/s`, `Вітер ${m[1]} м/с`])],
-    [/^gusts (\d+) m\/s from (N|NE|E|SE|S|SW|W|NW)$/, m => pick([`puhangud ${m[1]} m/s ${COMPASS[m[2]][0]}`, `puuskat ${m[1]} m/s ${COMPASS[m[2]][1]}`, `rachas de ${m[1]} m/s ${COMPASS[m[2]][2]}`, `пориви ${m[1]} м/с ${COMPASS[m[2]][3]}`])],
+    [/^(~?\d+) min$/, m => pick([null, null, null, `${m[1]} хв`, `${m[1]} мин`])],
+    [/^([\d.,]+) (k?m)$/, m => pick([null, null, null, `${m[1]} ${m[2] === 'km' ? 'км' : 'м'}`, `${m[1]} ${m[2] === 'km' ? 'км' : 'м'}`])],
+    [/^([\d.,]+ k?m) away$/, m => pick([`${m[1]} kaugusel`, `${m[1]} päässä`, `a ${m[1]}`, `за ${u(m[1])}`, `в ${u(m[1])}`])],
+    [/^(\d+) min walk$/, m => pick([`${m[1]} min jalgsi`, `${m[1]} min kävellen`, `${m[1]} min a pie`, `${m[1]} хв пішки`, `${m[1]} мин пешком`])],
+    [/^(\d+) d left$/, m => pick([`${m[1]} p jäänud`, `${m[1]} pv jäljellä`, `quedan ${m[1]} d`, `залишилось ${m[1]} дн.`, `осталось ${m[1]} дн.`])],
+    [/^in (\d+) d$/, m => pick([`${m[1]} p pärast`, `${m[1]} pv päästä`, `en ${m[1]} d`, `через ${m[1]} дн.`, `через ${m[1]} дн.`])],
+    [/^until ([^·]+)$/, m => pick([`kuni ${m[1]}`, `${m[1]} asti`, `hasta ${m[1]}`, `до ${m[1]}`, `до ${m[1]}`])],
+    [/^from ([^·]+)$/, m => pick([`alates ${m[1]}`, `${m[1]} alkaen`, `desde ${m[1]}`, `з ${m[1]}`, `с ${m[1]}`])],
+    [/^ends ([^·]+)$/, m => pick([`lõpeb ${m[1]}`, `päättyy ${m[1]}`, `termina ${m[1]}`, `завершується о ${m[1]}`, `заканчивается в ${m[1]}`])],
+    [/^Declared ([^·]+)$/, m => pick([`Välja kuulutatud ${m[1]}`, `Julistettu ${m[1]}`, `Declarada ${m[1]}`, `Оголошено о ${m[1]}`, `Объявлено в ${m[1]}`])],
+    [/^just now$/, () => pick(['just praegu', 'juuri nyt', 'ahora mismo', 'щойно', 'только что'])],
+    [/^(\d+) min ago$/, m => pick([`${m[1]} min tagasi`, `${m[1]} min sitten`, `hace ${m[1]} min`, `${m[1]} хв тому`, `${m[1]} мин назад`])],
+    [/^(\d+) h ago$/, m => pick([`${m[1]} h tagasi`, `${m[1]} h sitten`, `hace ${m[1]} h`, `${m[1]} год тому`, `${m[1]} ч назад`])],
+    [/^(\d+) d ago$/, m => pick([`${m[1]} p tagasi`, `${m[1]} pv sitten`, `hace ${m[1]} d`, `${m[1]} дн. тому`, `${m[1]} дн. назад`])],
+    [/^Updated by the city (.+)$/, (m, t) => pick([`Linn uuendas ${t(m[1])}`, `Kaupunki päivitti ${t(m[1])}`, `Actualizado por el ayuntamiento ${t(m[1])}`, `Оновлено містом ${t(m[1])}`, `Обновлено городом ${t(m[1])}`])],
+    [/^(\d+) closest$/, m => pick([`${m[1]} lähimat`, `${m[1]} lähintä`, `los ${m[1]} más cercanos`, `${m[1]} найближчих`, `${m[1]} ближайших`])],
+    [/^(.+) near you$/, m => { const x = look(m[1]); return x == null ? null : pick([`${x} sinu lähedal`, `${x} lähelläsi`, `${x} cerca de ti`, `${x} поруч із вами`, `${x} рядом с вами`]); }],
+    [/^(\d+) construction sites? within 2 km$/, m => pick([`${m[1]} ehitustööd 2 km raadiuses`, `${m[1]} työmaata 2 km:n säteellä`, `${m[1]} ${plural(m[1], 'obra', 'obras')} a menos de 2 km`, `Робіт у радіусі 2 км: ${m[1]}`, `Работ в радиусе 2 км: ${m[1]}`])],
+    [/^(\d+) hazard reports?$/, m => pick([`Ohuteateid: ${m[1]}`, `Vaarailmoituksia: ${m[1]}`, `${m[1]} ${plural(m[1], 'aviso de peligro', 'avisos de peligro')}`, `Повідомлень про небезпеки: ${m[1]}`, `Сообщений об опасностях: ${m[1]}`])],
+    [/^(\d+) fallen tree reports?$/, m => pick([`Teateid langenud puudest: ${m[1]}`, `Ilmoituksia kaatuneista puista: ${m[1]}`, `${m[1]} ${plural(m[1], 'aviso', 'avisos')} de árboles caídos`, `Повідомлень про повалені дерева: ${m[1]}`, `Сообщений об упавших деревьях: ${m[1]}`])],
+    [/^(\d+) issues and ideas near you$/, m => pick([`Probleeme ja ideid sinu lähedal: ${m[1]}`, `Ongelmia ja ideoita lähelläsi: ${m[1]}`, `${m[1]} problemas e ideas cerca de ti`, `Проблем та ідей поруч: ${m[1]}`, `Проблем и идей рядом: ${m[1]}`])],
+    [/^Päästeamet register, (.+)$/, m => pick([`Päästeameti register, ${m[1]}`, `Pelastusviraston rekisteri, ${m[1]}`, `Registro de Päästeamet, ${m[1]}`, `Реєстр Päästeamet, ${m[1]}`, `Реестр Päästeamet, ${m[1]}`])],
+    [/^Päästeamet register via Maa- ja Ruumiamet, (.+)$/, m => pick([`Päästeameti register Maa- ja Ruumiameti kaudu, ${m[1]}`, `Pelastusviraston rekisteri Maa- ja Ruumiametin kautta, ${m[1]}`, `Registro de Päästeamet vía Maa- ja Ruumiamet, ${m[1]}`, `Реєстр Päästeamet через Maa- ja Ruumiamet, ${m[1]}`, `Реестр Päästeamet через Maa- ja Ruumiamet, ${m[1]}`])],
+    [/^(Public library|Shopping centre): an indoor place to cool down during a heatwave or wait out a storm\.$/, (m, t) => `${t(m[1])}: ` + pick(['siseruum, kus kuumalaine ajal jahtuda või tormi üle oodata.', 'sisätila, jossa viilentyä helteellä tai odottaa myrskyn yli.', 'un interior donde refrescarse en una ola de calor o esperar a que pase una tormenta.', 'приміщення, де можна охолонути в спеку або перечекати шторм.', 'помещение, где можно остыть в жару или переждать шторм.'])],
+    [/^Active · (\d+) days left$/, m => pick([`Käimas · ${m[1]} päeva jäänud`, `Käynnissä · ${m[1]} päivää jäljellä`, `En curso · quedan ${m[1]} días`, `Триває · залишилось ${m[1]} дн.`, `Идут · осталось ${m[1]} дн.`])],
+    [/^Starts in (\d+) days$/, m => pick([`Algab ${m[1]} päeva pärast`, `Alkaa ${m[1]} päivän päästä`, `Empieza en ${m[1]} días`, `Почнеться через ${m[1]} дн.`, `Начнутся через ${m[1]} дн.`])],
+    [/^Routes keep (\d+) m away until the city clears it\.$/, m => pick([`Teekonnad hoiavad ${m[1]} m kaugusele, kuni linn selle koristab.`, `Reitit pysyvät ${m[1]} m:n päässä, kunnes kaupunki raivaa sen.`, `Las rutas se mantienen a ${m[1]} m hasta que el ayuntamiento lo retire.`, `Маршрути оминають це місце на ${m[1]} м, доки місто його не прибере.`, `Маршруты обходят это место на ${m[1]} м, пока город его не уберёт.`])],
+    [/^([\d.,]+ k?m) to the vehicle, then ride$/, m => pick([`${m[1]} sõidukini, siis sõida`, `${m[1]} ajoneuvolle, sitten aja`, `${m[1]} hasta el vehículo y luego a rodar`, `${u(m[1])} до транспорту, далі їхати`, `${u(m[1])} до транспорта, затем ехать`])],
+    [/^battery (\d+)%$/, m => pick([`aku ${m[1]}%`, `akku ${m[1]} %`, `batería ${m[1]} %`, `батарея ${m[1]}%`, `батарея ${m[1]}%`])],
+    [/^(.+), neighbour$/, m => pick([`${m[1]}, naaber`, `${m[1]}, naapuri`, `${m[1]}, vecino`, `${m[1]}, сусід`, `${m[1]}, сосед`])],
+    [/^position (\d+)$/, m => pick([`koht ${m[1]}`, `sija ${m[1]}`, `posición ${m[1]}`, `місце ${m[1]}`, `место ${m[1]}`])],
+    [/^(.+) is coming$/, (m, t) => pick([`${t(m[1])} on teel`, `${t(m[1])} on tulossa`, `${t(m[1])} está en camino`, `${t(m[1])} їде до вас`, `${t(m[1])} едет к вам`])],
+    [/^Pinge crew (\d+)$/, m => pick([`Pinge meeskond ${m[1]}`, `Pinge-tiimi ${m[1]}`, `Equipo Pinge ${m[1]}`, `Бригада Pinge ${m[1]}`, `Бригада Pinge ${m[1]}`])],
+    [/^(\d+) seats$/, m => pick([`${m[1]} kohta`, `${m[1]} paikkaa`, `${m[1]} plazas`, `${m[1]} місць`, `${m[1]} ${ruPlural(m[1], 'место', 'места', 'мест')}`])],
+    [/^(\d+) spare seats?$/, m => pick([`${m[1]} vaba kohta`, `${m[1]} vapaata paikkaa`, `${m[1]} ${plural(m[1], 'plaza libre', 'plazas libres')}`, `вільних місць: ${m[1]}`, `свободных мест: ${m[1]}`])],
+    [/^(\d+) pers\.$/, m => pick([`${m[1]} in.`, `${m[1]} hlö`, `${m[1]} pers.`, `${m[1]} ос.`, `${m[1]} чел.`])],
+    [/^queued #(\d+)$/, m => pick([`järjekorras #${m[1]}`, `jonossa #${m[1]}`, `en cola #${m[1]}`, `у черзі #${m[1]}`, `в очереди #${m[1]}`])],
+    [/^Location (.+)$/, m => pick([`Asukoht ${m[1]}`, `Sijainti ${m[1]}`, `Ubicación ${m[1]}`, `Місцезнаходження ${m[1]}`, `Местоположение ${m[1]}`])],
+    [/^Pin: (.+)$/, (m, t) => pick([`Märk: ${t(m[1])}`, `Merkki: ${t(m[1])}`, `Marcador: ${t(m[1])}`, `Позначка: ${t(m[1])}`, `Метка: ${t(m[1])}`])],
+    [/^Pinned at (.+)$/, m => pick([`Märgitud: ${m[1]}`, `Merkitty: ${m[1]}`, `Marcado en ${m[1]}`, `Позначено: ${m[1]}`, `Отмечено: ${m[1]}`])],
+    [/^Centred at (.+)$/, m => pick([`Keskpunkt: ${m[1]}`, `Keskipiste: ${m[1]}`, `Centro en ${m[1]}`, `Центр: ${m[1]}`, `Центр: ${m[1]}`])],
+    [/^(\d+) m of street$/, m => pick([`${m[1]} m tänavat`, `${m[1]} m katua`, `${m[1]} m de calle`, `${m[1]} м вулиці`, `${m[1]} м улицы`])],
+    [/^(\d+) m of street · (\d+) points$/, m => pick([`${m[1]} m tänavat · ${m[2]} punkti`, `${m[1]} m katua · ${m[2]} pistettä`, `${m[1]} m de calle · ${m[2]} puntos`, `${m[1]} м вулиці · точок: ${m[2]}`, `${m[1]} м улицы · точек: ${m[2]}`])],
+    [/^(\d+) m radius$/, m => pick([`raadius ${m[1]} m`, `säde ${m[1]} m`, `radio de ${m[1]} m`, `радіус ${m[1]} м`, `радиус ${m[1]} м`])],
+    [/^(\d+) active$/, m => pick([`${m[1]} käimas`, `${m[1]} käynnissä`, `${m[1]} activas`, `активних: ${m[1]}`, `активных: ${m[1]}`])],
+    [/^(\d+) upcoming$/, m => pick([`${m[1]} tulemas`, `${m[1]} tulossa`, `${m[1]} próximas`, `запланованих: ${m[1]}`, `запланированных: ${m[1]}`])],
+    [/^(\d+) open$/, m => pick([`${m[1]} avatud`, `${m[1]} avoinna`, `${m[1]} abiertos`, `відкритих: ${m[1]}`, `открытых: ${m[1]}`])],
+    [/^(\d+) new$/, m => pick([`${m[1]} uut`, `${m[1]} uutta`, `${m[1]} nuevos`, `нових: ${m[1]}`, `новых: ${m[1]}`])],
+    [/^(\d+) confirmed$/, m => pick([`${m[1]} kinnitatud`, `${m[1]} vahvistettu`, `${m[1]} confirmados`, `підтверджених: ${m[1]}`, `подтверждённых: ${m[1]}`])],
+    [/^(\d+) cleared$/, m => pick([`${m[1]} koristatud`, `${m[1]} raivattu`, `${m[1]} retirados`, `прибраних: ${m[1]}`, `убранных: ${m[1]}`])],
+    [/^(\d+) calls$/, m => pick([`${m[1]} päringut`, `${m[1]} kutsua`, `${m[1]} llamadas`, `запитів: ${m[1]}`, `запросов: ${m[1]}`])],
+    [/^sorted by new first, then most supported$/, () => pick(['uued eespool, seejärel enim toetatud', 'uusimmat ensin, sitten eniten tuetut', 'primero los nuevos y luego los más apoyados', 'спершу нові, потім найпідтримуваніші', 'сначала новые, затем самые поддержанные'])],
+    [/^(\d+) hours?$/, m => pick([`${m[1]} ${plural(m[1], 'tund', 'tundi')}`, `${m[1]} ${plural(m[1], 'tunti', 'tuntia')}`, `${m[1]} ${plural(m[1], 'hora', 'horas')}`, `${m[1]} ${ukPlural(m[1], 'година', 'години', 'годин')}`, `${m[1]} ${ruPlural(m[1], 'час', 'часа', 'часов')}`])],
+    [/^(\d+)h (\d+)m left$/, m => pick([`${m[1]} h ${m[2]} min jäänud`, `${m[1]} h ${m[2]} min jäljellä`, `quedan ${m[1]} h ${m[2]} min`, `залишилось ${m[1]} год ${m[2]} хв`, `осталось ${m[1]} ч ${m[2]} мин`])],
+    [/^Declare (.+) alert$/, (m, t) => pick([`Kuuluta välja ${t(m[1])} ohuteade`, `Julista ${t(m[1])} hälytys`, `Declarar alerta de ${t(m[1])}`, `Оголосити тривогу: ${t(m[1])}`, `Объявить тревогу: ${t(m[1])}`])],
+    [/^(War \/ air strike|Flood|Heatwave|Storm) alert$/, (m, t) => pick([`${t(m[1])}: ohuteade`, `${t(m[1])}: hälytys`, `Alerta: ${t(m[1]).toLowerCase()}`, `${t(m[1])}: тривога`, `${t(m[1])}: тревога`])],
+    [/^(War \/ air strike|Flood|Heatwave|Storm) alert active$/, (m, t) => pick([`${t(m[1])}: ohuteade aktiivne`, `${t(m[1])}: hälytys päällä`, `Alerta activa: ${t(m[1]).toLowerCase()}`, `${t(m[1])}: тривога активна`, `${t(m[1])}: тревога активна`])],
+    [/^(War \/ air strike|Flood|Heatwave|Storm) alert: your reports help everyone route safely$/, (m, t) => pick([`${t(m[1])}: sinu teated aitavad kõigil ohutult liikuda`, `${t(m[1])}: ilmoituksesi auttavat kaikkia kulkemaan turvallisesti`, `${t(m[1])}: tus avisos ayudan a todos a moverse con seguridad`, `${t(m[1])}: ваші повідомлення допомагають усім безпечно пересуватися`, `${t(m[1])}: ваши сообщения помогают всем безопасно передвигаться`])],
+    [/^Citizens are routed to the nearest (.+)\.$/, (m, t) => pick([`Elanikud suunatakse lähimasse kohta: ${t(m[1])}.`, `Asukkaat ohjataan lähimpään kohteeseen: ${t(m[1])}.`, `Se dirige a los vecinos a: ${t(m[1])} más cercano.`, `Мешканців спрямовують до найближчого місця: ${t(m[1])}.`, `Жителей направляют к ближайшему месту: ${t(m[1])}.`])],
+    [/^EE-ALARM pushed with the (.+) route and four ways to get there\.$/, (m, t) => pick([`EE-ALARM saadeti koos teekonnaga (${t(m[1])}) ja nelja liikumisviisiga.`, `EE-ALARM lähetettiin reitin (${t(m[1])}) ja neljän kulkutavan kanssa.`, `EE-ALARM enviado con la ruta (${t(m[1])}) y cuatro formas de llegar.`, `EE-ALARM надіслано з маршрутом (${t(m[1])}) і чотирма способами дістатися.`, `EE-ALARM отправлен с маршрутом (${t(m[1])}) и четырьмя способами добраться.`])],
+    [/^(\d+) dormant listings waiting\.$/, m => pick([`Ootel pakkumisi: ${m[1]}.`, `Lepotilassa olevia ilmoituksia: ${m[1]}.`, `${m[1]} ofertas latentes a la espera.`, `Неактивних пропозицій в очікуванні: ${m[1]}.`, `Спящих предложений в ожидании: ${m[1]}.`])],
+    [/^(\d+) neighbour listings live\.$/, m => pick([`Aktiivseid naabripakkumisi: ${m[1]}.`, `Naapureiden ilmoituksia voimassa: ${m[1]}.`, `${m[1]} ofertas de vecinos activas.`, `Активних пропозицій сусідів: ${m[1]}.`, `Активных предложений соседей: ${m[1]}.`])],
+    [/^(\d+) vehicles free in (\d+) m zones$/, m => pick([`${m[1]} sõidukit tasuta ${m[2]} m tsoonides`, `${m[1]} ajoneuvoa maksutta ${m[2]} m:n alueilla`, `${m[1]} vehículos gratis en zonas de ${m[2]} m`, `${m[1]} од. транспорту безкоштовно в зонах ${m[2]} м`, `${m[1]} ед. транспорта бесплатно в зонах ${m[2]} м`])],
+    [/^Drivers free: (\d+) of (\d+) \((\d+) Pinge crews, (\d+) neighbours\)\.$/, m => pick([`Vabu juhte: ${m[1]}/${m[2]} (${m[3]} Pinge meeskonda, ${m[4]} naabrit).`, `Vapaita kuljettajia: ${m[1]}/${m[2]} (${m[3]} Pinge-tiimiä, ${m[4]} naapuria).`, `Conductores libres: ${m[1]} de ${m[2]} (${m[3]} equipos Pinge, ${m[4]} vecinos).`, `Вільних водіїв: ${m[1]} з ${m[2]} (бригад Pinge: ${m[3]}, сусідів: ${m[4]}).`, `Свободных водителей: ${m[1]} из ${m[2]} (бригад Pinge: ${m[3]}, соседей: ${m[4]}).`])],
+    [/^Policy object \(MDS Policy ([\d.]+)\)$/, m => pick([`Poliitikaobjekt (MDS Policy ${m[1]})`, `Käytäntöobjekti (MDS Policy ${m[1]})`, `Objeto de política (MDS Policy ${m[1]})`, `Об'єкт політики (MDS Policy ${m[1]})`, `Объект политики (MDS Policy ${m[1]})`])],
+    [/^(\d+)% of the route is in shade$/, m => pick([`${m[1]}% teekonnast on varjus`, `${m[1]} % reitistä on varjossa`, `el ${m[1]} % de la ruta está a la sombra`, `${m[1]}% маршруту в тіні`, `${m[1]}% маршрута в тени`])],
+    [/^(\d+)% of the route is exposed$/, m => pick([`${m[1]}% teekonnast on avatud`, `${m[1]} % reitistä on alttiina`, `el ${m[1]} % de la ruta está expuesta`, `${m[1]}% маршруту відкриті`, `${m[1]}% маршрута открыты`])],
+    [/^, versus (\d+)% on the fastest route\. Green is shade from buildings and trees, orange is direct sun\.$/, m => pick([`, kiireimal teekonnal ${m[1]}%. Roheline on hoonete ja puude vari, oranž otsene päike.`, `, nopeimmalla reitillä ${m[1]} %. Vihreä on rakennusten ja puiden varjoa, oranssi suoraa aurinkoa.`, `, frente al ${m[1]} % de la ruta más rápida. Verde es sombra de edificios y árboles; naranja, sol directo.`, `, проти ${m[1]}% на найшвидшому маршруті. Зелене — тінь від будівель і дерев, помаранчеве — пряме сонце.`, `, против ${m[1]}% на самом быстром маршруте. Зелёное — тень от зданий и деревьев, оранжевое — прямое солнце.`])],
+    [/^\. Green is shade from buildings and trees, orange is direct sun\.$/, () => pick(['. Roheline on hoonete ja puude vari, oranž otsene päike.', '. Vihreä on rakennusten ja puiden varjoa, oranssi suoraa aurinkoa.', '. Verde es sombra de edificios y árboles; naranja, sol directo.', '. Зелене — тінь від будівель і дерев, помаранчеве — пряме сонце.', '. Зелёное — тень от зданий и деревьев, оранжевое — прямое солнце.'])],
+    [/^, down from (\d+)% on the fastest route\. Red marks stretches under trees, by the shoreline or next to construction\.$/, m => pick([`, kiireimal teekonnal ${m[1]}%. Punane tähistab lõike puude all, ranna ääres või ehitustööde kõrval.`, `, nopeimmalla reitillä ${m[1]} %. Punainen merkitsee osuuksia puiden alla, rannan tuntumassa tai työmaiden vieressä.`, `, frente al ${m[1]} % de la ruta más rápida. En rojo, tramos bajo árboles, junto a la costa o junto a obras.`, `, проти ${m[1]}% на найшвидшому маршруті. Червоним позначено ділянки під деревами, біля узбережжя чи поруч із будівництвом.`, `, против ${m[1]}% на самом быстром маршруте. Красным отмечены участки под деревьями, у побережья или рядом со стройкой.`])],
+    [/^\. Red marks stretches under trees, by the shoreline or next to construction\.$/, () => pick(['. Punane tähistab lõike puude all, ranna ääres või ehitustööde kõrval.', '. Punainen merkitsee osuuksia puiden alla, rannan tuntumassa tai työmaiden vieressä.', '. En rojo, tramos bajo árboles, junto a la costa o junto a obras.', '. Червоним позначено ділянки під деревами, біля узбережжя чи поруч із будівництвом.', '. Красным отмечены участки под деревьями, у побережья или рядом со стройкой.'])],
+    [/^Sun from the (N|NE|E|SE|S|SW|W|NW), (-?\d+)° above the horizon at ([\d:.]+)\.$/, m => pick([`Päike paistab ${COMPASS[m[1]][0]}, ${m[2]}° kõrgusel kell ${m[3]}.`, `Aurinko paistaa ${COMPASS[m[1]][1]}, ${m[2]}° korkeudella klo ${m[3]}.`, `Sol ${COMPASS[m[1]][2]}, a ${m[2]}° sobre el horizonte a las ${m[3]}.`, `Сонце світить ${COMPASS[m[1]][3]}, на висоті ${m[2]}° о ${m[3]}.`, `Солнце светит ${COMPASS[m[1]][4]}, на высоте ${m[2]}° в ${m[3]}.`])],
+    [/^(\d+) drinking water points? on the way, marked on the map\.$/, m => pick([`Teel on ${m[1]} joogiveepunkti, märgitud kaardil.`, `Matkalla on ${m[1]} juomavesipistettä, merkitty kartalle.`, `Hay ${m[1]} ${plural(m[1], 'fuente', 'fuentes')} de agua potable en el camino, marcadas en el mapa.`, `Точок з питною водою на шляху: ${m[1]}, вони позначені на карті.`, `Точек с питьевой водой по пути: ${m[1]}, они отмечены на карте.`])],
+    [/^: wind (\d+) m\/s, gusts up to (\d+) m\/s from the (N|NE|E|SE|S|SW|W|NW), (until|from) ([\d:.]+)\.$/, m => pick([`: tuul ${m[1]} m/s, puhangud kuni ${m[2]} m/s ${COMPASS[m[3]][0]}, ${m[4] === 'until' ? 'kuni' : 'alates'} ${m[5]}.`, `: tuuli ${m[1]} m/s, puuskat jopa ${m[2]} m/s ${COMPASS[m[3]][1]}, ${m[4] === 'until' ? m[5] + ' asti' : m[5] + ' alkaen'}.`, `: viento ${m[1]} m/s, rachas de hasta ${m[2]} m/s ${COMPASS[m[3]][2]}, ${m[4] === 'until' ? 'hasta las' : 'desde las'} ${m[5]}.`, `: вітер ${m[1]} м/с, пориви до ${m[2]} м/с ${COMPASS[m[3]][3]}, ${m[4] === 'until' ? 'до' : 'з'} ${m[5]}.`, `: ветер ${m[1]} м/с, порывы до ${m[2]} м/с ${COMPASS[m[3]][4]}, ${m[4] === 'until' ? 'до' : 'с'} ${m[5]}.`])],
+    [/^(\d+) fallen trees? and branch reports on the map\.$/, m => pick([`Kaardil on ${m[1]} teadet langenud puudest ja okstest.`, `Kartalla on ${m[1]} ilmoitusta kaatuneista puista ja oksista.`, `Hay ${m[1]} avisos de árboles y ramas caídos en el mapa.`, `Повідомлень про повалені дерева й гілки на карті: ${m[1]}.`, `Сообщений об упавших деревьях и ветках на карте: ${m[1]}.`])],
+    [/^Avoids (\d+) (flooded areas?|unsafe places?): (.+)$/, m => { const fl = m[2].startsWith('flooded'); return pick([`Väldib ${m[1]} ${fl ? 'üleujutatud ala' : 'ohtlikku kohta'}: ${m[3]}`, `Välttää ${m[1]} ${fl ? 'tulva-aluetta' : 'vaarallista paikkaa'}: ${m[3]}`, `Evita ${m[1]} ${fl ? plural(m[1], 'zona inundada', 'zonas inundadas') : plural(m[1], 'lugar peligroso', 'lugares peligrosos')}: ${m[3]}`, `Оминає ${fl ? 'затоплені ділянки' : 'небезпечні місця'} (${m[1]}): ${m[3]}`, `Обходит ${fl ? 'затопленные участки' : 'опасные места'} (${m[1]}): ${m[3]}`]); }],
+    [/^Avoids a blocked stretch:$/, () => pick(['Väldib suletud lõiku:', 'Välttää suljetun osuuden:', 'Evita un tramo bloqueado:', 'Оминає перекриту ділянку:', 'Обходит перекрытый участок:'])],
+    [/^Avoids (\d+) blocked stretches:$/, m => pick([`Väldib ${m[1]} suletud lõiku:`, `Välttää ${m[1]} suljettua osuutta:`, `Evita ${m[1]} tramos bloqueados:`, `Оминає перекриті ділянки (${m[1]}):`, `Обходит перекрытые участки (${m[1]}):`])],
+    [/^▲ Support$/, () => pick(['▲ Toeta', '▲ Tue', '▲ Apoyar', '▲ Підтримати', '▲ Поддержать'])],
+    [/^▲ Supported$/, () => pick(['▲ Toetatud', '▲ Tuettu', '▲ Apoyado', '▲ Підтримано', '▲ Поддержано'])],
+    [/^(\d+) comments?$/, m => pick([`${m[1]} kommentaari`, `${m[1]} kommenttia`, `${m[1]} ${plural(m[1], 'comentario', 'comentarios')}`, `коментарів: ${m[1]}`, `${m[1]} ${ruPlural(m[1], 'комментарий', 'комментария', 'комментариев')}`])],
+    [/^(\d+) support$/, m => pick([`${m[1]} toetust`, `${m[1]} tukea`, `${m[1]} apoyos`, `підтримок: ${m[1]}`, `поддержек: ${m[1]}`])],
+    [/^applied ([\d:.]+)$/, m => pick([`rakendatud ${m[1]}`, `sovellettu ${m[1]}`, `aplicado ${m[1]}`, `застосовано ${m[1]}`, `применено ${m[1]}`])],
+    [/^revoked ([\d:.]+)$/, m => pick([`tühistatud ${m[1]}`, `peruttu ${m[1]}`, `revocado ${m[1]}`, `скасовано ${m[1]}`, `отозвано ${m[1]}`])],
+    [/^(\d+) at €0$/, m => pick([`${m[1]} hinnaga €0`, `${m[1]} 0 €:lla`, `${m[1]} a 0 €`, `${m[1]} за 0 €`, `${m[1]} за 0 €`])],
+    [/^Wind (\d+) m\/s$/, m => pick([`Tuul ${m[1]} m/s`, `Tuuli ${m[1]} m/s`, `Viento ${m[1]} m/s`, `Вітер ${m[1]} м/с`, `Ветер ${m[1]} м/с`])],
+    [/^gusts (\d+) m\/s from (N|NE|E|SE|S|SW|W|NW)$/, m => pick([`puhangud ${m[1]} m/s ${COMPASS[m[2]][0]}`, `puuskat ${m[1]} m/s ${COMPASS[m[2]][1]}`, `rachas de ${m[1]} m/s ${COMPASS[m[2]][2]}`, `пориви ${m[1]} м/с ${COMPASS[m[2]][3]}`, `порывы ${m[1]} м/с ${COMPASS[m[2]][4]}`])],
     [/^(N|NE|E|SE|S|SW|W|NW)$/, m => pick(DIRSHORT[m[1]])],
   ];
 

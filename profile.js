@@ -23,7 +23,7 @@
     citizen: { label: 'Citizen', hint: 'Find shelters and safe routes, report issues, share ideas', svg: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>' },
     municipality: { label: 'Municipality employee', hint: 'Manage construction, run crisis protocols, answer residents', svg: '<path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-6 10 6"/>' },
   };
-  const LANGS = [['en', 'English'], ['et', 'Eesti'], ['fi', 'Suomi'], ['es', 'Español'], ['uk', 'Українська']];
+  const LANGS = [['en', 'English'], ['et', 'Eesti'], ['fi', 'Suomi'], ['es', 'Español'], ['uk', 'Українська'], ['ru', 'Русский']];
   const PIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
 
   const $ = s => document.querySelector(s);

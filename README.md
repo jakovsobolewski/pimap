@@ -57,7 +57,7 @@ profiles. Shade and exposure data come from the Overpass API per route.
 
 ## Languages
 
-PiMap is available in English, Estonian, Finnish, Spanish and Ukrainian. The switch sits next to the
+PiMap is available in English, Estonian, Finnish, Spanish, Ukrainian and Russian. The switch sits next to the
 Tallinn logo and remembers the choice. `i18n.js` translates interface text as it is rendered (text,
 placeholders, labels, popups, messages) from a phrase dictionary plus patterns for sentences with
 numbers, times and distances, and formats dates and times for the chosen language. Place names,
