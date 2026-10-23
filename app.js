@@ -129,7 +129,7 @@
   function freshUI() {
     return {
       portal: 'citizen', govTab: 'works',
-      cview: 'map', cat: null, dest: null, query: '', searchResults: [], searchPlace: null, mode: 'walk',
+      cview: 'map', cat: null, dest: null, query: '', searchResults: [], searchPlace: null, mode: 'bike',
       form: { protocol: 'airstrike', district: 'All of Tallinn', hours: 4, message: '' },
       lendDraft: { type: 'bicycle', label: '', accessible: false, unlock: '', contact: '', lat: null, lng: null },
       rideDraft: { need: 'none', people: 1, note: '' },
@@ -1033,6 +1033,7 @@
       ${bikeLegend()}
       <button class="btn-y btn-full" data-action="dir-bike" type="button" style="margin:10px 0 4px">${IC.dir} Plan a bike trip</button>
       <p class="muted">Bike directions follow cycle paths where they exist and show how much of your trip is on them.</p>
+      ${B.t ? `<p class="src">OpenStreetMap data, updated ${esc(fmtDate(new Date(B.t).toISOString().slice(0, 10)))} · <button class="linkbtn inline" data-action="bike-refresh" type="button">Refresh data</button></p>` : ''}
       <p class="src">© OpenStreetMap contributors</p></div>`;
   }
   /* Nearest bike parking and charging to the destination of a bike trip */
@@ -1278,12 +1279,43 @@
       ${Object.entries(PROTOCOLS).map(([k, p]) => `<div class="proto-box ${k}" style="margin-top:10px"><div class="pb-head">${PROTO_IC[k]}<b>${p.label}</b></div><ul class="tips">${p.tips.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}
       <p class="src">Your nearest public shelter is always one tap away: the Shelters chip or the directions button during an alert.</p></div>`;
   }
+  /* Ride conditions from Open-Meteo (no key, CORS-enabled), refreshed every 15 minutes or when you move */
+  const WX = { data: null, at: 0, key: '', busy: false };
+  async function loadWeather() {
+    const key = S.user.lat.toFixed(2) + ',' + S.user.lng.toFixed(2);
+    if (WX.busy || !navigator.onLine || (WX.key === key && Date.now() - WX.at < 15 * 60e3)) return;
+    WX.busy = true;
+    try {
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${S.user.lat}&longitude=${S.user.lng}&current=temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m&wind_speed_unit=ms&timezone=auto`);
+      const j = await r.json(), c = j && j.current;
+      if (c) { WX.data = { t: Math.round(c.temperature_2m), rain: c.precipitation || 0, wind: Math.round(c.wind_speed_10m), gust: Math.round(c.wind_gusts_10m) }; WX.at = Date.now(); WX.key = key; if (U.cview === 'map') renderCitizen(); }
+    } catch (e) { WX.key = key; WX.at = Date.now(); /* offline or blocked: the row stays hidden, retry in 15 min */ } finally { WX.busy = false; }
+  }
+  function rideConditions() {
+    const w = WX.data; if (!w) return null;
+    const advice = w.t <= 0 ? 'Freezing: watch for ice' : w.rain >= 0.2 ? 'Wet roads' : w.gust >= 14 ? 'Strong wind' : 'Good to ride';
+    return { tone: advice === 'Good to ride' ? '#1B8E3E' : '#E8A700', text: [`${w.t}°C`, `wind ${w.wind} m/s`, advice].join(' · ') };
+  }
+  function rideBlock() {
+    loadWeather();
+    const B = bikeData(), km = Math.round(B.ways.reduce((a, w) => a + lineLen(w.g), 0) / 1000), cond = rideConditions();
+    const row = (cat, title, sub) => { const c = catById(cat); return `<button class="hc-row" data-action="cat" data-cat="${cat}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>${title}</b><span>${sub}</span></span></button>`; };
+    const near = cat => { const n = nearby(cat, 1)[0]; return n ? `${esc(n.p.name)} · ${fmtDist(n.d)} · ${rideMin(n.d, 'bicycle')} min by bike` : bikeNote(); };
+    return `<div class="hc-title">Ride</div>
+      <button class="btn-y btn-full" data-action="dir-bike" type="button" style="margin:2px 0 8px">${IC.dir} Plan a bike trip</button>
+      ${cond ? `<div class="hc-cond" style="--c:${cond.tone}"><b>Ride conditions</b><span>${cond.text}</span></div>` : ''}
+      ${row('bikeroutes', 'Bike routes', B.status === 'ready' && km ? `${km} km mapped` : bikeNote())}
+      ${row('bikepark', 'Bike parking', near('bikepark'))}
+      ${row('bikecharge', 'Bike charging', near('bikecharge'))}
+      ${row('bikerepair', 'Bike repair', near('bikerepair'))}
+      <div class="hc-title" style="margin-top:10px">Around you</div>`;
+  }
   function homeCard() {
     if (S.emergency || U.cview !== 'map' || U.portal !== 'citizen') return '';
     const wd2 = w => zoneDist(S.user, workZone(w)), act = S.works.filter(w => workStatus(w) === 'active' && wd2(w) <= 2000).sort((a, b) => wd2(a) - wd2(b));
     const sh = nearby('shelter', 1)[0], reps = reportsShown();
     return `<div class="home-card" role="region" aria-label="Around you">
-      <div class="hc-title">Around you</div>
+      ${rideBlock()}
       <button class="hc-row" data-action="cat" data-cat="works" type="button"><span class="picon" style="--c:#F28C00">${svgOf(catById('works'))}</span><span class="ptext"><b>${act.length ? `${act.length} construction site${act.length > 1 ? 's' : ''} within 2 km` : 'No construction within 2 km'}</b><span>${act.length ? `${esc(act[0].name)} · until ${fmtDate(act[0].end)}` : 'Tap to see works across Tallinn'}</span></span></button>
       ${reps.length ? `<button class="hc-row" data-action="cat" data-cat="reports" type="button"><span class="picon" style="--c:#6D4C41">${svgOf(REPORT_TYPES.fallen_tree)}</span><span class="ptext"><b>${reps.length} hazard report${reps.length > 1 ? 's' : ''}</b><span>Routes go around them until cleared</span></span></button>` : ''}
       ${(() => { const n = S.contribs.filter(c => c.status !== 'declined' && c.status !== 'done' && dist(S.user, c) <= 1500); return `<button class="hc-row" data-action="cat" data-cat="community" type="button"><span class="picon" style="--c:#7B3FA0">${svgOf(catById('community'))}</span><span class="ptext"><b>${n.length} issues and ideas near you</b><span>Support them or add your own</span></span></button>`; })()}
@@ -1555,6 +1587,7 @@
         if (U.cview !== 'place') U.dest = null;
         U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
       case 'bike-retry': LKP.BIKE.retry(); break;
+      case 'bike-refresh': LKP.BIKE.refresh(); break;
       case 'dir-bike': U.mode = 'bike'; U.cat = null; U.dest = null; U.cview = 'whereto'; saveUI(); renderCitizen(); drawMap(); search.focus(); break;
       case 'go': { const gp = placeOf(b.dataset.kind, b.dataset.id); if (gp && isBike(gp.cat)) U.mode = 'bike'; } U.dest = { kind: b.dataset.kind, id: b.dataset.id }; U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
       case 'open-contribute':

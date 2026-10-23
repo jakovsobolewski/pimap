@@ -685,3 +685,6 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
 .bike-legend .bl[style*="--dash"] { border-top-style: dashed; border-top-width: 3px; }
 .bike-legend b { font-size: .86rem; }
 .bike-legend span:not(.bl) { font-size: .76rem; color: var(--grey); }
+
+.hc-cond { display: flex; flex-direction: column; gap: 2px; border-left: 4px solid var(--c); background: #F6F8F7; border-radius: 8px; padding: 8px 12px; margin: 0 0 8px; font-size: .84rem; }
+.hc-cond span { color: var(--grey); }

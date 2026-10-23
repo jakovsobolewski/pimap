@@ -2271,6 +2271,13 @@ Handlebar holder|Rooli hoidik|Ohjaustangon pidike|Soporte de manillar|Трима
 Wide stands|Laiad rattahoidjad|Leveät telineet|Soportes anchos|Широкі стійки|Широкие стойки
 Bollard|Postik|Pollari|Bolardo|Стовпчик|Столбик
 Ground slots|Maapilud|Maaurat|Ranuras en el suelo|Пази в землі|Пазы в земле
+Ride|Sõit|Pyöräily|Pedalear|Поїздка|Поездка
+Ride conditions|Sõidutingimused|Ajo-olosuhteet|Condiciones para rodar|Умови для поїздки|Условия для поездки
+Good to ride|Hea sõita|Hyvä pyöräillä|Buen tiempo para rodar|Добре їхати|Хорошо ехать
+Wet roads|Märjad teed|Märät tiet|Calzada mojada|Мокрі дороги|Мокрые дороги
+Strong wind|Tugev tuul|Kova tuuli|Viento fuerte|Сильний вітер|Сильный ветер
+Freezing: watch for ice|Külmunud: ettevaatust, jäid|Pakkasta: varo jäätä|Helada: cuidado con el hielo|Мороз: обережно, ожеледь|Мороз: осторожно, гололёд
+Refresh data|Värskenda andmeid|Päivitä tiedot|Actualizar datos|Оновити дані|Обновить данные
 Ride the city|Sõida linnas|Pyöräile kaupungissa|Recorre la ciudad en bici|Подорожуйте містом на велосипеді|Путешествуйте по городу на велосипеде
 PiMap is also an everyday map for people on bikes: cycle paths and lanes, bike parking, e-bike charging points and repair stations, with bike directions that follow cycle paths and tell you how much of your trip is on them.|PiMap on ka igapäevane kaart rattureile: rattateed ja -rajad, jalgrattaparklad, e-rataste laadimispunktid ja parandusjaamad ning rattajuhised, mis järgivad rattateid ja näitavad, kui suur osa sõidust on neil.|PiMap on myös arjen kartta pyöräilijöille: pyörätiet ja -kaistat, pyöräpysäköinti, sähköpyörien latauspisteet ja korjauspisteet sekä pyöräreitit, jotka seuraavat pyöräteitä ja kertovat, kuinka suuri osa matkasta on niillä.|PiMap es también un mapa para el día a día de quienes van en bici: vías y carriles ciclistas, aparcamientos de bicis, puntos de carga de e-bikes y puntos de reparación, con indicaciones que siguen las vías ciclistas y te dicen qué parte del viaje va por ellas.|PiMap також щоденна мапа для велосипедистів: велодоріжки та смуги, велопарковки, станції зарядки електровелосипедів і пункти ремонту, а веломаршрути ведуть велодоріжками й показують, яка частина поїздки проходить по них.|PiMap также ежедневная карта для велосипедистов: велодорожки и полосы, велопарковки, станции зарядки электровелосипедов и пункты ремонта, а веломаршруты идут по велодорожкам и показывают, какая часть поездки проходит по ним.
 Cycling data comes from OpenStreetMap contributors and is loaded when you open the map.|Rattaandmed pärinevad OpenStreetMapi kaastöölistelt ja laaditakse kaardi avamisel.|Pyöräilytiedot tulevat OpenStreetMapin osallistujilta ja ne ladataan kartan avautuessa.|Los datos ciclistas proceden de los colaboradores de OpenStreetMap y se cargan al abrir el mapa.|Дані для велосипедистів надають учасники OpenStreetMap, вони завантажуються під час відкриття мапи.|Данные для велосипедистов предоставляют участники OpenStreetMap, они загружаются при открытии карты.
@@ -2297,6 +2304,9 @@ Cycling data comes from OpenStreetMap contributors and is loaded when you open t
 
   /* Patterns for text with numbers, times, distances. t() translates a sub-phrase. Columns: et | fi | es | uk | ru */
   const P = [
+    [/^(\d+) km mapped$/, m => pick([`${m[1]} km kaardistatud`, `${m[1]} km kartoitettu`, `${m[1]} km cartografiados`, `${m[1]} км на мапі`, `${m[1]} км на карте`])],
+    [/^wind (\d+) m\/s$/, m => pick([`tuul ${m[1]} m/s`, `tuuli ${m[1]} m/s`, `viento ${m[1]} m/s`, `вітер ${m[1]} м/с`, `ветер ${m[1]} м/с`])],
+    [/^OpenStreetMap data, updated (.+)$/, m => pick([`OpenStreetMapi andmed, uuendatud ${m[1]}`, `OpenStreetMap-tiedot, päivitetty ${m[1]}`, `Datos de OpenStreetMap, actualizados ${m[1]}`, `Дані OpenStreetMap, оновлено ${m[1]}`, `Данные OpenStreetMap, обновлено ${m[1]}`])],
     [/^(\d+) min by bike$/, m => pick([`${m[1]} min rattaga`, `${m[1]} min pyörällä`, `${m[1]} min en bici`, `${m[1]} хв на велосипеді`, `${m[1]} мин на велосипеде`])],
     [/^(\d+) spaces$/, m => pick([`${m[1]} kohta`, `${m[1]} paikkaa`, `${m[1]} plazas`, `${m[1]} місць`, `${m[1]} мест`])],
     [/^(\d+)% of the route is on cycle infrastructure$/, m => pick([`${m[1]}% teekonnast kulgeb rattainfrastruktuuril`, `${m[1]} % reitistä kulkee pyöräinfrastruktuurilla`, `el ${m[1]} % de la ruta va por infraestructura ciclista`, `${m[1]}% маршруту проходить велоінфраструктурою`, `${m[1]}% маршрута проходит по велоинфраструктуре`])],

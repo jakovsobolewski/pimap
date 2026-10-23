@@ -132,6 +132,12 @@ window.LKP = window.LKP || {};
     }
   }
   B.retry = () => { B.status = 'loading'; emit(); init(); };
+  /* Force a fresh download now, ignoring the one-week cache; keeps the old data if it fails */
+  B.refresh = async () => {
+    const was = B.status; B.status = 'loading'; emit();
+    try { const d = await download(); if (!d.points.length && !d.ways.length) throw new Error('empty'); apply(d, 'ready'); idbPut(d); }
+    catch (e) { B.status = B.points.length || B.ways.length ? 'ready' : was; emit(); }
+  };
 
   /* ---------- how much of a route is on cycle infrastructure ----------
      Cycle ways are sampled every ~12 m into a coarse grid; route points count when a sample of that kind lies within 22 m. */
