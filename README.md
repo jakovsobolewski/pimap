@@ -11,6 +11,20 @@ kilometre. This prototype turns every shared and private light vehicle in the ci
 asset the moment a crisis is declared, and matches people who cannot ride with neighbours and
 services. Mobility-impaired first.
 
+## Cycling
+
+PiMap is also an everyday bike map. The chips **Bike routes**, **Bike parking**, **Bike charging** and
+**Bike repair** show OpenStreetMap data for Tallinn: cycle paths (separate from the road), protected
+tracks and painted lanes, bicycle parking with spaces and cover, e-bike charging points
+(`amenity=charging_station` + `bicycle=yes`) and repair stations. Bike directions use the OSRM bike
+profile, show how much of the trip is on cycle infrastructure, and suggest parking within 400 m and
+e-bike charging within 1.5 km of the destination.
+
+`bike.js` loads this data in the browser through the Overpass API (three public mirrors), keeps it in
+IndexedDB for a week so it works offline, and merges the points into the places list. Nothing is
+bundled. If Overpass is unreachable and nothing is cached, it falls back to an optional
+`bikedata.json` of shape `{ v: 2, t, points, ways }` next to `index.html`.
+
 ## Two portals, one shared state
 
 **Citizen portal** (`#citizen`) works like Google Maps: a full-screen map with a search bar, a
@@ -118,6 +132,7 @@ Profiles, emails, contributions and reports live in the browser's `localStorage`
 ## What is mocked
 
 * Shelters are the real Tallinn public shelters from the Päästeamet register (Maa- ja Ruumiamet geoportal, layer VARJEKOHT), 52 sites, data as of 23.09.2026. The register has no capacity or step-free access fields, so the app does not show them.
+* Bike parking, charging, repair stations and cycle paths are fetched live from OpenStreetMap (Overpass) in the visitor's browser, so they are as current as OSM; coverage depends on mappers.
 * Hospitals, pharmacies, police, rescue stations, groceries, drinking water, libraries and shopping centres are real OpenStreetMap data, fetched 25 Sep 2026 into `pois.js`.
 * Flood and storm hazard zones shipped with the demo are illustrative examples, not official flood-risk or damage data.
 * Fleet positions, neighbour listings, drivers and construction works are seed data, not live feeds.

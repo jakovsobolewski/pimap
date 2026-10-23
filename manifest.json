@@ -1,7 +1,7 @@
 {
   "name": "PiMap",
   "short_name": "PiMap",
-  "description": "Your nearest shelter and the safest way there, every day and in an emergency. Prototype.",
+  "description": "Bike map of Tallinn: cycle paths, bike parking and e-bike charging, and the safest way to a shelter in an emergency. Prototype.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

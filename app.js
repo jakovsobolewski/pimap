@@ -67,6 +67,10 @@
   /* Category chips (Google-Maps style). Shelters first. */
   const CATS = [
     { id: 'shelter',  label: 'Shelters',        color: '#0072CE', svg: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8l4 7H8z"/>' },
+    { id: 'bikeroutes', label: 'Bike routes',    color: '#1B8E3E', svg: '<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 18h6a4 4 0 000-8h-2a3 3 0 010-6h6"/>' },
+    { id: 'bikepark', label: 'Bike parking',    color: '#0B7A75', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 17V8h3.2a2.6 2.6 0 010 5.2H10"/>' },
+    { id: 'bikecharge', label: 'Bike charging', color: '#E8A700', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M13 7l-4 6h3l-1 4 4-6h-3z"/>' },
+    { id: 'bikerepair', label: 'Bike repair',   color: '#5E35B1', svg: '<path d="M14.7 6.3a4 4 0 00-5 5L4 17l3 3 5.7-5.7a4 4 0 005-5L15 12l-3-3z"/>' },
     { id: 'reports',  label: 'Fallen trees',    color: '#6D4C41', svg: REPORT_TYPES.fallen_tree.svg },
     { id: 'hospital', label: 'Hospitals',       color: '#D2232A', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/>' },
     { id: 'pharmacy', label: 'Pharmacies',      color: '#1E8E3E', svg: '<path d="M10.5 20.5l10-10a4.95 4.95 0 10-7-7l-10 10a4.95 4.95 0 107 7z"/><path d="M8.5 8.5l7 7"/>' },
@@ -78,6 +82,8 @@
     { id: 'community', label: 'Community',     color: '#7B3FA0', svg: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.8-3.5 3.2-5 6-5s5.2 1.5 6 5M15 15.5c2.5 0 4.5 1.3 5.5 4.5"/>' },
     { id: 'works',    label: 'Construction',    color: '#F28C00', svg: '<path d="M3 20h18M6 20l4-14h4l4 14M8 13h8"/>' },
   ];
+  const isBike = c => /^bike/.test(c || '');
+  const BIKE_MARKER_CATS = ['bikepark', 'bikecharge', 'bikerepair'];
   const ADDRESS_CAT = { id: 'address', label: 'Address', color: '#5F6368', svg: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>' };
   const catById = id => CATS.find(c => c.id === id) || (id === 'contrib-issue' ? { id, label: 'Issue', color: CONTRIB.issue.color, svg: CONTRIB.issue.svg } : id === 'contrib-idea' ? { id, label: 'Idea', color: CONTRIB.idea.color, svg: CONTRIB.idea.svg } : ADDRESS_CAT);
   const svgOf = c => `<svg viewBox="0 0 24 24" aria-hidden="true">${c.svg}</svg>`;
@@ -229,9 +235,14 @@
   const compass = az => COMPASS[Math.round(az / 45) % 8];
 
   /* ---------------- places & destinations ---------------- */
+  let poiIndex = null, poiIndexN = -1;
+  function poiById(id) {
+    if (!poiIndex || poiIndexN !== POIS.length) { poiIndex = new Map(POIS.map(p => [p.id, p])); poiIndexN = POIS.length; }
+    return poiIndex.get(id);
+  }
   function placeOf(kind, id) {
     if (kind === 'shelter') { const s = SHELTERS.find(x => x.id === id); return s && { kind, id, cat: 'shelter', name: s.name, address: `${s.address}, ${s.district}`, lat: s.lat, lng: s.lng }; }
-    if (kind === 'poi') { const p = POIS.find(x => x.id === id); return p && { kind, id, cat: p.cat, sub: p.sub, name: p.name, address: p.address, lat: p.lat, lng: p.lng, hours: p.hours, wheelchair: p.wheelchair }; }
+    if (kind === 'poi') { const p = poiById(id); return p && { kind, id, cat: p.cat, sub: p.sub, name: p.name, address: p.address, lat: p.lat, lng: p.lng, hours: p.hours, wheelchair: p.wheelchair, info: p.info }; }
     if (kind === 'work') { const w = S.works.find(x => x.id === id); return w && { kind, id, cat: 'works', name: w.name, address: `${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)}`, lat: w.lat, lng: w.lng, work: w }; }
     if (kind === 'contrib') { const c = S.contribs.find(x => x.id === id); return c && { kind, id, cat: 'contrib-' + c.kind, name: c.title, address: CONTRIB[c.kind].cats[c.cat] || CONTRIB[c.kind].label, lat: c.lat, lng: c.lng, contrib: c }; }
     if (kind === 'report') { const r = S.reports.find(x => x.id === id), T = r && REPORT_TYPES[r.type]; return r && { kind, id, cat: 'reports', name: T.label, address: r.note || T.hint, lat: r.lat, lng: r.lng, report: r }; }
@@ -581,7 +592,11 @@
       if (U.cat && U.cat !== 'shelter' && U.cat !== 'works') showCats.add(U.cat);
       if (inDir && proto() === 'heat') showCats.add('water');
       if (proto() === 'heat' || proto() === 'storm') showCats.add('cool');
-      POIS.filter(p => showCats.has(p.cat)).forEach(p => {
+      const bikeShow = new Set();
+      if (inDir && U.mode === 'bike' && !proto() && !isBike(tg.s.cat)) bikeNear('bikepark', tg.s, 3, 400).concat(bikeNear('bikecharge', tg.s, 2, 1500)).forEach(x => bikeShow.add(x.p.id));
+      const mb = map.getBounds().pad(0.25); let nb = 0;
+      POIS.filter(p => showCats.has(p.cat) || bikeShow.has(p.id)).forEach(p => {
+        if (isBike(p.cat) && !bikeShow.has(p.id) && (!mb.contains([p.lat, p.lng]) || ++nb > 500)) return;
         const c = catById(p.cat), onRoute = p.cat === 'water' && U.routeInfo && (U.routeInfo.water || []).includes(p.id);
         if (p.cat === 'water' && inDir && !onRoute && U.cat !== 'water') return;
         L.marker([p.lat, p.lng], { icon: icon('mk-poi' + (onRoute ? ' hl' : ''), `<span style="--c:${c.color}">${svgOf(c)}</span>`, 24) })
@@ -617,7 +632,32 @@
       L.marker([tg.s.lat, tg.s.lng], { icon: L.divIcon({ className: 'mk-pin', html: `<span style="--c:${catById(tg.s.cat).color}">${svgOf(catById(tg.s.cat))}</span>`, iconSize: [34, 44], iconAnchor: [17, 42] }), zIndexOffset: 900 }).addTo(layers.dest);
     }
     L.marker([S.user.lat, S.user.lng], { icon: icon('mk-user', '', 18), zIndexOffset: 1000 }).bindPopup('<b>You</b>').addTo(layers.user);
+    syncBikeLayer();
   }
+
+  /* Cycle paths and lanes: drawn once on a canvas below the route, shown on the Bike routes chip and in bike directions */
+  map.createPane('bikes').style.zIndex = 380;
+  const bikeRenderer = L.canvas({ pane: 'bikes', padding: 0.4 });
+  const BIKE_STYLE = { lane: { color: '#4C9BE8', weight: 3, opacity: 0.95, dashArray: '2 5' }, track: { color: '#2E9E5B', weight: 3.5, opacity: 0.95 }, path: { color: '#1B8E3E', weight: 4, opacity: 0.95 } };
+  let bikeLayer = null, bikeBuilt = 0;
+  function syncBikeLayer() {
+    const B = LKP.BIKE, want = !!(B && B.ways.length && U.portal === 'citizen' && (U.cat === 'bikeroutes' || (U.cview === 'directions' && U.mode === 'bike' && !proto())));
+    if (bikeLayer && (!want || bikeBuilt !== B.t)) { map.removeLayer(bikeLayer); bikeLayer = null; }
+    if (!want || bikeLayer) return;
+    bikeLayer = L.layerGroup();
+    ['lane', 'track', 'path'].forEach(k => B.ways.forEach(w => { if (w.c === k) L.polyline(w.g, Object.assign({ renderer: bikeRenderer, interactive: false, lineCap: 'round', lineJoin: 'round' }, BIKE_STYLE[k])).addTo(bikeLayer); }));
+    bikeLayer.addTo(map); bikeBuilt = B.t;
+  }
+  document.addEventListener('pimap:bike', () => {
+    if (U.portal !== 'citizen') return;
+    renderCitizen(); drawMap();
+    if (U.cview === 'directions' && U.mode === 'bike') refreshRoute();
+  });
+  let bikeMoveTimer = 0;
+  map.on('moveend', () => {
+    if (U.portal !== 'citizen' || !BIKE_MARKER_CATS.includes(U.cat)) return;
+    clearTimeout(bikeMoveTimer); bikeMoveTimer = setTimeout(drawMap, 200);
+  });
 
   let routeToken = 0;
   async function refreshRoute() {
@@ -663,6 +703,7 @@
     const hits = S.works.filter(w => workStatus(w) === 'active' && w.affects[modeKey]).filter(w => crosses(all, workZone(w)));
     U.conflicts = hits.map(w => w.id);
     U.routeInfo = Object.assign({ distance: res.route.distance, estimated: !!res.route.estimated }, res.info);
+    if (U.mode === 'bike' && LKP.BIKE) U.routeInfo.bikeCover = LKP.BIKE.coverage(res.route.coords);
     saveUI(); renderCitizen(); drawMap();
   }
 
@@ -887,7 +928,7 @@
     const hit = s => (s || '').toLowerCase().includes(q), out = [];
     SHELTERS.forEach(s => { if (hit(s.name) || hit(s.address) || hit(s.district)) out.push(placeOf('shelter', s.id)); });
     S.works.forEach(w => { if (workStatus(w) !== 'finished' && (hit(w.name) || hit(w.note))) out.push(placeOf('work', w.id)); });
-    POIS.forEach(p => { if (hit(p.name) || hit(p.address)) out.push(placeOf('poi', p.id)); });
+    POIS.forEach(p => { if (!isBike(p.cat) && (hit(p.name) || hit(p.address))) out.push(placeOf('poi', p.id)); });
     return out.map(p => ({ p, d: dist(S.user, p) })).sort((a, b) => a.d - b.d).slice(0, 8);
   }
   let geoToken = 0;
@@ -939,9 +980,15 @@
     const est = pickupEstimate(); return est ? '~' + est + ' min' : '—';
   }
   const phead = (title, back, sub) => `<div class="phead">${back ? `<button class="icon-btn" data-action="cview" data-view="${back}" type="button" aria-label="Back">${IC.back}</button>` : ''}<div class="ptitle"><b>${title}</b>${sub ? `<span>${sub}</span>` : ''}</div><button class="icon-btn" data-action="cview" data-view="map" type="button" aria-label="Close">${IC.close}</button></div>`;
+  /* One-line detail for bike places that have no street address */
+  function bikeSummary(p) {
+    if (!isBike(p.cat)) return '';
+    const get = k => ((p.info || []).find(i => i[0] === k) || [])[1];
+    return [get('Spaces') && get('Spaces') + ' spaces', get('Covered') === 'Yes' && 'Covered', get('Operator')].filter(Boolean).join(' · ');
+  }
   function placeRow(p, d) {
     const c = catById(p.cat);
-    return `<button class="prow" data-action="place" data-kind="${p.kind}" data-id="${esc(p.id)}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>${esc(p.name)}</b><span>${esc(p.address || c.label)}</span></span><span class="pdist">${fmtDist(d)}<small>${walkMin(d)} min walk</small></span></button>`;
+    return `<button class="prow" data-action="place" data-kind="${p.kind}" data-id="${esc(p.id)}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>${esc(p.name)}</b><span>${esc(p.address || bikeSummary(p) || c.label)}</span></span><span class="pdist">${fmtDist(d)}<small>${isBike(p.cat) ? rideMin(d, 'bicycle') + ' min by bike' : walkMin(d) + ' min walk'}</small></span></button>`;
   }
   function worksRow(w) {
     const st = workStatus(w), d = zoneDist(S.user, workZone(w)), c = catById('works');
@@ -965,9 +1012,43 @@
       const list = S.contribs.filter(c => c.status !== 'declined').sort((a, b) => dist(S.user, a) - dist(S.user, b)).slice(0, 20);
       return phead('Community', null, 'Issues and ideas from residents') + `<button class="btn-y btn-full" data-action="open-contribute" type="button" style="margin:6px 0 4px">+ Contribute</button><div class="plist">${list.map(contribRow).join('') || '<div class="empty">Nothing yet. Be the first.</div>'}</div>`;
     }
+    if (U.cat === 'bikeroutes') return bikeRoutesPanel();
     const c = catById(U.cat), items = nearby(U.cat, 15);
+    if (isBike(U.cat) && !items.length) return phead(`${c.label} near you`) + `<div class="plist"><div class="empty">${bikeNote()}</div></div>`;
     const src = U.cat === 'shelter' ? `Official public shelters · Päästeamet register, ${LKP.SHELTER_SOURCE.date}` : U.cat === 'works' ? 'Registered by the municipality' : '© OpenStreetMap contributors';
     return phead(`${c.label} near you`, null, `${items.length} closest`) + `<div class="plist">${items.map(({ p, d }) => placeRow(p, d)).join('') || '<div class="empty">Nothing found nearby.</div>'}</div><p class="src">${src}</p>`;
+  }
+  /* ---------- cycling ---------- */
+  const BIKE_CLASSES = [['path', 'Cycle path', '#1B8E3E', 'Separate from the road'], ['track', 'Protected track', '#2E9E5B', 'Beside the road, kerb or barrier'], ['lane', 'Painted lane', '#4C9BE8', 'Marked on the road']];
+  const bikeData = () => LKP.BIKE || { status: 'loading', points: [], ways: [] };
+  function bikeNote() {
+    const st = bikeData().status;
+    return st === 'loading' ? 'Loading cycling data from OpenStreetMap…' : st === 'error' ? `Could not load cycling data. Check your connection. <button class="linkbtn inline" data-action="bike-retry" type="button">Try again</button>` : 'Nothing found nearby.';
+  }
+  const bikeLegend = () => `<div class="bike-legend">${BIKE_CLASSES.map(([k, l, c, h]) => `<div><span class="bl" style="--c:${c}${k === 'lane' ? ';--dash:1' : ''}"></span><b>${l}</b><span>${h}</span></div>`).join('')}</div>`;
+  function bikeRoutesPanel() {
+    const B = bikeData(), km = B.ways.reduce((a, w) => a + lineLen(w.g), 0) / 1000;
+    return phead('Bike routes', null, 'Cycle paths and lanes in Tallinn') + `<div class="sheet flat">
+      ${B.status === 'ready' ? `<p><b>${Math.round(km)} km</b> of cycle paths, protected tracks and painted lanes are shown on the map.</p>` : `<p class="loading">${bikeNote()}</p>`}
+      ${bikeLegend()}
+      <button class="btn-y btn-full" data-action="dir-bike" type="button" style="margin:10px 0 4px">${IC.dir} Plan a bike trip</button>
+      <p class="muted">Bike directions follow cycle paths where they exist and show how much of your trip is on them.</p>
+      <p class="src">© OpenStreetMap contributors</p></div>`;
+  }
+  /* Nearest bike parking and charging to the destination of a bike trip */
+  function bikeNear(cat, p, n, max) { return POIS.filter(x => x.cat === cat && x.id !== p.id).map(x => ({ x, d: dist(p, x) })).filter(o => o.d <= max).sort((a, b) => a.d - b.d).slice(0, n).map(o => ({ p: placeOf('poi', o.x.id), d: o.d })); }
+  function bikeBox() {
+    if (U.mode !== 'bike' || proto()) return '';
+    const ri = U.routeInfo || {}, tg = target().s, cv = ri.bikeCover;
+    let h = '';
+    if (cv) {
+      const pct = Math.round(cv.any * 100);
+      const parts = [['path', 'cycle path'], ['track', 'protected track'], ['lane', 'painted lane']].filter(([k]) => cv[k] >= 0.01).map(([k, l]) => Math.round(cv[k] * 100) + '% ' + l);
+      h += `<div class="meter good"><span style="width:${pct}%"></span></div><p><b>${pct}% of the route is on cycle infrastructure</b></p>${parts.length ? `<p class="muted">${parts.join(' · ')}</p>` : ''}<p class="muted">Cycle paths are green, painted lanes are blue.</p>`;
+    } else if (bikeData().status === 'loading') h += `<p class="loading">Loading cycle paths…</p>`;
+    const rows = (cat, list, noun) => list.length ? `<div class="plabel">${noun}</div>${list.map(({ p, d }) => `<button class="prow" data-action="go" data-kind="poi" data-id="${esc(p.id)}" type="button"><span class="picon" style="--c:${catById(cat).color}">${svgOf(catById(cat))}</span><span class="ptext"><b>${esc(p.name)}</b><span>${esc([p.address, (p.info || []).filter(i => i[0] === 'Spaces').map(i => i[1] + ' spaces').join('')].filter(Boolean).join(' · ') || catById(cat).label)}</span></span><span class="pdist">${fmtDist(d)}<small>from destination</small></span></button>`).join('')}` : '';
+    if (!isBike(tg.cat)) h += rows('bikepark', bikeNear('bikepark', tg, 3, 400), 'Park your bike near here') + rows('bikecharge', bikeNear('bikecharge', tg, 2, 1500), 'Charge an e-bike near here');
+    return `<div class="info-box bike">${h || '<p class="muted">Cycling data is not available yet.</p>'}</div>`;
   }
   function searchPanel() {
     const q = U.query.trim(), ql = q.toLowerCase();
@@ -983,15 +1064,15 @@
     const c = catById(p.cat), d = dist(S.user, p);
     let extra = '';
     if (p.kind === 'shelter') extra = `<p class="muted">Public shelter, marked with the civil defence sign (blue triangle on orange). Päästeamet register, ${LKP.SHELTER_SOURCE.date}.</p>`;
-    if (p.kind === 'poi') extra = `${p.hours ? `<div class="kv"><span>Opening hours</span><b>${esc(p.hours)}</b></div>` : ''}${p.wheelchair ? `<div class="kv"><span>Wheelchair access</span><b>${esc(p.wheelchair)}</b></div>` : ''}${p.cat === 'cool' ? `<p class="muted">${p.sub === 'library' ? 'Public library' : 'Shopping centre'}: an indoor place to cool down during a heatwave or wait out a storm.</p>` : ''}<p class="src">© OpenStreetMap contributors</p>`;
+    if (p.kind === 'poi') extra = `${p.hours ? `<div class="kv"><span>Opening hours</span><b>${esc(p.hours)}</b></div>` : ''}${p.wheelchair ? `<div class="kv"><span>Wheelchair access</span><b>${esc(p.wheelchair)}</b></div>` : ''}${(p.info || []).map(([k, v]) => `<div class="kv"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}${p.cat === 'cool' ? `<p class="muted">${p.sub === 'library' ? 'Public library' : 'Shopping centre'}: an indoor place to cool down during a heatwave or wait out a storm.</p>` : ''}<p class="src">© OpenStreetMap contributors</p>`;
     if (p.kind === 'report') { const r = p.report; extra = `<div class="kv"><span>Status</span><b>${r.status === 'reported' ? 'Reported, not yet confirmed' : r.status === 'confirmed' ? 'Confirmed by the city' : 'Cleared'}</b></div><div class="kv"><span>Reported by</span><b>${r.by === 'city' ? 'City crew' : r.mine ? 'You' : 'A neighbour'} · ${ago(r.createdAt)}</b></div><p class="muted">Routes keep ${REPORT_TYPES[r.type].radius} m away until the city clears it.</p>`; }
     if (p.kind === 'work') { const w = p.work, st = workStatus(w); extra = `<div class="kv"><span>Status</span><b>${st === 'active' ? `Active · ${daysBetween(todayISO(0), w.end)} days left` : st === 'upcoming' ? `Starts in ${daysBetween(todayISO(0), w.start)} days` : 'Finished'}</b></div><div class="kv"><span>Dates</span><b>${fmtDate(w.start)} – ${fmtDate(w.end)}</b></div>${w.coords ? `<div class="kv"><span>Street section</span><b>${Math.round(lineLen(w.coords))} m</b></div>` : ''}<div class="kv"><span>Last updated</span><b>${w.updatedAt ? new Date(w.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—'} · Tallinna Linnavalitsus</b></div><div class="kv"><span>Affects</span><b>${['walk', 'bike', 'drive'].filter(k => w.affects[k]).map(k => ({ walk: 'Pedestrians', bike: 'Cyclists', drive: 'Cars' })[k]).join(', ') || '—'}</b></div>${w.note ? `<p>${esc(w.note)}</p>` : ''}<p class="src">Registered by the municipality</p>`; }
     if (p.kind === 'search') extra = `<p class="src">Address search © OpenStreetMap contributors (Nominatim)</p>`;
     const back = U.cat ? 'list' : (U.query ? 'search' : null);
     if (p.kind === 'contrib') return phead(p.contrib.kind === 'idea' ? 'Idea' : 'Issue', U.cat === 'community' ? 'list' : 'contribute') + contribDetail(p);
     if (p.kind === 'report') return phead('Storm report', back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away</p>${extra}</div>`;
-    return phead(c.label, back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away · ${walkMin(d)} min walk</p>
-      <div class="row">${p.kind !== 'work' ? `<button class="btn-y" data-action="directions" type="button">${IC.dir} Directions</button>` : ''}${p.kind !== 'shelter' ? `<button class="btn-y-outline" data-action="directions" data-nearest="1" type="button">Nearest ${S.emergency ? P().destLabel : 'shelter'}</button>` : ''}</div>${extra}</div>`;
+    return phead(c.label, back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away · ${isBike(p.cat) ? rideMin(d, 'bicycle') + ' min by bike' : walkMin(d) + ' min walk'}</p>
+      <div class="row">${p.kind !== 'work' ? `<button class="btn-y" data-action="directions" type="button">${IC.dir} Directions</button>` : ''}${p.kind !== 'shelter' && !isBike(p.cat) ? `<button class="btn-y-outline" data-action="directions" data-nearest="1" type="button">Nearest ${S.emergency ? P().destLabel : 'shelter'}</button>` : ''}</div>${extra}</div>`;
   }
   function protoBox() {
     const t = proto(); if (!t) return '';
@@ -1030,7 +1111,7 @@
     return `<div class="dir-head">
         <button class="icon-btn" data-action="close-dir" type="button" aria-label="Close directions">${IC.back}</button>
         <div class="dir-route"><div class="dir-row"><span class="rdot you"></span><span>Your location</span></div><div class="dir-line"></div><div class="dir-row"><span class="rdot to" style="--c:${c.color}"></span><b>${esc(tg.s.name)}</b></div></div>
-      </div>${U.dest ? '' : `<p class="dir-note">Nearest ${S.emergency ? P().destLabel : 'public shelter'} · ${esc(tg.s.address)}</p>`}${modes}${protoBox()}${everydayBox()}${modeSheet(tg)}`;
+      </div>${U.dest ? '' : `<p class="dir-note">Nearest ${S.emergency ? P().destLabel : 'public shelter'} · ${esc(tg.s.address)}</p>`}${modes}${protoBox()}${everydayBox()}${bikeBox()}${modeSheet(tg)}`;
   }
   function everydayBox() {
     if (proto()) return '';
@@ -1186,7 +1267,7 @@
       ${mine.length ? `<h4>Your reports</h4>${mine.map(r => `<div class="lst"><div><b>${REPORT_TYPES[r.type].label}</b><span class="meta">${esc(r.note || '')}${r.note ? ' · ' : ''}${ago(r.createdAt)}</span></div><span class="tag ${r.status === 'cleared' ? 'tag-dark' : 'tag-y'}">${r.status}</span></div>`).join('')}` : ''}</div>`;
   }
   function wheretoPanel() {
-    const picks = [['pharmacy', 'pharmacy'], ['grocery', 'grocery store'], ['hospital', 'hospital'], ['shelter', 'public shelter'], ['water', 'drinking water'], ['cool', 'library or shopping centre']]
+    const picks = [['pharmacy', 'pharmacy'], ['grocery', 'grocery store'], ['hospital', 'hospital'], ['shelter', 'public shelter'], ['water', 'drinking water'], ['cool', 'library or shopping centre'], ['bikepark', 'bike parking'], ['bikecharge', 'bike charging station']]
       .map(([cat, noun]) => { const n = nearby(cat, 1)[0]; return n && { cat, noun, p: n.p, d: n.d }; }).filter(Boolean);
     return phead('Where to?', null, 'Search above, or pick one of these') + `<div class="plist">${picks.map(q => { const c = catById(q.cat); return `<button class="prow" data-action="go" data-kind="${q.p.kind}" data-id="${esc(q.p.id)}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>Nearest ${q.noun}</b><span>${esc(q.p.name)}</span></span><span class="pdist">${fmtDist(q.d)}<small>${walkMin(q.d)} min walk</small></span></button>`; }).join('')}</div>`;
   }
@@ -1267,7 +1348,7 @@
           <div class="step ${S.mandate === 'active' ? '' : 'pending'}"><div class="num">2</div><div><b>Unlock</b><span>${S.mandate === 'active' ? `${unlocked} vehicles free in ${S.radius} m zones` : S.mandate === 'publishing' ? 'Publishing…' : 'Fleets locked.'}</span></div></div>
           <div class="step ${em ? '' : 'pending'}"><div class="num">3</div><div><b>Lend</b><span>${em ? `${active} neighbour listings live.` : `${S.listings.filter(l => l.status === 'dormant').length} dormant listings waiting.`}</span></div></div></div>`)
       + card('Data sources', null, `<div class="lst"><div><b>Public shelters</b><span class="meta">Päästeamet register via Maa- ja Ruumiamet, ${LKP.SHELTER_SOURCE.date}</span></div><span class="badge badge-green">${SHELTERS.length}</span></div>
-          <div class="lst"><div><b>Hospitals, pharmacies, cool places, water</b><span class="meta">OpenStreetMap, fetched 25 Sep 2026</span></div><span class="badge badge-grey">${POIS.length}</span></div>
+          <div class="lst"><div><b>Hospitals, pharmacies, cool places, water</b><span class="meta">OpenStreetMap, fetched 25 Sep 2026</span></div><span class="badge badge-grey">${POIS.filter(p => !isBike(p.cat)).length}</span></div>
           <div class="lst"><div><b>Hazard zones</b><span class="meta">Drawn by the city during an alert; seeded ones are examples</span></div><span class="badge badge-grey">${S.hazards.length}</span></div>
           <div class="lst"><div><b>Fallen tree reports</b><span class="meta">From citizens and city crews</span></div><span class="badge badge-grey">${S.reports.filter(r => r.status !== 'cleared').length} open</span></div>
           <div class="lst"><div><b>Citizen contributions</b><span class="meta">Issues and ideas pinned by residents</span></div><span class="badge badge-grey">${S.contribs.length}</span></div>
@@ -1473,7 +1554,9 @@
         if (!S.emergency && U.cview !== 'place') { U.dest = null; U.cview = 'whereto'; saveUI(); renderCitizen(); drawMap(); search.focus(); break; }
         if (U.cview !== 'place') U.dest = null;
         U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
-      case 'go': U.dest = { kind: b.dataset.kind, id: b.dataset.id }; U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
+      case 'bike-retry': LKP.BIKE.retry(); break;
+      case 'dir-bike': U.mode = 'bike'; U.cat = null; U.dest = null; U.cview = 'whereto'; saveUI(); renderCitizen(); drawMap(); search.focus(); break;
+      case 'go': { const gp = placeOf(b.dataset.kind, b.dataset.id); if (gp && isBike(gp.cat)) U.mode = 'bike'; } U.dest = { kind: b.dataset.kind, id: b.dataset.id }; U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
       case 'open-contribute':
         U.cview = 'contribute'; U.cat = null; U.dest = null; layers.route.clearLayers();
         if (b.dataset.k) U.contribDraft.kind = b.dataset.k;
@@ -1503,6 +1586,7 @@
       case 'end-work': endWorkToday(b.dataset.id); break;
       case 'cancel-edit': U.workDraft = freshUI().workDraft; saveUI(); renderGov(); drawMap(); break;
       case 'directions':
+        { const dp = U.dest && placeOf(U.dest.kind, U.dest.id); if (dp && isBike(dp.cat)) U.mode = 'bike'; }
         if (b.dataset.nearest) U.dest = null;
         else if (!U.dest && U.cview !== 'place') U.dest = null;
         U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;

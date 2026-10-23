@@ -2213,10 +2213,73 @@ rule so trips end at shelters, a|чтобы поездки заканчивал�
 rule holding accessible vehicles for priority riders, and a ban on rebalancing out of geofences.|резервирующее доступный транспорт для приоритетных пассажиров, и запрет вывозить транспорт за пределы геозон.
 `;
 
+  /* Cycling: English | Eesti | Suomi | Español | Українська | Русский */
+  const RAW_BIKE = `
+Bike routes|Rattateed|Pyöräreitit|Rutas ciclistas|Веломаршрути|Веломаршруты
+Bike parking|Jalgrattaparklad|Pyöräpysäköinti|Aparcamientos de bicis|Велопарковки|Велопарковки
+Bike charging|Rattalaadimine|Pyörien lataus|Carga de bicis|Зарядка велосипедів|Зарядка велосипедов
+Bike repair|Rattaparandus|Pyöräkorjaus|Reparación de bicis|Ремонт велосипедів|Ремонт велосипедов
+Bike charging station|Rattalaadimispunkt|Pyörien latauspiste|Punto de carga de bicis|Станція зарядки велосипедів|Станция зарядки велосипедов
+Bike repair station|Rattaparandusepunkt|Pyöräkorjauspiste|Punto de reparación de bicis|Пункт ремонту велосипедів|Пункт ремонта велосипедов
+Cycle paths and lanes in Tallinn|Tallinna rattateed ja -rajad|Tallinnan pyörätiet ja -kaistat|Carriles y vías ciclistas de Tallin|Велодоріжки та смуги в Таллінні|Велодорожки и полосы в Таллинне
+of cycle paths, protected tracks and painted lanes are shown on the map.|rattateid, kaitstud radu ja märgistatud ribasid on kaardil näha.|pyöräteitä, suojattuja väyliä ja merkittyjä kaistoja näkyy kartalla.|de vías ciclistas, carriles protegidos y carriles pintados se muestran en el mapa.|велодоріжок, захищених смуг і розмічених смуг показано на карті.|велодорожек, защищённых полос и размеченных полос показано на карте.
+Cycle path|Rattatee|Pyörätie|Vía ciclista|Велодоріжка|Велодорожка
+Protected track|Kaitstud rada|Suojattu pyöräkaista|Carril protegido|Захищена смуга|Защищённая полоса
+Painted lane|Märgistatud riba|Merkitty kaista|Carril pintado|Розмічена смуга|Размеченная полоса
+cycle path|rattatee|pyörätie|vía ciclista|велодоріжка|велодорожка
+protected track|kaitstud rada|suojattu pyöräkaista|carril protegido|захищена смуга|защищённая полоса
+painted lane|märgistatud riba|merkitty kaista|carril pintado|розмічена смуга|размеченная полоса
+Separate from the road|Sõiduteest eraldatud|Erillään ajoradasta|Separada de la calzada|Окремо від проїзної частини|Отдельно от проезжей части
+Beside the road, kerb or barrier|Sõidutee kõrval, äärekivi või tõkkega|Tien vieressä, reunakivi tai este|Junto a la calzada, con bordillo o barrera|Біля дороги, з бордюром чи бар'єром|Рядом с дорогой, с бордюром или барьером
+Marked on the road|Märgitud sõidutee peale|Merkitty ajoradalle|Marcado en la calzada|Позначена на дорозі|Размечена на дороге
+Plan a bike trip|Planeeri rattasõit|Suunnittele pyöräretki|Planificar un viaje en bici|Спланувати поїздку на велосипеді|Спланировать поездку на велосипеде
+Bike directions follow cycle paths where they exist and show how much of your trip is on them.|Rattajuhised järgivad rattateid, kus need on, ja näitavad, kui suur osa sõidust on neil.|Pyöräreitit seuraavat pyöräteitä, missä niitä on, ja näyttävät, kuinka suuri osa matkasta on niillä.|Las indicaciones en bici siguen las vías ciclistas donde las hay y muestran qué parte del viaje va por ellas.|Веломаршрути йдуть велодоріжками, де вони є, і показують, яка частина поїздки проходить по них.|Веломаршруты идут по велодорожкам, где они есть, и показывают, какая часть поездки проходит по ним.
+Park your bike near here|Pargi ratas siin lähedal|Pysäköi pyöräsi tämän lähelle|Aparca tu bici cerca de aquí|Припаркуйте велосипед поруч|Припаркуйте велосипед рядом
+Charge an e-bike near here|Lae e-ratast siin lähedal|Lataa sähköpyörä tämän lähellä|Carga una e-bike cerca de aquí|Зарядіть електровелосипед поруч|Зарядите электровелосипед рядом
+from destination|sihtkohast|kohteesta|del destino|від пункту призначення|от пункта назначения
+Loading cycle paths…|Rattateid laaditakse…|Ladataan pyöräteitä…|Cargando vías ciclistas…|Завантаження велодоріжок…|Загрузка велодорожек…
+Loading cycling data from OpenStreetMap…|Rattaandmeid laaditakse OpenStreetMapist…|Ladataan pyöräilytietoja OpenStreetMapista…|Cargando datos ciclistas de OpenStreetMap…|Завантаження даних для велосипедистів з OpenStreetMap…|Загрузка данных для велосипедистов из OpenStreetMap…
+Could not load cycling data. Check your connection.|Rattaandmeid ei õnnestunud laadida. Kontrolli ühendust.|Pyöräilytietojen lataus epäonnistui. Tarkista yhteys.|No se pudieron cargar los datos ciclistas. Comprueba tu conexión.|Не вдалося завантажити дані для велосипедистів. Перевірте з'єднання.|Не удалось загрузить данные для велосипедистов. Проверьте соединение.
+Try again|Proovi uuesti|Yritä uudelleen|Reintentar|Спробувати знову|Попробовать снова
+Cycling data is not available yet.|Rattaandmeid pole veel saadaval.|Pyöräilytietoja ei ole vielä saatavilla.|Los datos ciclistas aún no están disponibles.|Дані для велосипедистів поки недоступні.|Данные для велосипедистов пока недоступны.
+Nearest bike parking|Lähim jalgrattaparkla|Lähin pyöräpysäköinti|Aparcamiento de bicis más cercano|Найближча велопарковка|Ближайшая велопарковка
+Nearest bike charging station|Lähim rattalaadimispunkt|Lähin pyörien latauspiste|Punto de carga de bicis más cercano|Найближча станція зарядки велосипедів|Ближайшая станция зарядки велосипедов
+Spaces|Kohti|Paikkoja|Plazas|Місць|Мест
+Covered|Katusega|Katettu|Cubierto|З накриттям|Крытая
+Access|Juurdepääs|Pääsy|Acceso|Доступ|Доступ
+Fee|Tasu|Maksu|Tarifa|Плата|Плата
+Surveillance|Valve|Valvonta|Vigilancia|Відеоспостереження|Видеонаблюдение
+Services|Teenused|Palvelut|Servicios|Послуги|Услуги
+Air pump|Õhupump|Ilmapumppu|Bomba de aire|Повітряний насос|Воздушный насос
+Operator|Operaator|Operaattori|Operador|Оператор|Оператор
+Sockets|Pistikupesad|Pistorasiat|Enchufes|Розетки|Розетки
+Yes|Jah|Kyllä|Sí|Так|Да
+No|Ei|Ei|No|Ні|Нет
+Free|Tasuta|Ilmainen|Gratis|Безкоштовно|Бесплатно
+Customers only|Ainult klientidele|Vain asiakkaille|Solo clientes|Лише для клієнтів|Только для клиентов
+Private|Privaatne|Yksityinen|Privado|Приватна|Частная
+Stands|Rattahoidjad|Telineet|Soportes|Стійки|Стойки
+Wall loops|Seinasilmused|Seinäkiinnikkeet|Anclajes de pared|Настінні кільця|Настенные кольца
+Rack|Rattaraam|Teline|Rack|Рама|Рама
+Shed|Varjualune|Katos|Cobertizo|Навіс|Навес
+Lockers|Kapid|Lokerot|Taquillas|Шафки|Шкафчики
+Building|Hoone|Rakennus|Edificio|Будівля|Здание
+Two-tier rack|Kahekorruseline rattaraam|Kaksikerroksinen teline|Rack de dos niveles|Дворівнева стійка|Двухъярусная стойка
+Safe loops|Turvasilmused|Turvakiinnikkeet|Anclajes seguros|Захисні кільця|Защитные кольца
+Anchors|Ankrud|Ankkurit|Anclajes|Якорі|Якоря
+Handlebar holder|Rooli hoidik|Ohjaustangon pidike|Soporte de manillar|Тримач керма|Держатель руля
+Wide stands|Laiad rattahoidjad|Leveät telineet|Soportes anchos|Широкі стійки|Широкие стойки
+Bollard|Postik|Pollari|Bolardo|Стовпчик|Столбик
+Ground slots|Maapilud|Maaurat|Ranuras en el suelo|Пази в землі|Пазы в земле
+Ride the city|Sõida linnas|Pyöräile kaupungissa|Recorre la ciudad en bici|Подорожуйте містом на велосипеді|Путешествуйте по городу на велосипеде
+PiMap is also an everyday map for people on bikes: cycle paths and lanes, bike parking, e-bike charging points and repair stations, with bike directions that follow cycle paths and tell you how much of your trip is on them.|PiMap on ka igapäevane kaart rattureile: rattateed ja -rajad, jalgrattaparklad, e-rataste laadimispunktid ja parandusjaamad ning rattajuhised, mis järgivad rattateid ja näitavad, kui suur osa sõidust on neil.|PiMap on myös arjen kartta pyöräilijöille: pyörätiet ja -kaistat, pyöräpysäköinti, sähköpyörien latauspisteet ja korjauspisteet sekä pyöräreitit, jotka seuraavat pyöräteitä ja kertovat, kuinka suuri osa matkasta on niillä.|PiMap es también un mapa para el día a día de quienes van en bici: vías y carriles ciclistas, aparcamientos de bicis, puntos de carga de e-bikes y puntos de reparación, con indicaciones que siguen las vías ciclistas y te dicen qué parte del viaje va por ellas.|PiMap також щоденна мапа для велосипедистів: велодоріжки та смуги, велопарковки, станції зарядки електровелосипедів і пункти ремонту, а веломаршрути ведуть велодоріжками й показують, яка частина поїздки проходить по них.|PiMap также ежедневная карта для велосипедистов: велодорожки и полосы, велопарковки, станции зарядки электровелосипедов и пункты ремонта, а веломаршруты идут по велодорожкам и показывают, какая часть поездки проходит по ним.
+Cycling data comes from OpenStreetMap contributors and is loaded when you open the map.|Rattaandmed pärinevad OpenStreetMapi kaastöölistelt ja laaditakse kaardi avamisel.|Pyöräilytiedot tulevat OpenStreetMapin osallistujilta ja ne ladataan kartan avautuessa.|Los datos ciclistas proceden de los colaboradores de OpenStreetMap y se cargan al abrir el mapa.|Дані для велосипедистів надають учасники OpenStreetMap, вони завантажуються під час відкриття мапи.|Данные для велосипедистов предоставляют участники OpenStreetMap, они загружаются при открытии карты.
+`;
   const D = new Map();
   const rows = s => s.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//')).map(l => l.split('|'));
   rows(RAW).forEach(p => { if (p.length === 4) D.set(p[0], p.concat([null, null])); });
   rows(RAW5).forEach(p => { if (p.length === 5) D.set(p[0], p.concat([null])); });
+  rows(RAW_BIKE).forEach(p => { if (p.length === 6) D.set(p[0], p); });
   rows(RAW_UK).forEach(p => { if (p.length !== 2) return; const r = D.get(p[0]); if (r) r[4] = p[1]; else D.set(p[0], [p[0], null, null, null, p[1], null]); });
   rows(RAW_RU).forEach(p => { if (p.length !== 2) return; const r = D.get(p[0]); if (r) r[5] = p[1]; else D.set(p[0], [p[0], null, null, null, null, p[1]]); });
   const COMPASS = { N: ['põhjast', 'pohjoisesta', 'del norte', 'з півночі', 'с севера'], NE: ['kirdest', 'koillisesta', 'del noreste', 'з північного сходу', 'с северо-востока'], E: ['idast', 'idästä', 'del este', 'зі сходу', 'с востока'], SE: ['kagust', 'kaakosta', 'del sureste', 'з південного сходу', 'с юго-востока'], S: ['lõunast', 'etelästä', 'del sur', 'з півдня', 'с юга'], SW: ['edelast', 'lounaasta', 'del suroeste', 'з південного заходу', 'с юго-запада'], W: ['läänest', 'lännestä', 'del oeste', 'із заходу', 'с запада'], NW: ['loodest', 'luoteesta', 'del noroeste', 'з північного заходу', 'с северо-запада'] };
@@ -2234,6 +2297,11 @@ rule holding accessible vehicles for priority riders, and a ban on rebalancing o
 
   /* Patterns for text with numbers, times, distances. t() translates a sub-phrase. Columns: et | fi | es | uk | ru */
   const P = [
+    [/^(\d+) min by bike$/, m => pick([`${m[1]} min rattaga`, `${m[1]} min pyörällä`, `${m[1]} min en bici`, `${m[1]} хв на велосипеді`, `${m[1]} мин на велосипеде`])],
+    [/^(\d+) spaces$/, m => pick([`${m[1]} kohta`, `${m[1]} paikkaa`, `${m[1]} plazas`, `${m[1]} місць`, `${m[1]} мест`])],
+    [/^(\d+)% of the route is on cycle infrastructure$/, m => pick([`${m[1]}% teekonnast kulgeb rattainfrastruktuuril`, `${m[1]} % reitistä kulkee pyöräinfrastruktuurilla`, `el ${m[1]} % de la ruta va por infraestructura ciclista`, `${m[1]}% маршруту проходить велоінфраструктурою`, `${m[1]}% маршрута проходит по велоинфраструктуре`])],
+    [/^(\d+)% (cycle path|protected track|painted lane)$/, (m, t) => `${m[1]}% ${t(m[2])}`],
+    [/^Cycle paths are green, painted lanes are blue\.$/, () => pick(['Rattateed on rohelised, märgistatud ribad sinised.', 'Pyörätiet ovat vihreitä, merkityt kaistat sinisiä.', 'Las vías ciclistas son verdes y los carriles pintados, azules.', 'Велодоріжки зелені, розмічені смуги сині.', 'Велодорожки зелёные, размеченные полосы синие.'])],
     [/^(~?\d+) min$/, m => pick([null, null, null, `${m[1]} хв`, `${m[1]} мин`])],
     [/^([\d.,]+) (k?m)$/, m => pick([null, null, null, `${m[1]} ${m[2] === 'km' ? 'км' : 'м'}`, `${m[1]} ${m[2] === 'km' ? 'км' : 'м'}`])],
     [/^([\d.,]+ k?m) away$/, m => pick([`${m[1]} kaugusel`, `${m[1]} päässä`, `a ${m[1]}`, `за ${u(m[1])}`, `в ${u(m[1])}`])],

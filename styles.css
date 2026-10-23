@@ -668,3 +668,20 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
 .c-yes { background: var(--blue); color: #fff; border: 0; border-radius: var(--r-pill); padding: 8px 18px; font-weight: 700; }
 .c-no { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.5); border-radius: var(--r-pill); padding: 8px 16px; font-weight: 700; }
 .consent a { color: #fff; margin-left: auto; font-size: .82rem; }
+
+/* ---- cycling ---- */
+.info-box.bike { background: #E8F5EC; }
+.info-box.bike p { color: #14532D !important; }
+.info-box.bike p b { color: #14532D; }
+.info-box.bike p.loading { color: var(--grey) !important; }
+.info-box.bike .plabel { color: #2F6B45; }
+.info-box.bike .prow { border-bottom-color: #CFE6D6; }
+.info-box.bike .prow:hover { background: #DCEFE2; }
+.meter.good { background: #D5DBD7; }
+.meter.good span { background: #1B8E3E; }
+.bike-legend { display: grid; gap: 10px; margin: 12px 0; }
+.bike-legend > div { display: grid; grid-template-columns: 38px 1fr; column-gap: 12px; align-items: center; }
+.bike-legend .bl { grid-row: span 2; height: 0; border-top: 4px solid var(--c); border-radius: 2px; }
+.bike-legend .bl[style*="--dash"] { border-top-style: dashed; border-top-width: 3px; }
+.bike-legend b { font-size: .86rem; }
+.bike-legend span:not(.bl) { font-size: .76rem; color: var(--grey); }
