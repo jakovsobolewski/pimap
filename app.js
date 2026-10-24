@@ -482,7 +482,7 @@
   const map = L.map('map', { zoomControl: false }).setView(LKP.CITY_CENTER, 14);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   map.attributionControl.setPrefix('<b>PiMap prototype</b> · not an official City of Tallinn service · <a href="https://leafletjs.com">Leaflet</a>');
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 20, subdomains: 'abcd', attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }).addTo(map);
   const layers = {};
   ['hazards', 'geofences', 'works', 'route', 'pois', 'fleet', 'listings', 'volunteers', 'requests', 'shelters', 'dest', 'user'].forEach(k => { layers[k] = L.layerGroup().addTo(map); });
   const icon = (cls, html, size) => L.divIcon({ className: 'mk ' + cls, html, iconSize: [size, size] });
@@ -1304,10 +1304,12 @@
     return `<div class="hc-title">Ride</div>
       <button class="btn-y btn-full" data-action="dir-bike" type="button" style="margin:2px 0 8px">${IC.dir} Plan a bike trip</button>
       ${cond ? `<div class="hc-cond" style="--c:${cond.tone}"><b>Ride conditions</b><span>${cond.text}</span></div>` : ''}
+      <div class="hc-group">
       ${row('bikeroutes', 'Bike routes', B.status === 'ready' && km ? `${km} km mapped` : bikeNote())}
       ${row('bikepark', 'Bike parking', near('bikepark'))}
       ${row('bikecharge', 'Bike charging', near('bikecharge'))}
       ${row('bikerepair', 'Bike repair', near('bikerepair'))}
+      </div>
       <div class="hc-title" style="margin-top:10px">Around you</div>`;
   }
   function homeCard() {
@@ -1316,13 +1318,16 @@
     const sh = nearby('shelter', 1)[0], reps = reportsShown();
     return `<div class="home-card" role="region" aria-label="Around you">
       ${rideBlock()}
+      <div class="hc-group">
       <button class="hc-row" data-action="cat" data-cat="works" type="button"><span class="picon" style="--c:#F28C00">${svgOf(catById('works'))}</span><span class="ptext"><b>${act.length ? `${act.length} construction site${act.length > 1 ? 's' : ''} within 2 km` : 'No construction within 2 km'}</b><span>${act.length ? `${esc(act[0].name)} · until ${fmtDate(act[0].end)}` : 'Tap to see works across Tallinn'}</span></span></button>
       ${reps.length ? `<button class="hc-row" data-action="cat" data-cat="reports" type="button"><span class="picon" style="--c:#6D4C41">${svgOf(REPORT_TYPES.fallen_tree)}</span><span class="ptext"><b>${reps.length} hazard report${reps.length > 1 ? 's' : ''}</b><span>Routes go around them until cleared</span></span></button>` : ''}
       ${(() => { const n = S.contribs.filter(c => c.status !== 'declined' && c.status !== 'done' && dist(S.user, c) <= 1500); return `<button class="hc-row" data-action="cat" data-cat="community" type="button"><span class="picon" style="--c:#7B3FA0">${svgOf(catById('community'))}</span><span class="ptext"><b>${n.length} issues and ideas near you</b><span>Support them or add your own</span></span></button>`; })()}
       <button class="hc-row" data-action="place" data-kind="shelter" data-id="${sh.p.id}" type="button"><span class="picon" style="--c:#0072CE">${svgOf(catById('shelter'))}</span><span class="ptext"><b>Your nearest shelter</b><span>${esc(sh.p.name)} · ${walkMin(sh.d)} min walk</span></span></button>
       <button class="hc-row" data-action="cview" data-view="ready" type="button"><span class="picon" style="--c:#1E8E3E"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg></span><span class="ptext"><b>Be ready</b><span>Home supplies and what to do in each emergency</span></span></button>
+      </div>
     </div>`;
   }
+  function syncAvatar() { const av = document.querySelector('#profileBtn .pf-av'), sav = document.querySelector('.sb-avatar .pf-av'); if (av && sav) sav.innerHTML = av.innerHTML; }
   function renderCitizen() {
     const em = S.emergency;
     $('#homeCard').innerHTML = homeCard();
@@ -1336,6 +1341,10 @@
       : U.cview === 'menu' ? menuPanel() : U.cview === 'settings' ? settingsPanel() : U.cview === 'lend' ? lendPanel()
       : U.cview === 'contribute' ? contributePanel() : U.cview === 'report' ? reportPanel() : U.cview === 'whereto' ? wheretoPanel() : U.cview === 'ready' ? readyPanel() : '';
     panel.hidden = !html; panel.innerHTML = html; document.body.classList.toggle('panel-open', !!html);
+    const bd = document.body.dataset; bd.portal = U.portal; bd.cview = U.cview; bd.sheet = U.sheet || 'peek';
+    const wx = WX.data, wc = $('#wxChip');
+    wc.hidden = !wx; if (wx) wc.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${wx.rain >= 0.2 ? '<path d="M7 15a4 4 0 010-8 5 5 0 019.6-1.5A3.5 3.5 0 1117 15z"/><path d="M8 18l-1 2M12 18l-1 2M16 18l-1 2"/>' : '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>'}</svg><b>${wx.t}°</b>`;
+    syncAvatar();
     $('#searchClear').hidden = !U.query;
     document.body.classList.toggle('has-alert', !!em);
     const cbtn = $('#contributeBtn'); if (cbtn && U.portal === 'citizen') cbtn.classList.toggle('active', U.cview === 'contribute');
@@ -1543,7 +1552,19 @@
     clearTimeout(searchTimer);
     if (U.query.trim().length >= 3 && localSearch(U.query).length === 0) searchTimer = setTimeout(() => geocode(U.query), 700);
   });
-  search.addEventListener('focus', () => { if (U.query) { U.cview = 'search'; renderCitizen(); } });
+  search.addEventListener('focus', () => { if (U.query) { U.cview = 'search'; renderCitizen(); } setSheet('full'); });
+  /* Phone bottom sheet (Apple Maps style): 'peek' shows search and categories, 'full' the whole card */
+  function setSheet(v) { if (U.sheet === v) return; U.sheet = v; document.body.dataset.sheet = v; saveUI(); }
+  map.on('dragstart click', () => { if (U.portal === 'citizen' && U.sheet === 'full' && ['map', 'whereto'].includes(U.cview) && document.activeElement !== search) setSheet('peek'); });
+  (() => {
+    const head = $('.c-top'); let y0 = null, x0 = 0;
+    head.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; }, { passive: true });
+    head.addEventListener('touchend', e => {
+      if (y0 == null) return; const t = e.changedTouches[0], dy = t.clientY - y0, dx = t.clientX - x0; y0 = null;
+      if (Math.abs(dy) < 30 || Math.abs(dy) < Math.abs(dx)) return;
+      if (dy < 0) setSheet('full'); else { setSheet('peek'); search.blur(); }
+    }, { passive: true });
+  })();
   search.addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); geocode(U.query); }
     if (e.key === 'Escape') { search.value = ''; U.query = ''; U.cview = U.cat ? 'list' : 'map'; renderCitizen(); }
@@ -1586,6 +1607,8 @@
         if (!S.emergency && U.cview !== 'place') { U.dest = null; U.cview = 'whereto'; saveUI(); renderCitizen(); drawMap(); search.focus(); break; }
         if (U.cview !== 'place') U.dest = null;
         U.cview = 'directions'; saveUI(); renderCitizen(); drawMap(); refreshRoute(); break;
+      case 'sheet-toggle': setSheet(U.sheet === 'full' ? 'peek' : 'full'); break;
+      case 'open-profile': { const pb = $('#profileBtn'); if (pb) pb.click(); break; }
       case 'bike-retry': LKP.BIKE.retry(); break;
       case 'bike-refresh': LKP.BIKE.refresh(); break;
       case 'dir-bike': U.mode = 'bike'; U.cat = null; U.dest = null; U.cview = 'whereto'; saveUI(); renderCitizen(); drawMap(); search.focus(); break;
@@ -1702,7 +1725,7 @@
 
   /* ---------------- boot ---------------- */
   syncHeader();
-  renderAll();
+  renderAll(); setTimeout(syncAvatar, 0);
   if (S.emergency && S.mandate === 'publishing') { S.mandate = 'none'; publishMandate(); }
   map.setView([S.user.lat, S.user.lng], 15);
   refreshRoute();

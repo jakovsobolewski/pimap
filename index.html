@@ -12,13 +12,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="styles.css?v=20261023-2">
+  <link rel="stylesheet" href="styles.css?v=20261024-1">
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand">
-        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20261023-2" alt="Tallinn"></a>
+        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20261024-1" alt="Tallinn"></a>
       </div>
       <nav class="portals" role="tablist" aria-label="Portals">
         <button class="portal-tab" role="tab" data-portal="citizen" type="button">Citizen portal</button>
@@ -47,6 +47,7 @@
 
       <div id="citizenUI" class="citizen-ui">
         <div class="c-top">
+          <button class="sheet-grab" data-action="sheet-toggle" type="button" aria-label="Show more"><span></span></button>
           <div class="searchbar" role="search">
             <button class="sb-icon" data-action="cview" data-view="menu" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
             <input id="searchInput" type="search" placeholder="Search PiMap" autocomplete="off" aria-label="Search shelters, places and addresses">
@@ -55,10 +56,17 @@
             <span class="sb-sep" aria-hidden="true"></span>
             <button class="sb-dir" data-action="dir-button" type="button" aria-label="Directions" title="Directions"><svg viewBox="0 0 24 24" aria-hidden="true" class="dir-ic"><rect x="4.2" y="4.2" width="15.6" height="15.6" rx="2.4" transform="rotate(45 12 12)"/><path d="M9 14v-2.5a1.5 1.5 0 011.5-1.5H15M13 8l2 2-2 2"/></svg></button>
           </div>
+          <button class="sb-avatar" data-action="open-profile" type="button" aria-label="Your profile"><span class="pf-av"></span></button>
           <div class="chips-wrap">
             <div id="chips" class="chips" role="tablist" aria-label="Places to go"></div>
             <button class="chips-more" data-action="chips-more" type="button" aria-label="More categories"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
           </div>
+        </div>
+        <div id="wxChip" class="wx-chip" hidden></div>
+        <div class="map-ctrls" role="group" aria-label="Map">
+          <button data-action="cat" data-cat="bikeroutes" type="button" aria-label="Bike routes" title="Bike routes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg></button>
+          <button data-action="geolocate" type="button" aria-label="Use my location" title="Use my location"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3L3 10.5l7.5 3 3 7.5z"/></svg></button>
+          <button data-action="open-contribute" type="button" aria-label="Report an issue or share an idea" title="Contribute"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
         </div>
         <div id="alertBanner"></div>
         <div id="homeCard"></div>
@@ -88,14 +96,14 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="data.js?v=20261023-2"></script>
-  <script src="mds.js?v=20261023-2"></script>
-  <script src="pois.js?v=20261023-2"></script>
-  <script src="bike.js?v=20261023-2"></script>
-  <script src="i18n.js?v=20261023-2"></script>
-  <script src="app.js?v=20261023-2"></script>
-  <script src="profile.js?v=20261023-2"></script>
+  <script src="data.js?v=20261024-1"></script>
+  <script src="mds.js?v=20261024-1"></script>
+  <script src="pois.js?v=20261024-1"></script>
+  <script src="bike.js?v=20261024-1"></script>
+  <script src="i18n.js?v=20261024-1"></script>
+  <script src="app.js?v=20261024-1"></script>
+  <script src="profile.js?v=20261024-1"></script>
   <script>window.PIMAP_GA_ID = 'G-ZCB6TDFQB4'; /* paste your Google Analytics 4 Measurement ID here */</script>
-  <script src="analytics.js?v=20261023-2"></script>
+  <script src="analytics.js?v=20261024-1"></script>
 </body>
 </html>
