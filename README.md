@@ -4,7 +4,7 @@ Live at **https://pimap.app** · prototype, not an official City of Tallinn serv
 
 City Resilience Hack 2026 · City of Tallinn × Pinge Electronics OÜ
 
-The interface follows the tallinn.ee visual identity (Tallinn blue #0072CE, pale blue #CCE3F5, white surfaces, pill controls) and carries the Tallinn logo. The logo is a hand-drawn SVG approximation in `tallinn-logo.svg`; swap in the official asset before any public use.
+The interface follows the Pinge brandbook (2025): Pinge green #5B8C4C, concrete #F1F1F1, ink #222222 / #434343, accent blue #154290, bolt yellow #F8C704, and Helvetica. Primary actions are ink, the yellow bolt marks the main action, green marks cycling and selection. The header carries `pinge-logo.png`.
 
 **Map · Unlock · Lend.** Estonia has shelters, sirens and EE-ALARM, but no plan for the last
 kilometre. This prototype turns every shared and private light vehicle in the city into a public

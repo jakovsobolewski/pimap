@@ -5,20 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>PiMap</title>
   <meta name="description" content="PiMap: a bike map of Tallinn with cycle paths, bike parking, e-bike charging and repair stations, plus your nearest shelter and the safest way there in an emergency. Prototype, not an official City of Tallinn service.">
-  <meta name="theme-color" content="#0072CE">
+  <meta name="theme-color" content="#F1F1F1">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="styles.css?v=20261024-2">
+  <link rel="stylesheet" href="styles.css?v=20261024-3">
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand">
-        <a class="logo logo-left" href="https://www.tallinn.ee" target="_blank" rel="noopener" aria-label="Tallinn"><img src="tallinn-logo.svg?v=20261024-2" alt="Tallinn"></a>
+        <a class="logo logo-left" href="https://www.pinge.info" target="_blank" rel="noopener" aria-label="Pinge"><img src="pinge-logo.png?v=1" alt="Pinge"></a>
       </div>
       <nav class="portals" aria-label="Portals">
         <button class="portal-tab back-map" data-portal="citizen" type="button">Back to map</button>
@@ -76,7 +73,7 @@
       <section id="govPanel" class="gov-panel" aria-label="Municipality"></section>
 
       <div class="legend" aria-label="Map legend">
-        <div><span class="lg" style="--c:#0072CE"></span>Public shelter</div>
+        <div><span class="lg" style="--c:#154290"></span>Public shelter</div>
         <div><span class="mk mk-user"></span>Resident</div>
         <div><span class="mk mk-fleet">B</span>Shared vehicle, locked</div>
         <div><span class="mk mk-fleet on">B</span>Shared vehicle, free</div>
@@ -95,14 +92,14 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="data.js?v=20261024-2"></script>
-  <script src="mds.js?v=20261024-2"></script>
-  <script src="pois.js?v=20261024-2"></script>
-  <script src="bike.js?v=20261024-2"></script>
-  <script src="i18n.js?v=20261024-2"></script>
-  <script src="app.js?v=20261024-2"></script>
-  <script src="profile.js?v=20261024-2"></script>
+  <script src="data.js?v=20261024-3"></script>
+  <script src="mds.js?v=20261024-3"></script>
+  <script src="pois.js?v=20261024-3"></script>
+  <script src="bike.js?v=20261024-3"></script>
+  <script src="i18n.js?v=20261024-3"></script>
+  <script src="app.js?v=20261024-3"></script>
+  <script src="profile.js?v=20261024-3"></script>
   <script>window.PIMAP_GA_ID = 'G-ZCB6TDFQB4'; /* paste your Google Analytics 4 Measurement ID here */</script>
-  <script src="analytics.js?v=20261024-2"></script>
+  <script src="analytics.js?v=20261024-3"></script>
 </body>
 </html>

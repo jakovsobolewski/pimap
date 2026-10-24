@@ -66,16 +66,16 @@
 
   /* Category chips (Google-Maps style). Shelters first. */
   const CATS = [
-    { id: 'shelter',  label: 'Shelters',        color: '#0072CE', svg: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8l4 7H8z"/>' },
-    { id: 'bikeroutes', label: 'Bike routes',    color: '#1B8E3E', svg: '<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 18h6a4 4 0 000-8h-2a3 3 0 010-6h6"/>' },
-    { id: 'bikepark', label: 'Bike parking',    color: '#0B7A75', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 17V8h3.2a2.6 2.6 0 010 5.2H10"/>' },
-    { id: 'bikecharge', label: 'Bike charging', color: '#E8A700', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M13 7l-4 6h3l-1 4 4-6h-3z"/>' },
-    { id: 'bikerepair', label: 'Bike repair',   color: '#5E35B1', svg: '<path d="M14.7 6.3a4 4 0 00-5 5L4 17l3 3 5.7-5.7a4 4 0 005-5L15 12l-3-3z"/>' },
+    { id: 'shelter',  label: 'Shelters',        color: '#154290', svg: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8l4 7H8z"/>' },
+    { id: 'bikeroutes', label: 'Bike routes',    color: '#5B8C4C', svg: '<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 18h6a4 4 0 000-8h-2a3 3 0 010-6h6"/>' },
+    { id: 'bikepark', label: 'Bike parking',    color: '#154290', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 17V8h3.2a2.6 2.6 0 010 5.2H10"/>' },
+    { id: 'bikecharge', label: 'Bike charging', color: '#2B2B2B', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M13 7l-4 6h3l-1 4 4-6h-3z"/>' },
+    { id: 'bikerepair', label: 'Bike repair',   color: '#434343', svg: '<path d="M14.7 6.3a4 4 0 00-5 5L4 17l3 3 5.7-5.7a4 4 0 005-5L15 12l-3-3z"/>' },
     { id: 'reports',  label: 'Fallen trees',    color: '#6D4C41', svg: REPORT_TYPES.fallen_tree.svg },
     { id: 'hospital', label: 'Hospitals',       color: '#D2232A', svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/>' },
     { id: 'pharmacy', label: 'Pharmacies',      color: '#1E8E3E', svg: '<path d="M10.5 20.5l10-10a4.95 4.95 0 10-7-7l-10 10a4.95 4.95 0 107 7z"/><path d="M8.5 8.5l7 7"/>' },
     { id: 'cool',     label: 'Cool places',     color: '#0A93B8', svg: '<path d="M12 2v20M4.9 6l14.2 12M4.9 18L19.1 6"/><path d="M9 3l3 2 3-2M9 21l3-2 3 2"/>' },
-    { id: 'water',    label: 'Drinking water',  color: '#1A73E8', svg: '<path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/>' },
+    { id: 'water',    label: 'Drinking water',  color: '#154290', svg: '<path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/>' },
     { id: 'grocery',  label: 'Groceries',       color: '#7A4FD6', svg: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.5 11h11l2-8H6.5"/>' },
     { id: 'police',   label: 'Police',          color: '#23408E', svg: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>' },
     { id: 'rescue',   label: 'Rescue stations', color: '#E4572E', svg: '<path d="M12 3c2 3 5 5 5 9a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-8z"/>' },
@@ -580,7 +580,7 @@
     }
 
     const showGeo = em && S.mandate === 'active' && (gov || (inDir && U.mode === 'bike'));
-    if (showGeo) SHELTERS.forEach(s => L.circle([s.lat, s.lng], { radius: S.radius, color: '#0072CE', weight: 1, fillColor: '#0072CE', fillOpacity: 0.05, interactive: false }).addTo(layers.geofences));
+    if (showGeo) SHELTERS.forEach(s => L.circle([s.lat, s.lng], { radius: S.radius, color: '#154290', weight: 1, fillColor: '#154290', fillOpacity: 0.05, interactive: false }).addTo(layers.geofences));
 
     const shelterCat = catById('shelter');
     if (gov || em || U.cat === 'shelter' || (U.dest && U.dest.kind === 'shelter')) SHELTERS.forEach(s => {
@@ -642,7 +642,7 @@
   /* Cycle paths and lanes: drawn once on a canvas below the route, shown on the Bike routes chip and in bike directions */
   map.createPane('bikes').style.zIndex = 380;
   const bikeRenderer = L.canvas({ pane: 'bikes', padding: 0.4 });
-  const BIKE_STYLE = { lane: { color: '#4C9BE8', weight: 3, opacity: 0.95, dashArray: '2 5' }, track: { color: '#2E9E5B', weight: 3.5, opacity: 0.95 }, path: { color: '#1B8E3E', weight: 4, opacity: 0.95 } };
+  const BIKE_STYLE = { lane: { color: '#154290', weight: 3, opacity: 0.9, dashArray: '2 5' }, track: { color: '#86AE77', weight: 3.5, opacity: 0.95 }, path: { color: '#5B8C4C', weight: 4, opacity: 0.95 } };
   let bikeLayer = null, bikeBuilt = 0;
   function syncBikeLayer() {
     const B = LKP.BIKE, want = !!(B && B.ways.length && U.portal === 'citizen' && (U.cat === 'bikeroutes' || (U.cview === 'directions' && U.mode === 'bike' && !proto())));
@@ -671,13 +671,13 @@
     const tg = target().s, u = S.user, profile = MODE_PROFILE[U.mode];
     const modeKey = { walk: 'walk', bike: 'bike', drive: 'drive', pickup: 'drive' }[U.mode];
     U.routeInfo = { loading: true }; renderCitizen();
-    const base = { color: '#0072CE', weight: 6, opacity: 0.95 }, dashed = { color: '#5F6368', weight: 4, dashArray: '2 9', opacity: 0.95, lineCap: 'round' };
+    const base = { color: '#154290', weight: 6, opacity: 0.95 }, dashed = { color: '#5F6368', weight: 4, dashArray: '2 9', opacity: 0.95, lineCap: 'round' };
     const drawn = [];
     const draw = (coords, st) => { if (token === routeToken) { L.polyline(coords, Object.assign({ lineCap: 'round', lineJoin: 'round' }, st)).addTo(layers.route); drawn.push(coords); } };
     const drawSmart = res => {
       const pr = proto() && PROTOCOLS[proto()];
       if (res.segs && pr) {
-        const colors = pr.routing === 'shade' ? { 1: '#1B7F3B', 0: '#F28C00' } : { 1: '#D2232A', 0: '#0072CE' };
+        const colors = pr.routing === 'shade' ? { 1: '#1B7F3B', 0: '#F28C00' } : { 1: '#D2232A', 0: '#154290' };
         L.polyline(res.route.coords, { color: '#fff', weight: 10, opacity: 0.9, lineCap: 'round' }).addTo(layers.route);
         res.segs.forEach(sg => draw(sg.coords, { color: colors[sg.cls], weight: 6, opacity: 0.95 }));
       } else {
@@ -1029,7 +1029,7 @@
     return phead(`${c.label} near you`, null, `${items.length} closest`) + `<div class="plist">${items.map(({ p, d }) => placeRow(p, d)).join('') || '<div class="empty">Nothing found nearby.</div>'}</div><p class="src">${src}</p>`;
   }
   /* ---------- cycling ---------- */
-  const BIKE_CLASSES = [['path', 'Cycle path', '#1B8E3E', 'Separate from the road'], ['track', 'Protected track', '#2E9E5B', 'Beside the road, kerb or barrier'], ['lane', 'Painted lane', '#4C9BE8', 'Marked on the road']];
+  const BIKE_CLASSES = [['path', 'Cycle path', '#5B8C4C', 'Separate from the road'], ['track', 'Protected track', '#86AE77', 'Beside the road, kerb or barrier'], ['lane', 'Painted lane', '#154290', 'Marked on the road']];
   const bikeData = () => LKP.BIKE || { status: 'loading', points: [], ways: [] };
   function bikeNote() {
     const st = bikeData().status;
@@ -1304,7 +1304,7 @@
   function rideConditions() {
     const w = WX.data; if (!w) return null;
     const advice = w.t <= 0 ? 'Freezing: watch for ice' : w.rain >= 0.2 ? 'Wet roads' : w.gust >= 14 ? 'Strong wind' : 'Good to ride';
-    return { tone: advice === 'Good to ride' ? '#1B8E3E' : '#E8A700', text: [`${w.t}°C`, `wind ${w.wind} m/s`, advice].join(' · ') };
+    return { tone: advice === 'Good to ride' ? '#5B8C4C' : '#F8C704', text: [`${w.t}°C`, `wind ${w.wind} m/s`, advice].join(' · ') };
   }
   function rideBlock() {
     loadWeather();
