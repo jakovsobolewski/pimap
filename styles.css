@@ -795,3 +795,44 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
 /* Charging is an ink disc with a yellow bolt, wherever its colour token appears (chips, list icons, map markers) */
 [style*="--c:#2B2B2B"] svg, .chip[style*="--c:#2B2B2B"] svg { stroke: var(--bolt); }
 .mk-poi > span[style*="--c:#2B2B2B"] { border-color: var(--bolt); }
+
+/* ---------- Pinge concrete ----------
+   The brandbook's surface: light concrete with white cards on it, ink type and the yellow bolt for the main action. */
+:root { --concrete: #DADAD8 url(concrete-bg.jpg?v=1) center / 1200px auto; --concrete-phone: #DADAD8 url(concrete-bg-phone.jpg?v=1) center top / 750px auto; --card-shadow: 0 1px 2px rgba(34,34,34,.08), 0 6px 18px rgba(34,34,34,.10); }
+.topbar { background: var(--concrete); border-bottom: 0; box-shadow: 0 1px 0 rgba(34,34,34,.08); }
+.home-card { background: var(--concrete); }
+.home-card .hc-group { background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
+.home-card .hc-title { color: var(--ink); }
+.home-card .hc-cond { background: #fff; border-left: 0; border-radius: 16px; box-shadow: var(--card-shadow); }
+@media (max-width: 860px) {
+  .c-top, .home-card, .cpanel, body.has-alert .cpanel { background: var(--concrete-phone); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .c-top { box-shadow: 0 -1px 0 rgba(34,34,34,.06), 0 -8px 24px rgba(34,34,34,.18); }
+  .sheet-grab span { background: rgba(34,34,34,.35); }
+  .searchbar { background: #fff; box-shadow: var(--card-shadow); }
+  .sb-avatar { background: #fff; box-shadow: var(--card-shadow); }
+  .chip svg { background: #fff; stroke: var(--ink); box-shadow: var(--card-shadow); }
+  .chip[style*="--c:#2B2B2B"] svg { stroke: var(--ink); }
+  .chip.active svg { background: var(--bolt); }
+  .chip.active span { color: var(--ink); font-weight: 700; }
+  .hc-title { font-size: 1.5rem; letter-spacing: -.03em; }
+  .hc-group { box-shadow: var(--card-shadow); border-radius: 18px; }
+  .hc-cond { box-shadow: var(--card-shadow); border-radius: 18px; }
+  .home-card .btn-y.btn-full { border-radius: 18px; box-shadow: 0 6px 16px rgba(34,34,34,.25); }
+  .cpanel .prow { background: #fff; border-bottom: 0; border-radius: 0; padding-left: 12px; padding-right: 12px; }
+  .cpanel .plist { background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); overflow: hidden; }
+  .cpanel .plist .prow + .prow { box-shadow: inset 0 1px 0 var(--sep); }
+  .cpanel .phead { background: var(--concrete-phone); border-bottom: 0; margin-left: -16px; margin-right: -16px; padding-left: 12px; padding-right: 12px; }
+  .wx-chip:not([hidden]), .map-ctrls { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: var(--card-shadow); }
+}
+/* One sheet element carries the concrete so search, card and lists share a seamless texture.
+   On desktop it is layout-transparent and its children keep their own positions. */
+.sheet { display: contents; }
+.sheet > #homeCard, .sheet > .cpanel { pointer-events: auto; }
+@media (max-width: 860px) {
+  .sheet { display: flex; flex-direction: column; pointer-events: auto; background: var(--concrete-phone); border-radius: 22px 22px 0 0; box-shadow: 0 -8px 24px rgba(34,34,34,.18); overflow: hidden; }
+  .sheet > .c-top, .sheet .home-card, .sheet > .cpanel, body.has-alert .sheet > .cpanel { background: transparent; box-shadow: none; border-radius: 0; }
+  .sheet .cpanel .phead { background: var(--concrete-phone); background-attachment: local; }
+  body[data-cview="place"] .sheet > .cpanel, body[data-cview="directions"] .sheet > .cpanel, body[data-cview="menu"] .sheet > .cpanel, body[data-cview="settings"] .sheet > .cpanel,
+  body[data-cview="lend"] .sheet > .cpanel, body[data-cview="contribute"] .sheet > .cpanel, body[data-cview="report"] .sheet > .cpanel, body[data-cview="ready"] .sheet > .cpanel { box-shadow: none; border-radius: 0; }
+  body[data-cview="map"].has-alert .sheet { border-radius: 22px 22px 0 0; }
+}
