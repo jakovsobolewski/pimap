@@ -528,6 +528,10 @@ body.ob-open { overflow: hidden; }
 .mu-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
 .ob-hint.left { text-align: left; }
 body.role-citizen .portals { display: none !important; }
+/* No portal switcher: the municipality portal only offers a way back to the map */
+.portals { display: none; }
+body[data-portal="gov"]:not(.role-citizen) .portals { display: flex; }
+.portal-tab.back-map { background: var(--blue); color: #fff; }
 .btn-profile { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--blue-light); background: var(--blue-pale); padding: 0; display: grid; place-items: center; flex-shrink: 0; }
 .btn-profile .pf-av { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: .86rem; }
 .btn-profile:hover { border-color: var(--blue); }
@@ -692,7 +696,9 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
 /* ---------- Phone: Apple Maps style ----------
    Full-screen map; one bottom sheet holds the search field, round category icons and the card below.
    body[data-sheet] is 'peek' (search + categories + a glimpse) or 'full'. */
-.sheet-grab, .sb-avatar, .map-ctrls, .wx-chip { display: none; }
+.sheet-grab, .sb-avatar, .map-ctrls, .wx-chip, .plus-btn { display: none; }
+.cpanel p.loading { color: var(--grey); font-size: .84rem; margin: 8px 2px; }
+.cpanel p.loading::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 8px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -1px; }
 @media (max-width: 860px) {
   :root { --sheet-bg: rgba(248, 249, 251, .94); --fill: rgba(118, 118, 128, .12); --sep: rgba(60, 60, 67, .14); --label2: #6B6E76; }
   body[data-portal="citizen"] .topbar { display: none; }
@@ -719,18 +725,19 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
 
   /* categories as round icons with a label underneath */
   .c-top > * { min-width: 0; }
+  body[data-cview="search"] .chips-wrap { display: none; }
   .chips-wrap { grid-column: 1 / -1; }
-  .chips { gap: 4px; padding: 2px 0 2px; margin: 0 -6px; }
-  .chip { flex-direction: column; justify-content: flex-start; height: auto; width: 70px; padding: 2px 0; gap: 5px; background: transparent; box-shadow: none; border-radius: 12px; font-size: .7rem; font-weight: 600; line-height: 1.2; white-space: normal; text-align: center; color: var(--text); }
+  .chips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px 2px; overflow: visible; padding: 2px 0 4px; margin: 0 -4px; }
+  .chip { flex-direction: column; justify-content: flex-start; height: auto; width: auto; min-width: 0; padding: 2px 0; gap: 5px; background: transparent; box-shadow: none; border-radius: 12px; font-size: .7rem; font-weight: 600; line-height: 1.2; white-space: normal; text-align: center; color: var(--text); }
   .chip:hover { background: transparent; }
-  .chip svg { width: 50px; height: 50px; padding: 13px; border-radius: 50%; background: var(--c); stroke: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+  .chip svg { width: 48px; height: 48px; padding: 13px; flex-shrink: 0; border-radius: 50%; background: var(--c); stroke: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
   .chip.active { background: transparent; color: var(--text); }
   .chip.active svg { box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px var(--c); }
   .chip span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   /* card under the search: grouped lists like iOS settings */
   .home-card { position: static; width: auto; border-radius: 0; box-shadow: none; background: var(--sheet-bg); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
-    padding: 4px 16px calc(14px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; max-height: 58vh; max-height: 58dvh; transition: max-height .28s var(--ease), padding .28s var(--ease); }
+    padding: 4px 16px calc(14px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; max-height: 50vh; max-height: 50dvh; transition: max-height .28s var(--ease), padding .28s var(--ease); }
   body[data-sheet="peek"] .home-card { max-height: 0; padding-top: 0; padding-bottom: 0; overflow: hidden; }
   .hc-title { font-size: 1.18rem; font-weight: 700; color: var(--ink); text-transform: none; letter-spacing: -.01em; padding: 10px 2px 8px; }
   .hc-group { background: #fff; border-radius: 12px; overflow: hidden; }
@@ -752,20 +759,26 @@ path.hz-flood { animation: flood-pulse 3s ease-in-out infinite; }
   body[data-cview="lend"] .c-top, body[data-cview="contribute"] .c-top, body[data-cview="report"] .c-top, body[data-cview="ready"] .c-top { display: none; }
   body[data-cview="place"] .cpanel, body[data-cview="directions"] .cpanel, body[data-cview="menu"] .cpanel, body[data-cview="settings"] .cpanel,
   body[data-cview="lend"] .cpanel, body[data-cview="contribute"] .cpanel, body[data-cview="report"] .cpanel, body[data-cview="ready"] .cpanel { border-radius: 22px 22px 0 0; box-shadow: 0 -2px 18px rgba(0,0,0,.14); padding-top: 14px; }
-  body[data-sheet="peek"][data-cview="list"] .cpanel, body[data-sheet="peek"][data-cview="whereto"] .cpanel { max-height: 34vh; max-height: 34dvh; }
+  body[data-cview="list"] .cpanel, body[data-cview="search"] .cpanel, body[data-cview="whereto"] .cpanel { max-height: 42vh; max-height: 42dvh; }
+  body[data-sheet="peek"][data-cview="list"] .cpanel, body[data-sheet="peek"][data-cview="whereto"] .cpanel { max-height: 30vh; max-height: 30dvh; }
 
   /* floating weather and map buttons */
   .wx-chip:not([hidden]) { display: inline-flex; position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: max(14px, env(safe-area-inset-left, 0px)); align-items: center; gap: 5px;
     background: var(--sheet-bg); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-radius: 12px; padding: 7px 11px; box-shadow: 0 1px 6px rgba(0,0,0,.16); font-size: 1.05rem; }
   .wx-chip svg { width: 22px; height: 22px; fill: none; stroke: var(--text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .map-ctrls { display: flex; flex-direction: column; position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: max(14px, env(safe-area-inset-right, 0px));
+  .plus-btn { display: grid; place-items: center; position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: max(14px, env(safe-area-inset-right, 0px));
+    width: 60px; height: 60px; border-radius: 50%; border: 0; background: var(--blue); box-shadow: 0 4px 14px rgba(0,60,120,.35); }
+  .plus-btn svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; }
+  .plus-btn:active { transform: scale(.94); }
+  body[data-cview="contribute"] .plus-btn { display: none; }
+  .map-ctrls { display: flex; flex-direction: column; position: absolute; top: calc(env(safe-area-inset-top, 0px) + 84px); right: max(20px, env(safe-area-inset-right, 0px));
     background: var(--sheet-bg); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.16); overflow: hidden; }
   .map-ctrls button { width: 46px; height: 46px; border: 0; background: transparent; display: grid; place-items: center; }
   .map-ctrls button + button { border-top: 1px solid var(--sep); }
   .map-ctrls svg { width: 21px; height: 21px; fill: none; stroke: var(--blue); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .alert-banner { top: calc(env(safe-area-inset-top, 0px) + 66px); left: 14px; right: 14px; width: auto; }
-  .fab { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 170px); left: auto; right: 14px; transform: none; }
-  body[data-portal="citizen"] .leaflet-bottom.leaflet-right { top: calc(env(safe-area-inset-top, 0px) + 160px); bottom: auto; }
+  .alert-banner { top: calc(env(safe-area-inset-top, 0px) + 84px); left: 14px; right: 74px; width: auto; }
+  .fab { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 200px); left: auto; right: 14px; transform: none; }
+  body[data-portal="citizen"] .leaflet-bottom.leaflet-right { top: calc(env(safe-area-inset-top, 0px) + 12px); bottom: auto; right: 84px; }
   body[data-portal="citizen"] .leaflet-control-attribution { font-size: 9px; line-height: 1.3; border-radius: 6px 0 0 6px; max-width: 58vw; text-align: right; }
 }
 @media (max-width: 860px) and (prefers-reduced-motion: reduce) { .home-card { transition: none; } }

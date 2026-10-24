@@ -2271,6 +2271,9 @@ Handlebar holder|Rooli hoidik|Ohjaustangon pidike|Soporte de manillar|Трима
 Wide stands|Laiad rattahoidjad|Leveät telineet|Soportes anchos|Широкі стійки|Широкие стойки
 Bollard|Postik|Pollari|Bolardo|Стовпчик|Столбик
 Ground slots|Maapilud|Maaurat|Ranuras en el suelo|Пази в землі|Пазы в земле
+Back to map|Tagasi kaardile|Takaisin karttaan|Volver al mapa|Назад до мапи|Назад к карте
+Type a place or an address, like Telliskivi 60.|Sisesta koht või aadress, näiteks Telliskivi 60.|Kirjoita paikka tai osoite, esimerkiksi Telliskivi 60.|Escribe un lugar o una dirección, como Telliskivi 60.|Введіть місце або адресу, наприклад Telliskivi 60.|Введите место или адрес, например Telliskivi 60.
+No places or addresses found in Tallinn.|Tallinnas ei leitud kohti ega aadresse.|Tallinnasta ei löytynyt paikkoja tai osoitteita.|No se encontraron lugares ni direcciones en Tallin.|У Таллінні не знайдено місць чи адрес.|В Таллинне не найдено мест или адресов.
 Ride|Sõit|Pyöräily|Pedalear|Поїздка|Поездка
 Ride conditions|Sõidutingimused|Ajo-olosuhteet|Condiciones para rodar|Умови для поїздки|Условия для поездки
 Good to ride|Hea sõita|Hyvä pyöräillä|Buen tiempo para rodar|Добре їхати|Хорошо ехать

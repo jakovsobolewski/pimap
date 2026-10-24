@@ -83,6 +83,9 @@
     { id: 'works',    label: 'Construction',    color: '#F28C00', svg: '<path d="M3 20h18M6 20l4-14h4l4 14M8 13h8"/>' },
   ];
   const isBike = c => /^bike/.test(c || '');
+  /* Shelters, rescue, construction, community posts and heatwave cool places are city / emergency info: shown only during an alert */
+  const ALERT_ONLY = ['shelter', 'rescue', 'cool', 'works', 'community'];
+  const catShown = id => !!S.emergency || !ALERT_ONLY.includes(id);
   const BIKE_MARKER_CATS = ['bikepark', 'bikecharge', 'bikerepair'];
   const ADDRESS_CAT = { id: 'address', label: 'Address', color: '#5F6368', svg: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>' };
   const catById = id => CATS.find(c => c.id === id) || (id === 'contrib-issue' ? { id, label: 'Issue', color: CONTRIB.issue.color, svg: CONTRIB.issue.svg } : id === 'contrib-idea' ? { id, label: 'Idea', color: CONTRIB.idea.color, svg: CONTRIB.idea.svg } : ADDRESS_CAT);
@@ -558,6 +561,7 @@
 
     S.works.forEach(w => {
       const st = workStatus(w); if (st === 'finished') return;
+      if (!gov && !em && U.cat !== 'works' && !(U.dest && U.dest.kind === 'work') && !(inDir && (U.conflicts || []).includes(w.id))) return;
       const color = st === 'active' ? '#F28C00' : '#9AA5B1', z = workZone(w);
       const html = `<b>${esc(w.name)}</b><span class="muted">${WORK_TYPES[w.type] || w.type} · ${fmtDate(w.start)} – ${fmtDate(w.end)} · ${st}${z.coords ? ` · ${Math.round(lineLen(z.coords))} m of street` : ''}</span>${esc(w.note)}<div class="pop-actions"><button class="btn btn-outline btn-sm" data-action="edit-work" data-id="${w.id}" type="button">Edit</button><button class="btn btn-grey btn-sm" data-action="extend-work" data-id="${w.id}" type="button">+7 days</button></div>`;
       const bind = l => { if (gov) l.bindPopup(html); else l.on('click', () => openPlace('work', w.id)); return l; };
@@ -579,7 +583,7 @@
     if (showGeo) SHELTERS.forEach(s => L.circle([s.lat, s.lng], { radius: S.radius, color: '#0072CE', weight: 1, fillColor: '#0072CE', fillOpacity: 0.05, interactive: false }).addTo(layers.geofences));
 
     const shelterCat = catById('shelter');
-    SHELTERS.forEach(s => {
+    if (gov || em || U.cat === 'shelter' || (U.dest && U.dest.kind === 'shelter')) SHELTERS.forEach(s => {
       const isT = !gov && tg.s.kind === 'shelter' && tg.s.id === s.id && (U.cview === 'directions' || U.cview === 'place');
       const m = L.marker([s.lat, s.lng], { icon: icon('mk-poi mk-shelter-poi' + (isT ? ' target' : ''), `<span style="--c:${shelterCat.color}">${svgOf(shelterCat)}</span>`, isT ? 32 : 26), zIndexOffset: isT ? 800 : 200 });
       if (gov) m.bindPopup(`<b>${esc(s.name)}</b><span class="muted">Public shelter · ${esc(s.district)}</span>${esc(s.address)}`);
@@ -926,9 +930,9 @@
   function localSearch(q) {
     q = q.trim().toLowerCase(); if (q.length < 2) return [];
     const hit = s => (s || '').toLowerCase().includes(q), out = [];
-    SHELTERS.forEach(s => { if (hit(s.name) || hit(s.address) || hit(s.district)) out.push(placeOf('shelter', s.id)); });
-    S.works.forEach(w => { if (workStatus(w) !== 'finished' && (hit(w.name) || hit(w.note))) out.push(placeOf('work', w.id)); });
-    POIS.forEach(p => { if (!isBike(p.cat) && (hit(p.name) || hit(p.address))) out.push(placeOf('poi', p.id)); });
+    if (S.emergency) SHELTERS.forEach(s => { if (hit(s.name) || hit(s.address) || hit(s.district)) out.push(placeOf('shelter', s.id)); });
+    if (S.emergency) S.works.forEach(w => { if (workStatus(w) !== 'finished' && (hit(w.name) || hit(w.note))) out.push(placeOf('work', w.id)); });
+    POIS.forEach(p => { if (!isBike(p.cat) && catShown(p.cat) && (hit(p.name) || hit(p.address))) out.push(placeOf('poi', p.id)); });
     return out.map(p => ({ p, d: dist(S.user, p) })).sort((a, b) => a.d - b.d).slice(0, 8);
   }
   let geoToken = 0;
@@ -937,12 +941,18 @@
     if (!navigator.onLine || q.trim().length < 3) return;
     U.searching = true; renderCitizen();
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&bounded=1&viewbox=24.50,59.52,24.96,59.35&accept-language=et,en&q=${encodeURIComponent(q)}`;
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&bounded=1&viewbox=24.50,59.52,24.96,59.35&countrycodes=ee&accept-language=et,en&q=${encodeURIComponent(q)}`;
       const j = await fetch(url).then(r => r.json());
       if (token !== geoToken) return;
-      U.searchResults = j.map(x => ({ kind: 'search', id: 'n' + x.place_id, cat: 'address', name: x.name || x.display_name.split(',')[0], address: x.display_name.split(',').slice(1, 4).join(',').trim(), lat: +x.lat, lng: +x.lon }));
-    } catch (e) { U.searchResults = []; }
-    U.searching = false; saveUI(); renderCitizen();
+      const seen = new Set();
+      U.searchResults = (Array.isArray(j) ? j : []).map(x => {
+        const a = x.address || {}, street = [a.road || a.pedestrian || a.footway || a.cycleway, a.house_number].filter(Boolean).join(' ');
+        const name = x.name && x.name !== a.house_number ? x.name : street || x.display_name.split(',')[0];
+        const area = [x.name && street !== name ? street : '', a.suburb || a.quarter || a.neighbourhood, a.city_district, a.postcode].filter(Boolean).join(', ');
+        return { kind: 'search', id: 'n' + x.place_id, cat: 'address', name, address: area || x.display_name.split(',').slice(1, 3).join(',').trim(), lat: +x.lat, lng: +x.lon };
+      }).filter(r => { const k = r.name + '|' + r.address; if (seen.has(k)) return false; seen.add(k); return true; });
+    } catch (e) { if (token !== geoToken) return; U.searchResults = []; }
+    U.searching = false; saveUI(); if (U.cview === 'search') renderCitizen();
   }
 
   /* ---------------- rendering ---------------- */
@@ -953,7 +963,7 @@
     if (em) { pill.className = 'pill pill-alert'; pill.textContent = `${PROTOCOLS[em.type || 'airstrike'].label} · ${em.district} · until ${timeStr(em.endsAt)}`; } else { pill.className = 'pill'; pill.textContent = 'No alert'; }
     const net = $('#netPill'); net.textContent = 'Offline · cached'; net.hidden = navigator.onLine;
     const cb = $('#contributeBtn'); if (cb) { const n = S.contribs.filter(c => c.status === 'new').length + S.reports.filter(r => r.status === 'reported' && !r.example).length; cb.classList.toggle('active', (U.portal === 'citizen' && U.cview === 'contribute') || (U.portal === 'gov' && U.govTab === 'contrib')); cb.querySelector('.cb-n').textContent = U.portal === 'gov' && n ? n : ''; }
-    document.querySelectorAll('.portal-tab').forEach(t => { const on = t.dataset.portal === U.portal; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
+
     $('#app').className = 'portal-' + U.portal;
     document.body.dataset.portal = U.portal;
     document.title = (U.portal === 'gov' ? 'Municipality portal' : 'Citizen portal') + ' · PiMap';
@@ -1053,12 +1063,12 @@
   }
   function searchPanel() {
     const q = U.query.trim(), ql = q.toLowerCase();
-    const cats = q ? CATS.filter(c => c.label.toLowerCase().includes(ql)) : [];
+    const cats = q ? CATS.filter(c => catShown(c.id) && c.label.toLowerCase().includes(ql)) : [];
     const local = localSearch(q), remote = (U.searchResults || []).map(p => ({ p, d: dist(S.user, p) }));
     const rows = cats.map(c => `<button class="prow" data-action="cat" data-cat="${c.id}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>${c.label}</b><span>Show on map</span></span></button>`).join('')
       + local.map(({ p, d }) => placeRow(p, d)).join('')
       + (remote.length ? `<div class="plabel">Addresses</div>${remote.map(({ p, d }) => placeRow(p, d)).join('')}` : '');
-    return `<div class="plist">${rows || `<div class="empty">${U.searching ? 'Searching addresses…' : q.length < 2 ? 'Type a place, shelter or address.' : 'No places found. Press Enter to search addresses.'}</div>`}</div>${!remote.length && q.length >= 3 && !U.searching ? '<button class="linkbtn" data-action="search-go" type="button">Search addresses in Tallinn</button>' : ''}`;
+    return `<div class="plist">${rows || `<div class="empty">${U.searching ? 'Searching addresses…' : q.length < 3 ? 'Type a place or an address, like Telliskivi 60.' : 'No places or addresses found in Tallinn.'}</div>`}</div>${U.searching && rows ? '<p class="loading">Searching addresses…</p>' : ''}`;
   }
   function placePanel() {
     const p = U.dest && placeOf(U.dest.kind, U.dest.id); if (!p) return '';
@@ -1073,7 +1083,7 @@
     if (p.kind === 'contrib') return phead(p.contrib.kind === 'idea' ? 'Idea' : 'Issue', U.cat === 'community' ? 'list' : 'contribute') + contribDetail(p);
     if (p.kind === 'report') return phead('Storm report', back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away</p>${extra}</div>`;
     return phead(c.label, back) + `<div class="place"><h3>${esc(p.name)}</h3><p class="addr">${esc(p.address)}</p><p class="muted">${fmtDist(d)} away · ${isBike(p.cat) ? rideMin(d, 'bicycle') + ' min by bike' : walkMin(d) + ' min walk'}</p>
-      <div class="row">${p.kind !== 'work' ? `<button class="btn-y" data-action="directions" type="button">${IC.dir} Directions</button>` : ''}${p.kind !== 'shelter' && !isBike(p.cat) ? `<button class="btn-y-outline" data-action="directions" data-nearest="1" type="button">Nearest ${S.emergency ? P().destLabel : 'shelter'}</button>` : ''}</div>${extra}</div>`;
+      <div class="row">${p.kind !== 'work' ? `<button class="btn-y" data-action="directions" type="button">${IC.dir} Directions</button>` : ''}${p.kind !== 'shelter' && !isBike(p.cat) && S.emergency ? `<button class="btn-y-outline" data-action="directions" data-nearest="1" type="button">Nearest ${S.emergency ? P().destLabel : 'shelter'}</button>` : ''}</div>${extra}</div>`;
   }
   function protoBox() {
     const t = proto(); if (!t) return '';
@@ -1269,7 +1279,7 @@
   }
   function wheretoPanel() {
     const picks = [['pharmacy', 'pharmacy'], ['grocery', 'grocery store'], ['hospital', 'hospital'], ['shelter', 'public shelter'], ['water', 'drinking water'], ['cool', 'library or shopping centre'], ['bikepark', 'bike parking'], ['bikecharge', 'bike charging station']]
-      .map(([cat, noun]) => { const n = nearby(cat, 1)[0]; return n && { cat, noun, p: n.p, d: n.d }; }).filter(Boolean);
+      .filter(([cat]) => catShown(cat)).map(([cat, noun]) => { const n = nearby(cat, 1)[0]; return n && { cat, noun, p: n.p, d: n.d }; }).filter(Boolean);
     return phead('Where to?', null, 'Search above, or pick one of these') + `<div class="plist">${picks.map(q => { const c = catById(q.cat); return `<button class="prow" data-action="go" data-kind="${q.p.kind}" data-id="${esc(q.p.id)}" type="button"><span class="picon" style="--c:${c.color}">${svgOf(c)}</span><span class="ptext"><b>Nearest ${q.noun}</b><span>${esc(q.p.name)}</span></span><span class="pdist">${fmtDist(q.d)}<small>${walkMin(q.d)} min walk</small></span></button>`; }).join('')}</div>`;
   }
   function readyPanel() {
@@ -1309,23 +1319,11 @@
       ${row('bikepark', 'Bike parking', near('bikepark'))}
       ${row('bikecharge', 'Bike charging', near('bikecharge'))}
       ${row('bikerepair', 'Bike repair', near('bikerepair'))}
-      </div>
-      <div class="hc-title" style="margin-top:10px">Around you</div>`;
+      </div>`;
   }
   function homeCard() {
     if (S.emergency || U.cview !== 'map' || U.portal !== 'citizen') return '';
-    const wd2 = w => zoneDist(S.user, workZone(w)), act = S.works.filter(w => workStatus(w) === 'active' && wd2(w) <= 2000).sort((a, b) => wd2(a) - wd2(b));
-    const sh = nearby('shelter', 1)[0], reps = reportsShown();
-    return `<div class="home-card" role="region" aria-label="Around you">
-      ${rideBlock()}
-      <div class="hc-group">
-      <button class="hc-row" data-action="cat" data-cat="works" type="button"><span class="picon" style="--c:#F28C00">${svgOf(catById('works'))}</span><span class="ptext"><b>${act.length ? `${act.length} construction site${act.length > 1 ? 's' : ''} within 2 km` : 'No construction within 2 km'}</b><span>${act.length ? `${esc(act[0].name)} · until ${fmtDate(act[0].end)}` : 'Tap to see works across Tallinn'}</span></span></button>
-      ${reps.length ? `<button class="hc-row" data-action="cat" data-cat="reports" type="button"><span class="picon" style="--c:#6D4C41">${svgOf(REPORT_TYPES.fallen_tree)}</span><span class="ptext"><b>${reps.length} hazard report${reps.length > 1 ? 's' : ''}</b><span>Routes go around them until cleared</span></span></button>` : ''}
-      ${(() => { const n = S.contribs.filter(c => c.status !== 'declined' && c.status !== 'done' && dist(S.user, c) <= 1500); return `<button class="hc-row" data-action="cat" data-cat="community" type="button"><span class="picon" style="--c:#7B3FA0">${svgOf(catById('community'))}</span><span class="ptext"><b>${n.length} issues and ideas near you</b><span>Support them or add your own</span></span></button>`; })()}
-      <button class="hc-row" data-action="place" data-kind="shelter" data-id="${sh.p.id}" type="button"><span class="picon" style="--c:#0072CE">${svgOf(catById('shelter'))}</span><span class="ptext"><b>Your nearest shelter</b><span>${esc(sh.p.name)} · ${walkMin(sh.d)} min walk</span></span></button>
-      <button class="hc-row" data-action="cview" data-view="ready" type="button"><span class="picon" style="--c:#1E8E3E"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg></span><span class="ptext"><b>Be ready</b><span>Home supplies and what to do in each emergency</span></span></button>
-      </div>
-    </div>`;
+    return `<div class="home-card" role="region" aria-label="Ride">${rideBlock()}</div>`;
   }
   function syncAvatar() { const av = document.querySelector('#profileBtn .pf-av'), sav = document.querySelector('.sb-avatar .pf-av'); if (av && sav) sav.innerHTML = av.innerHTML; }
   function renderCitizen() {
@@ -1333,7 +1331,7 @@
     $('#homeCard').innerHTML = homeCard();
     const fabLbl = proto() === 'storm' ? 'Report fallen tree' : proto() === 'flood' ? 'Report flooding' : 'Report a hazard', fabT = proto() === 'storm' ? REPORT_TYPES.fallen_tree : proto() === 'flood' ? REPORT_TYPES.flooded : REPORT_TYPES.danger;
     $('#fab').innerHTML = (S.emergency && !['report', 'contribute'].includes(U.cview)) ? `<button class="fab ${proto()}" data-action="open-contribute" data-k="tree" type="button">${svgOf(fabT)}<span>${fabLbl}</span></button>` : '';
-    $('#chips').innerHTML = CATS.filter(c => c.id !== 'reports' || reportsShown().length).map(c => `<button class="chip ${U.cat === c.id ? 'active' : ''}" data-action="cat" data-cat="${c.id}" type="button" role="tab" aria-selected="${U.cat === c.id}" style="--c:${c.color}">${svgOf(c)}<span>${c.label}</span></button>`).join('');
+    $('#chips').innerHTML = CATS.filter(c => catShown(c.id) && (c.id !== 'reports' || reportsShown().length)).map(c => `<button class="chip ${U.cat === c.id ? 'active' : ''}" data-action="cat" data-cat="${c.id}" type="button" role="tab" aria-selected="${U.cat === c.id}" style="--c:${c.color}">${svgOf(c)}<span>${c.label}</span></button>`).join('');
     const pr = em && PROTOCOLS[em.type || 'airstrike'];
     $('#alertBanner').innerHTML = em ? `<div class="alert-banner ${em.type}" role="alert">${PROTO_IC[em.type || 'airstrike']}<div class="ab-text"><b>EE-ALARM · ${pr.label}</b><span>${esc(em.message)}</span></div><button class="btn-alert" data-action="directions" data-nearest="1" type="button">Go to nearest ${pr.destLabel}</button></div>` : '';
     const panel = $('#cpanel');
@@ -1546,11 +1544,11 @@
   search.value = U.query || '';
   let searchTimer = null;
   search.addEventListener('input', () => {
-    U.query = search.value; U.searchResults = []; geoToken++; U.searching = false;
+    U.query = search.value; if (U.query.trim().length < 3) U.searchResults = []; geoToken++; U.searching = false;
     U.cview = U.query ? 'search' : (U.cat ? 'list' : 'map');
     renderCitizen(); saveUI();
     clearTimeout(searchTimer);
-    if (U.query.trim().length >= 3 && localSearch(U.query).length === 0) searchTimer = setTimeout(() => geocode(U.query), 700);
+    if (U.query.trim().length >= 3) searchTimer = setTimeout(() => geocode(U.query), 450);
   });
   search.addEventListener('focus', () => { if (U.query) { U.cview = 'search'; renderCitizen(); } setSheet('full'); });
   /* Phone bottom sheet (Apple Maps style): 'peek' shows search and categories, 'full' the whole card */
